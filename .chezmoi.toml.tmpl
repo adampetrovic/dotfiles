@@ -1,0 +1,21 @@
+{{/* boolean feature tags */}}
+{{- $server := false -}}
+{{- $work := false -}}
+{{- $personal := false -}}
+
+{{- if eq .chezmoi.username "apetrovic" -}}
+{{-	$work = true -}}
+{{- else -}}
+{{-	$personal = true -}}
+{{- end -}}
+
+{{- if eq .chezmoi.os "darwin" -}}
+{{- 	$server = false	-}}
+{{- else if eq .chezmoi.os "linux" -}}
+{{-	$server = true -}}
+{{- end -}}
+
+[data]
+	server = {{ $server }}
+	work = {{ $work }}
+	personal = {{ $personal }}
