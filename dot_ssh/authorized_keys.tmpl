@@ -1,5 +1,5 @@
-{{ if .work }}
-{{- range(gitHubKeys "adampetrovic") }}
-    {{ .Key }}
-{{ end }}
+{{ if .server }}
+    {{ range (gitHubKeys "adampetrovic") }}
+    {{- .Key }}
+    {{ end }}
 {{ end }}
