@@ -1,0 +1,9 @@
+#!/bin/bash
+
+PASSPHRASE="{{ (onepasswordItemFields "y6v45oav4jeh5c64ii6trm2foq").passphrase.v }}"
+ssh-keygen -y -P ${PASSPHRASE} -f $HOME/.ssh/id_rsa.personal > $HOME/.ssh/id_rsa.personal.pub
+
+{{ if .work }}
+PASSPHRASE="{{ (onepasswordItemFields "xl7jenum2jcdtbbttwtohqms3q").passphrase.v }}"
+ssh-keygen -y -P ${PASSPHRASE} -f $HOME/.ssh/id_rsa.work > $HOME/.ssh/id_rsa.work.pub
+{{ end }}

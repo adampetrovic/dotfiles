@@ -1,0 +1,28 @@
+Host nuc nuc.petrovic.network petrovic.network
+    HostName petrovic.network
+    User adam
+
+Host hass hass.petrovic.network
+    HostName hass.petrovic.network
+    User adam
+
+Host px1 px1.petrovic.network
+    HostName px1.petrovic.network
+    User adam
+
+Host nvr
+    HostName nvr-direct.petrovic.network
+    User adampetrovic
+
+Host nas
+    HostName nas-direct.petrovic.network
+    User adampetrovic
+
+# networking
+Host gateway
+    HostName 10.0.0.1
+    User adampetrovic
+
+Host cloudkey
+    HostName 10.0.0.2
+    User adampetrovic
