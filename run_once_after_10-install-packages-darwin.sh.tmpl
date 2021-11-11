@@ -1,0 +1,11 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+# id_rsa.personal hash: {{ include "dot_Brewfile.tmpl" | sha256sum }}
+
+set -eufo pipefail
+
+brew update
+brew bundle --no-lock --file=~/.Brewfile
+brew bundle cleanup --global --zap --force
+mas upgrade
+{{- end -}}

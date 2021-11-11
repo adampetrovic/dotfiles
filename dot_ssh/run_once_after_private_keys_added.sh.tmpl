@@ -1,9 +1,13 @@
 #!/bin/bash
+# id_rsa.personal hash: {{ onepasswordDocument "y6v45oav4jeh5c64ii6trm2foq" | sha256sum }}
+{{ if .work -}}
+# id_rsa.work hash: {{ onepasswordDocument "g6jq64b6vjgfjgs6s4hmucfrly" | sha256sum }}
+{{- end }}
 
 PASSPHRASE="{{ (onepasswordItemFields "y6v45oav4jeh5c64ii6trm2foq").passphrase.v }}"
 ssh-keygen -y -P ${PASSPHRASE} -f $HOME/.ssh/id_rsa.personal > $HOME/.ssh/id_rsa.personal.pub
 
 {{ if .work }}
-PASSPHRASE="{{ (onepasswordItemFields "xl7jenum2jcdtbbttwtohqms3q").passphrase.v }}"
+PASSPHRASE="{{ (onepasswordItemFields "g6jq64b6vjgfjgs6s4hmucfrly").passphrase.v }}"
 ssh-keygen -y -P ${PASSPHRASE} -f $HOME/.ssh/id_rsa.work > $HOME/.ssh/id_rsa.work.pub
 {{ end }}

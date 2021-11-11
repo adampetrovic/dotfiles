@@ -1,0 +1,96 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+{{/* base level packages for all environments */}}
+{{- $taps := list
+    "homebrew/cask"
+    "homebrew/cask-fonts"
+    "homebrew/core"
+    "homebrew/bundle"
+    "buo/cask-upgrade" -}}
+
+{{- $customTaps := dict -}}
+
+{{- $brews := list
+    "asdf"
+    "coreutils"
+    "dockutil"
+    "git"
+    "gnu-sed"
+    "grep"
+    "httpstat"
+    "httpie"
+    "mas"
+    "pipenv"
+    "sift"
+    "tldr"
+    "tmux"
+    "vim"
+    "watch"
+    "wget"
+    "zsh" -}}
+
+{{- $casks := list
+    "1password"
+    "1password-cli"
+    "alfred"
+    "bartender"
+    "cleanshot"
+    "fantastical"
+    "font-jetbrains-mono"
+    "font-fira-code"
+    "goland"
+    "google-chrome"
+    "istat-menus"
+    "iterm2"
+    "obsidian"
+    "pycharm"
+    "rectangle"
+    "spotify"
+    "telegram" -}}
+
+{{- $mas := dict
+    "Amphetamine" "937984704"
+    "Instapaper" "288545208"
+    "Reeder" "1529448980"
+    "Things3" "904280696" -}}
+
+{{/* personal-specific packages */}}
+{{- if .personal -}}
+{{-  $brews := concat $brews (list
+        "") -}}
+
+{{-  $casks := concat $casks (list
+        "") -}}
+{{- end -}}
+
+{{/* work-specific packages */}}
+{{- if .work -}}
+{{  $customTaps = merge $customTaps (dict
+    "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git"
+    "atlassian/cloudtoken" "ssh://git@bitbucket.org/atlassian/cloudtoken-homebrew-tap.git") -}}
+
+{{  $brews = concat $brews (list
+        "atlas-cli") -}}
+
+{{  $casks = concat $casks (list
+        "cloudtoken") -}}
+
+{{  $mas = merge $mas (dict
+        "Be Focused - Focus Timer" "973134470") -}}
+{{ end -}}
+
+{{ range ($taps | sortAlpha | uniq) -}}
+tap "{{ . }}"
+{{ end -}}
+{{ range $name, $url := $customTaps -}}
+tap "{{ $name }}", "{{ $url }}"
+{{ end -}}
+{{ range ($brews | sortAlpha | uniq) -}}
+brew "{{ . }}"
+{{ end -}}
+{{ range ($casks | sortAlpha | uniq) -}}
+cask "{{ . }}"
+{{ end -}}
+{{ range $app, $id := $mas -}}
+mas "{{ $app }}", id: {{ $id }}
+{{ end -}}
+{{- end -}}

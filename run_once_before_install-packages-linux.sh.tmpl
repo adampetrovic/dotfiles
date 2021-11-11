@@ -1,0 +1,30 @@
+{{ if (eq .chezmoi.os "linux") -}}
+{{ if (eq .chezmoi.osRelease.id "debian" "ubuntu") -}}
+#!/bin/bash
+
+set -eufo pipefail
+
+packages=(
+    curl
+    vim
+    tmux
+    zsh
+)
+
+sudo apt update
+sudo apt install -y ${packages[@]}
+
+{{ else if (eq .chezmoi.osRelease.id "alpine") -}}
+#!/bin/bash
+
+packages=(
+    curl
+    vim
+    tmux
+    zsh
+)
+
+sudo apk update
+sudo apk add -y ${packages[@]}
+{{ end -}}
+{{ end -}}
