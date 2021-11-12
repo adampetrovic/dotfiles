@@ -2,7 +2,7 @@ alias ls="gls --color"
 alias dns="sudo killall -hUP mDNSResponder"
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 
-{{- if .work -}}
+{{ if .work -}}
 # ssh into a dev instance. requires atlas + the atlas micros plugin to be installed
 function micros-ssh() { 
     atlas micros service ssh --service=$1 --env=$2 

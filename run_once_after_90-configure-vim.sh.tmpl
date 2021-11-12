@@ -1,0 +1,8 @@
+{{ if (eq .chezmoi.os "darwin" "linux") -}}
+#!/bin/bash
+
+set -eufo pipefail
+
+vim -c NeoBundleInstall -c qa
+vim -c GoInstallBinaries -c qa
+{{ end -}}
