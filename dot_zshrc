@@ -56,8 +56,6 @@ zplug 'plugins/terraform', from:oh-my-zsh
 
 # prezto-plugins
 zplug 'modules/osx', from:prezto
-zstyle ':prezto:module:ssh:load' identities 'id_rsa.personal' 'id_rsa.work'
-zplug 'modules/ssh', from:prezto
 
 
 # binaries / commands
