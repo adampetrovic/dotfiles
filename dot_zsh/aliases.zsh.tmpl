@@ -4,7 +4,7 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 
 function yt-stash() {
     rm -f /tmp/cookies.txt
-    yt-dlp --cookies-from-browser chrome --cookies /tmp/cookies.txt --exec "rsync -avzh --progress --remove-source-files '%(filepath)s' root@{{ (onepasswordItemFields "ciqn4r2nfvdvnnorzxblhcys5u").hostname.value -}}:/var/lib/docker/volumes/stash_stash_fs/_data" $1
+    yt-dlp --cookies-from-browser chrome --cookies /tmp/cookies.txt --exec 'rsync -avzh --progress --remove-source-files "%(filepath)s" root@{{ (onepasswordItemFields "ciqn4r2nfvdvnnorzxblhcys5u").hostname.value -}}:/var/lib/docker/volumes/stash_stash_fs/_data' $1
     curl --cookie /tmp/cookies.txt -H "Content-Type: application/json"  --data '{  "query": "mutation { metadataScan ( input: { useFileMetadata: false } ) } "}' https://{{ (onepasswordItemFields "ciqn4r2nfvdvnnorzxblhcys5u").hostname.value -}}/graphql
 }
 
