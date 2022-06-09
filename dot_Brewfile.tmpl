@@ -6,7 +6,8 @@
     "homebrew/cask-versions"
     "homebrew/core"
     "homebrew/bundle"
-    "buo/cask-upgrade" -}}
+    "buo/cask-upgrade"
+    "hpedrorodrigues/tools" -}}
 
 {{- $customTaps := dict -}}
 
@@ -14,7 +15,6 @@
     "asdf"
     "chezmoi"
     "coreutils"
-    "dockutil"
     "git"
     "gnu-sed"
     "grep"
@@ -34,11 +34,12 @@
 
 {{- $casks := list
     "1password-beta"
-    "1password-cli"
+    "1password-cli-beta"
     "alfred"
     "bartender"
     "cleanshot"
     "docker"
+    "hpedrorodrigues/tools/dockutil"
     "fantastical"
     "font-jetbrains-mono"
     "font-fira-code"
@@ -74,10 +75,15 @@
 {{- if .work -}}
 {{  $customTaps = merge $customTaps (dict
     "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git"
-    "atlassian/cloudtoken" "ssh://git@bitbucket.org/atlassian/cloudtoken-homebrew-tap.git") -}}
+    "atlassian/cloudtoken" "ssh://git@bitbucket.org/atlassian/cloudtoken-homebrew-tap.git"
+    "atlassian/kubetoken" "ssh://git@stash.atlassian.com:7997/kube/homebrew-kubetoken.git") -}}
 
 {{  $brews = concat $brews (list
-        "atlas-cli") -}}
+        "atlas-cli"
+        "kubectl"
+        "kubectx"
+        "kubetoken"
+        "minikube") -}}
 
 {{  $casks = concat $casks (list
         "cloudtoken") -}}
