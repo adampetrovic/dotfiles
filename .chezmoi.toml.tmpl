@@ -10,7 +10,7 @@
 {{- end -}}
 
 {{- if eq .chezmoi.os "darwin" -}}
-{{- 	$server = false	-}}
+{{- $server = false	-}}
 {{- else if eq .chezmoi.os "linux" -}}
 {{-	$server = true -}}
 {{- end -}}
