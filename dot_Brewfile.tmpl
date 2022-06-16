@@ -52,7 +52,6 @@
     "obsidian"
     "pycharm"
     "rectangle"
-    "slack"
     "spotify"
     "telegram" -}}
 
@@ -64,13 +63,13 @@
 
 {{/* personal-specific packages */}}
 {{- if .personal -}}
-{{-  $brews := concat $brews (list
-        "") -}}
+{{-  $brews = concat $brews (list) -}}
 
-{{-  $casks := concat $casks (list
+{{-  $casks = concat $casks (list
         "calibre"
         "handbrake") -}}
 {{- end -}}
+
 
 {{/* work-specific packages */}}
 {{- if .work -}}
@@ -87,25 +86,26 @@
         "minikube") -}}
 
 {{  $casks = concat $casks (list
-        "cloudtoken") -}}
+        "cloudtoken"
+        "slack") -}}
 
 {{  $mas = merge $mas (dict
         "Be Focused - Focus Timer" "973134470") -}}
-{{ end -}}
+{{- end -}}
 
 {{ range ($taps | sortAlpha | uniq) -}}
 tap "{{ . }}"
-{{ end -}}
+{{ end }}
 {{ range $name, $url := $customTaps -}}
 tap "{{ $name }}", "{{ $url }}"
 {{ end -}}
 {{ range ($brews | sortAlpha | uniq) -}}
 brew "{{ . }}"
-{{ end -}}
+{{ end }}
 {{ range ($casks | sortAlpha | uniq) -}}
 cask "{{ . }}"
-{{ end -}}
+{{ end }}
 {{ range $app, $id := $mas -}}
 mas "{{ $app }}", id: {{ $id }}
-{{ end -}}
+{{ end }}
 {{- end -}}
