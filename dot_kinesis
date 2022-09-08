@@ -1,0 +1,72 @@
+* =====  apetrovic keyboard layout for Kinesis Advantage2 =====
+* how to install:
+* - activate Power User Mode (PUM): [progm]+[shift]+[f1]
+* - mount the partition (in PUM): [progm]+f1
+* - copy this file overwriting the file in /Volumes/ADVANTAGE2/active/<file>.txt
+* - umount the partition: [progm]+f1
+* - exit PUM: [progm]+[shift]+[f1]
+* - Activate the layout at any time with: [progm]+[a]
+* - Enable this mapping file on keyboard boot: update `active/state.txt` and ensure `startup_file=a_qwerty.txt` is set
+* 
+* Keyboard Settings:
+*  Global Macro Playback Speed: 9 (progm + F10 + 9)
+*
+* ====================
+* thumb cluster remap
+* ====================
+
+* left thumb cluster
+[lctrl]>[lctrl]
+[lalt]>[lwin]
+[bspace]>[space]
+[delete]>[bspace]
+[home]>[home]
+[end]>[end]
+
+* right thumb cluster
+[rwin]>[ralt]
+[rctrl]>[hyper]
+[space]>[enter]
+[enter]>[delete]
+[pup]>[pup]
+[pdown]>[pdown]
+
+* ===============
+* Misc key remaps
+* ===============
+
+* swap Escape and Caps keys
+[escape]>[caps]
+[caps]>[escape]
+
+
+* =================
+* Macro Definitions
+* =================
+
+* left+s - take screenshot using Cleanshot
+{kp-s}>{-lwin}{-lshift}{4}{+lshift}{+lwin}{kptoggle}
+
+* ctrl+c - Fantastical quick entry
+{kp-c}>{-lwin}{-lshift}{c}{+lshift}{+lwin}{kptoggle}
+
+* ctrl+enter - things3 quick entry
+{lctrl}{space}>{-lctrl}{space}{+lctrl}
+
+* rectangle remapping
+* ctrl+left arrow - move window to left half
+{lctrl}{left}>{-lalt}{-lwin}{left}{+lwin}{+lalt}
+* ctrl+right arrow - move window to right half
+{lctrl}{right}>{-lalt}{-lwin}{right}{+lwin}{+lalt}
+* ctrl+up arrow - move window to upper half
+{lctrl}{up}>{-lalt}{-lwin}{up}{+lwin}{+lalt}
+* ctrl+down arrow - move window to lower half
+{lctrl}{down}>{-lalt}{-lwin}{down}{+lwin}{+lalt}
+* kp+left - move to left display
+{kp-left}>{-lctrl}{-lalt}{-lwin}{left}{+lctrl}{+lalt}{+lwin}
+* kp+right - move to right display
+{kp-right}>{-lctrl}{-lalt}{-lwin}{right}{+lctrl}{+lalt}{+lwin}
+* ctrl+f - make window full screen
+{lctrl}{f}>{-lalt}{-lwin}{f}{+lwin}{+lalt}
+* TODO mode - reorganise
+{kp-=}>{-lctrl}{-lalt}{-lwin}{=}{+lctrl}{+lwin}{+lalt}
