@@ -13,11 +13,7 @@ zplug 'spaceship-prompt/spaceship-prompt', use:spaceship.zsh, from:github, as:th
 SPACESHIP_PROMPT_ORDER=(
     user
     dir
-    git
-    aws
     venv
-    pyenv
-    terraform
     exec_time
     line_sep
     jobs
