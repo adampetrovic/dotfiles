@@ -1,6 +1,6 @@
 # init zplug
 if [[ ! -d ~/.zplug ]];then
-    git clone https://github.com/zplug/zplug ~/.zplug
+    git clone https://github.com/wwcd/zplug $HOME/.zplug
 fi
 
 if [[ -z "$ZPLUG_HOME" ]]; then
@@ -55,14 +55,12 @@ zplug 'modules/osx', from:prezto
 
 
 # binaries / commands
-zplug 'dandavison/delta', as:command, from:gh-r
-zplug 'alecthomas/chroma', as:command, from:gh-r
+zplug 'alecthomas/chroma', as:command, from:gh-r, use:"*darwin*amd64*"
 zplug 'junegunn/fzf', use:'shell/*.zsh'
-zplug 'junegunn/fzf-bin', as:command, from:gh-r, rename-to:fzf
 zplug 'go-jira/jira', as:command, from:gh-r, rename-to:jira
 zplug 'paulirish/git-open', as:plugin
 zplug 'rupa/z', use:z.sh
-zplug 'stedolan/jq', as:command, from:gh-r, rename-to:jq
+zplug 'stedolan/jq', as:command, from:gh-r, rename-to:jq, use:"*osx*"
 zplug 'wfxr/forgit'
 zplug 'denilsonsa/prettyping', as:command
 zplug 'eivindArvesen/prm', as:command, use:prm.sh, hook-load:"alias prm='source prm.sh'"
@@ -84,6 +82,7 @@ SAVEHIST=99999999           #Number of history entries to save to disk
 setopt    appendhistory     #Append history to the history file (no overwriting)
 setopt    sharehistory      #Share history across terminals
 setopt    incappendhistory  #Immediately append to the history file, not just when a term is killed
+setopt    histignorespace   #Prefix command with space for it not to show in zsh history
 
 # automatically escape characters in URL paste
 autoload -U url-quote-magic bracketed-paste-magic
@@ -99,3 +98,6 @@ source ~/.zsh/aliases.zsh
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob \!.git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export ZSH_COLORIZE_TOOL="chroma"
+
+# homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"

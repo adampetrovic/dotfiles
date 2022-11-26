@@ -1,7 +1,7 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/usr/bin/env zsh
 
-[[ ! -f $(brew --prefix asdf)/asdf.sh ]] && echo "Unable to find asdf binary. Exiting." && exit 1
+[[ ! -f $(brew --prefix asdf)/bin/asdf ]] && echo "Unable to find asdf binary. Exiting." && exit 1
 
 asdf plugin add golang > /dev/null 2>&1
 asdf plugin add python > /dev/null 2>&1

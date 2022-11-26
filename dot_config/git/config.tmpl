@@ -7,8 +7,9 @@
     email = "adam@petrovic.com.au"
 {{- end }}
 
-[url "git@github.com:"]
-    insteadOf = https://github.com/
+[url "https://github.com"]
+	insteadOf = git://github.com
+
 {{- if .work }}
 [url "ssh://git@stash.atlassian.com:7997/"]
     insteadof = https://stash.atlassian.com/scm/
