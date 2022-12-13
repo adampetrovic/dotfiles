@@ -1,6 +1,9 @@
+alias l='ls'
+{{- if (eq .chezmoi.os "darwin") }}
 alias ls="gls --color"
 alias dns="sudo killall -hUP mDNSResponder"
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+{{- end }}
 
 {{ if .work -}}
 # ssh into a dev instance. requires atlas + the atlas micros plugin to be installed
