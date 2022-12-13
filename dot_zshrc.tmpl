@@ -11,6 +11,9 @@ source $ZPLUG_HOME/init.zsh
 # theme
 zplug 'spaceship-prompt/spaceship-prompt', use:spaceship.zsh, from:github, as:theme
 SPACESHIP_PROMPT_ORDER=(
+{{- if (eq .chezmoi.os "linux") }}
+    host
+{{- end }}
     user
     dir
     venv
@@ -28,6 +31,10 @@ SPACESHIP_RPROMPT_ORDER=(
 SPACESHIP_TIME_SHOW=true
 SPACESHIP_EXIT_CODE_SHOW=true
 SPACESHIP_PROMPT_ADD_NEWLINE=false
+{{- if (eq .chezmoi.os "linux") }}
+SPACESHIP_HOST_SHOW_FULL=true
+SPACESHIP_HOST_COLOR_SSH=red
+{{- end }}
 
 zplug 'zsh-users/zsh-syntax-highlighting', defer:2
 zplug 'zsh-users/zsh-history-substring-search', defer:3
@@ -51,16 +58,19 @@ zplug 'plugins/sudo', from:oh-my-zsh
 zplug 'plugins/terraform', from:oh-my-zsh
 
 # prezto-plugins
+{{- if (eq .chezmoi.os "darwin") }}
 zplug 'modules/osx', from:prezto
+{{- end }}
 
 
 # binaries / commands
-zplug 'alecthomas/chroma', as:command, from:gh-r, use:"*darwin*amd64*"
+zplug 'alecthomas/chroma', as:command, from:gh-r
+
 zplug 'junegunn/fzf', use:'shell/*.zsh'
 zplug 'go-jira/jira', as:command, from:gh-r, rename-to:jira
 zplug 'paulirish/git-open', as:plugin
 zplug 'rupa/z', use:z.sh
-zplug 'stedolan/jq', as:command, from:gh-r, rename-to:jq, use:"*osx*"
+zplug 'stedolan/jq', as:command, from:gh-r, rename-to:jq
 zplug 'wfxr/forgit'
 zplug 'denilsonsa/prettyping', as:command
 zplug 'eivindArvesen/prm', as:command, use:prm.sh, hook-load:"alias prm='source prm.sh'"
@@ -99,5 +109,7 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --glob \!.git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export ZSH_COLORIZE_TOOL="chroma"
 
+{{- if (eq .chezmoi.os "darwin") }}
 # homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
+{{- end }}
