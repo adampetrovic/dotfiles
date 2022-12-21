@@ -225,11 +225,7 @@ dockutil --no-restart --add "/Applications/Reeder.app"
 dockutil --no-restart --add "/Applications/Slack.app"
 dockutil --no-restart --add "/Applications/Cisco/Cisco AnyConnect Secure Mobility Client.app"
 {{ end -}}
-if [ -d "/Applications/System Preferences.app" ]; then
-    dockutil --no-restart --add "/Applications/System Preferences.app"
-else
-    dockutil --no-restart --add "/System/Applications/System Preferences.app"
-fi
+dockutil --no-restart --add "/Applications/System Settings.app"
 dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
 dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
 
