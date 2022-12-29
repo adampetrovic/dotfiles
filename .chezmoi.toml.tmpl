@@ -15,7 +15,10 @@
 {{-	$server = true -}}
 {{- end -}}
 
+{{ $email := promptStringOnce . "email" "What is your email address" -}}
+
 [data]
 	server = {{ $server }}
 	work = {{ $work }}
 	personal = {{ $personal }}
+    email = {{ $email | quote }}

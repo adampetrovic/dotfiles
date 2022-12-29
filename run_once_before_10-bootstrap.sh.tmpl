@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# Install Homebrew
+command -v brew >/dev/null 2>&1 || \
+  (echo '🍺  Installing Homebrew' && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)")
+
+echo 'Installing dotfiles dependencies'
+brew bundle --no-lock --file=/dev/stdin <<EOF
+cask "1password"
+cask "1password-cli"
+EOF
+
+op account add --address my.1password.com --email "{{ .email }}"
+eval $(op signin --account my)
