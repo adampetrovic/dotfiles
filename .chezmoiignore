@@ -1,4 +1,5 @@
 iterm
+README.md
 {{ if .work -}}
 # work files
 # these files will be ignored on work machine
