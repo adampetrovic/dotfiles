@@ -4,6 +4,8 @@
 
 set -eufo pipefail
 
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 brew update
 brew bundle --no-lock --file=~/.Brewfile
 brew bundle cleanup --zap --force --file=~/.Brewfile
