@@ -83,9 +83,12 @@
 
 {{  $casks = concat $casks (list
         "cloudtoken"
-        "slack") -}}
+        "slack"
+        "zoom") -}}
 
-{{  $mas = merge $mas (dict) -}}
+{{  $mas = merge $mas (dict
+        "Wireguard" "1451685025"
+        "Parcel" "639968404") -}}
 {{- end -}}
 
 {{ range ($taps | sortAlpha | uniq) -}}

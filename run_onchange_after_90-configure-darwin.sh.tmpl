@@ -12,7 +12,7 @@ echo "Configuring MacOS..."
 {{ if .personal -}}
 echo -n '{{ (onepasswordDetailsFields "rjpfwny7abgnnegncgaobkru7u").password.value -}}' | sudo -vS
 {{ else if .work -}}
-echo -n '{{ (onepasswordDetailsFields "skujj4ecr5akbpcs7zcv7org3a").password.value -}}' | sudo -vS
+echo -n '{{ (onepasswordDetailsFields "gjacv6sej3wmvlnk54qhoa6gxy").password.value -}}' | sudo -vS
 {{ end -}}
 
 while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
