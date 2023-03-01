@@ -12,6 +12,7 @@
 {{- $customTaps := dict -}}
 
 {{- $brews := list
+    "asdf"
     "chezmoi"
     "coreutils"
     "git"
@@ -76,7 +77,6 @@
     "atlassian/kubetoken" "ssh://git@stash.atlassian.com:7997/kube/homebrew-kubetoken.git") -}}
 
 {{  $brews = concat $brews (list
-        "asdf"
         "atlas-cli"
         "kubectl"
         "kubectx"

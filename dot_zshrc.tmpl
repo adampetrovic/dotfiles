@@ -46,7 +46,6 @@ zplug 'zpm-zsh/material-colors'
 
 # oh-my-zsh plugins
 zplug 'lib/clipboard', from:oh-my-zsh
-zplug 'plugins/asdf', from:oh-my-zsh
 zplug 'plugins/colored-man-pages', from:oh-my-zsh
 zplug 'plugins/colorize', from:oh-my-zsh
 zplug 'plugins/command-not-found', from:oh-my-zsh
@@ -114,8 +113,5 @@ export ZSH_COLORIZE_TOOL="chroma"
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # asdf
-. $(brew --prefix asdf)/libexec/asdf.sh
+source $(brew --prefix asdf)/libexec/asdf.sh
 {{- end }}
-
-
-
