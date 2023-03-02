@@ -114,4 +114,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # asdf
 source $(brew --prefix asdf)/libexec/asdf.sh
+
+# path
+PATH=$HOMEBREW_PREFIX/bin:$PATH
 {{- end }}
