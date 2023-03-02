@@ -4,6 +4,15 @@
 
 set -eufo pipefail
 
+{{ if .work -}}
+ping -t1 -c1 stash.atlassian.com > /dev/null
+if [ ! $? -eq 0 ]
+then
+    echo "[Work Profile] Please ensure Work VPN is enabled before running chezmoi apply"
+    exit 1
+fi
+{{- end }}
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
 brew update
