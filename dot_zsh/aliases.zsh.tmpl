@@ -5,6 +5,7 @@ alias dns="sudo killall -hUP mDNSResponder"
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 {{- end }}
 
+{{ if .personal -}}
 function yt-stash() {
     rm -f /tmp/cookies.txt
     yt-dlp --cookies-from-browser chrome --cookies /tmp/cookies.txt --exec 'rsync -avzh --progress --remove-source-files "%(filepath)s" root@{{ (onepasswordItemFields "src7akdzeh2bv7okc2rzhx5xui").hostname.value -}}:/var/lib/docker/volumes/stash_media_fs/_data' $1
@@ -15,6 +16,7 @@ function sync-stash() {
     rsync -avzh --progress --remove-source-files $@/** root@{{ (onepasswordItemFields "src7akdzeh2bv7okc2rzhx5xui").hostname.value -}}:/var/lib/docker/volumes/stash_media_fs/_data
     curl --cookie /tmp/cookies.txt -H "Content-Type: application/json"  --data '{  "query": "mutation { metadataScan ( input: { useFileMetadata: false } ) } "}' https://{{ (onepasswordItemFields "src7akdzeh2bv7okc2rzhx5xui").hostname.value -}}/graphql
 }
+{{- end }}
 
 {{ if .work -}}
 # ssh into a dev instance. requires atlas + the atlas micros plugin to be installed

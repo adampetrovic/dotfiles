@@ -108,6 +108,11 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --glob \!.git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export ZSH_COLORIZE_TOOL="chroma"
 
+{{ if .work -}}
+# source atlas zsh completions
+[[ -f $(brew --prefix)/bin/atlas ]] && source <(atlas --completion-script-zsh)
+{{ end -}}
+
 {{- if (eq .chezmoi.os "darwin") }}
 # homebrew
 eval "$(/opt/homebrew/bin/brew shellenv)"
