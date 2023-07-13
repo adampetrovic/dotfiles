@@ -1,4 +1,3 @@
-{{- if (eq .chezmoi.os "darwin") -}}
 {{/* base level packages for all environments */}}
 {{- $taps := list
     "homebrew/cask"
@@ -43,13 +42,15 @@
     "fantastical"
     "font-fira-code"
     "google-chrome"
+    "intellij-idea"
     "istat-menus"
     "iterm2"
     "obsidian"
     "rectangle"
     "spotify"
     "tomatobar"
-    "telegram" -}}
+    "telegram" 
+    "visual-studio-code" -}}
 
 {{- $mas := dict
     "Amphetamine" "937984704"
@@ -59,16 +60,35 @@
 
 {{/* personal-specific packages */}}
 {{- if .personal -}}
-{{-  $brews = concat $brews (list) -}}
+{{- $taps = concat $taps (list
+    "fluxcd/tap"
+    "go-task/tap"
+    "weaveworks/tap") -}}
+
+{{-  $brews = concat $brews (list
+	"age"
+	"ansible"
+	"cilium-cli"
+	"cloudflared"
+	"direnv"
+	"fluxcd/tap/flux"
+	"weaveworks/tap/gitops"
+	"go-task/tap/go-task"
+	"ipcalc"
+	"jq"
+	"kubectl"
+	"pre-commit"
+	"sops"
+	"yq") -}}
 
 {{-  $casks = concat $casks (list
-        "calibre"
-        "kindle-previewer"
-        "handbrake") -}}
+    "calibre"
+    "kindle-previewer"
+    "handbrake") -}}
 
 {{-  $mas = merge $mas (dict
-        "Wireguard" "1451685025"
-        "Parcel" "639968404") -}}
+    "Wireguard" "1451685025"
+    "Parcel" "639968404") -}}
 {{- end -}}
 
 
@@ -80,22 +100,18 @@
     "atlassian/kubetoken" "ssh://git@stash.atlassian.com:7997/kube/homebrew-kubetoken.git") -}}
 
 {{  $brews = concat $brews (list
-        "atlas-cli"
-        "kubectl"
-        "kubectx"
-        "kubetoken"
-        "minikube") -}}
+    "atlas-cli") -}}
 
 {{  $casks = concat $casks (list
-        "brainfm"
-        "cloudtoken"
-        "slack"
-        "visual-studio-code"
-        "zoom") -}}
+    "brainfm"
+    "cloudtoken"
+    "slack"
+    "visual-studio-code"
+    "zoom") -}}
 
 {{  $mas = merge $mas (dict
-        "Wireguard" "1451685025"
-        "Parcel" "639968404") -}}
+    "Wireguard" "1451685025"
+    "Parcel" "639968404") -}}
 {{- end -}}
 
 {{ range ($taps | sortAlpha | uniq) -}}

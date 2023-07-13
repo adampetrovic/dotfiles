@@ -67,6 +67,7 @@ zplug 'alecthomas/chroma', as:command, from:gh-r
 
 zplug 'junegunn/fzf', use:'shell/*.zsh'
 zplug 'go-jira/jira', as:command, from:gh-r, rename-to:jira
+zplug 'ajeetdsouza/zoxide', as:command, from:gh-r
 zplug 'paulirish/git-open', as:plugin
 zplug 'rupa/z', use:z.sh
 zplug 'stedolan/jq', as:command, from:gh-r, rename-to:jq
@@ -123,3 +124,5 @@ source $(brew --prefix asdf)/libexec/asdf.sh
 # path
 PATH=$HOMEBREW_PREFIX/bin:$PATH
 {{- end }}
+
+eval "$(zoxide init zsh)"
