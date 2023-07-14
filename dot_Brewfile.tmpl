@@ -72,6 +72,7 @@
 	"cloudflared"
 	"direnv"
 	"fluxcd/tap/flux"
+    "krew"
 	"weaveworks/tap/gitops"
 	"go-task/tap/go-task"
 	"ipcalc"
@@ -129,4 +130,3 @@ cask "{{ . }}"
 {{ range $app, $id := $mas -}}
 mas "{{ $app }}", id: {{ $id }}
 {{ end }}
-{{- end -}}

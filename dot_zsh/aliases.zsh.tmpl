@@ -6,12 +6,18 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 {{- end }}
 
 function stash-sync() {
-    KUBECONFIG=~/code/k8s-home/kubeconfig kubectl cp --no-preserve=true ~/Desktop/.hidden/. media/stash-0:/media
+    kubectl cp --no-preserve=true ~/Desktop/.hidden/. media/stash-0:/media
     find ~/Desktop/.hidden/. ! -type d -exec rm '{}' \;
     curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { useFileMetadata: false } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
 }
 
 function stash-watch() {
+    curl --connect-timeout 1 {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}} &> /dev/null
+    if [ ! $? -eq 0 ]
+    then
+        echo "Can't connect to stash. Check network and try again."
+        exit 0
+    fi
     echo 'stash-watch: waiting for new files. Ctrl+C to exit'
     while true; do
         find ~/Desktop/.hidden/. -type d | entr -d echo '' > /dev/null
