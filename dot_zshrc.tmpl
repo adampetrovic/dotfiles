@@ -38,11 +38,11 @@ SPACESHIP_HOST_COLOR_SSH=red
 
 zplug 'zsh-users/zsh-syntax-highlighting', defer:2
 zplug 'zsh-users/zsh-history-substring-search', defer:3
-zplug 'zdharma/history-search-multi-word', defer:3
+zplug 'zdharma-continuum/history-search-multi-word', defer:3
 zplug 'zsh-users/zsh-autosuggestions'
 zplug 'zsh-users/zsh-completions', depth:1
-zplug 'zpm-zsh/material-colors'
-
+zplug 'zpm-zsh/colors'
+zplug 'zpm-zsh/dircolors-neutral', use:'dircolors-neutral.plugin.zsh', defer:2
 
 # oh-my-zsh plugins
 zplug 'lib/clipboard', from:oh-my-zsh
@@ -108,11 +108,6 @@ source ~/.zsh/aliases.zsh
 export FZF_DEFAULT_COMMAND='rg --files --hidden --glob \!.git'
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export ZSH_COLORIZE_TOOL="chroma"
-
-{{ if .work -}}
-# source atlas zsh completions
-[[ -f $(brew --prefix)/bin/atlas ]] && source <(atlas --completion-script-zsh)
-{{ end -}}
 
 {{- if (eq .chezmoi.os "darwin") }}
 # homebrew
