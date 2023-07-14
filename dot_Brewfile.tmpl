@@ -2,6 +2,7 @@
 {{- $taps := list
     "homebrew/cask-fonts"
     "homebrew/cask-versions"
+    "homebrew/command-not-found"
     "homebrew/bundle"
     "buo/cask-upgrade"
     "hpedrorodrigues/tools" -}}
@@ -10,12 +11,16 @@
 
 {{- $brews := list
     "asdf"
+    "bat"
     "bind"
     "chezmoi"
     "coreutils"
     "entr"
+    "exa"
+    "fzf"
     "git"
     "git-delta"
+    "git-extras"
     "gnu-sed"
     "grep"
     "httpstat"
@@ -44,7 +49,7 @@
     "istat-menus"
     "iterm2"
     "obsidian"
-    "rectangle"
+    "rectangle-pro"
     "spotify"
     "tomatobar"
     "telegram" 
@@ -52,7 +57,6 @@
 
 {{- $mas := dict
     "Amphetamine" "937984704"
-    "Instapaper" "288545208"
     "Reeder" "1529448980"
     "Things3" "904280696" -}}
 
@@ -82,12 +86,13 @@
 
 {{-  $casks = concat $casks (list
     "calibre"
-    "kindle-previewer"
-    "handbrake") -}}
+    "handbrake"
+    "kindle-previewer") -}}
 
 {{-  $mas = merge $mas (dict
     "Wireguard" "1451685025"
-    "Parcel" "639968404") -}}
+    "Parcel" "639968404"
+    "Stockfish Chess" "801463932") -}}
 {{- end -}}
 
 
