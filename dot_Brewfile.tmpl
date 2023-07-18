@@ -5,6 +5,9 @@
     "homebrew/command-not-found"
     "homebrew/bundle"
     "buo/cask-upgrade"
+    "fluxcd/tap"
+    "go-task/tap"
+    "weaveworks/tap"
     "hpedrorodrigues/tools" -}}
 
 {{- $customTaps := dict -}}
@@ -18,19 +21,23 @@
     "entr"
     "exa"
     "fzf"
+	"fluxcd/tap/flux"
     "git"
     "git-delta"
     "git-extras"
     "gnu-sed"
+	"go-task/tap/go-task"
     "grep"
     "httpstat"
     "httpie"
+	"kubectl"
     "mas"
     "pipenv"
     "ripgrep"
     "rsync"
     "vim"
     "watch"
+	"weaveworks/tap/gitops"
     "wget"
     "zsh" -}}
 
@@ -62,26 +69,15 @@
 
 {{/* personal-specific packages */}}
 {{- if .personal -}}
-{{- $taps = concat $taps (list
-    "fluxcd/tap"
-    "go-task/tap"
-    "weaveworks/tap") -}}
+{{- $taps = concat $taps (list) -}}
 
 {{-  $brews = concat $brews (list
-	"age"
-	"ansible"
 	"cilium-cli"
-	"cloudflared"
 	"direnv"
-	"fluxcd/tap/flux"
     "krew"
-	"weaveworks/tap/gitops"
-	"go-task/tap/go-task"
 	"ipcalc"
 	"jq"
-	"kubectl"
 	"pre-commit"
-	"sops"
 	"yq") -}}
 
 {{-  $casks = concat $casks (list
