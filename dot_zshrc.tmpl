@@ -12,6 +12,7 @@ zi light spaceship-prompt/spaceship-prompt
 SPACESHIP_PROMPT_ORDER=(
     user
     dir
+    git
     venv
     exec_time
     line_sep
@@ -24,10 +25,29 @@ SPACESHIP_RPROMPT_ORDER=(
     time
 )
 
+SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_TIME_SHOW=true
 SPACESHIP_EXIT_CODE_SHOW=true
 SPACESHIP_EXIT_CODE_COLOR=red
-SPACESHIP_PROMPT_ADD_NEWLINE=false
+
+# spaceship git
+SPACESHIP_GIT_BRANCH_SHOW=true
+SPACESHIP_GIT_BRANCH_ASYNC=true
+SPACESHIP_GIT_BRANCH_COLOR="magenta"
+SPACESHIP_GIT_STATUS_SHOW=true
+SPACESHIP_GIT_STATUS_PREFIX=" ["
+SPACESHIP_GIT_STATUS_SUFFIX="]"
+SPACESHIP_GIT_STATUS_COLOR="red"
+SPACESHIP_GIT_STATUS_UNTRACKED="⇡⇣"
+SPACESHIP_GIT_STATUS_ADDED="+"
+SPACESHIP_GIT_STATUS_MODIFIED="::"
+SPACESHIP_GIT_STATUS_RENAMED="»"
+SPACESHIP_GIT_STATUS_DELETED="✘"
+SPACESHIP_GIT_STATUS_STASHED="$"
+SPACESHIP_GIT_STATUS_UNMERGED="="
+SPACESHIP_GIT_STATUS_AHEAD="⇡"
+SPACESHIP_GIT_STATUS_BEHIND="⇣"
+SPACESHIP_GIT_STATUS_DIVERGED="⇕"
 
 zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpcompinit; zpcdreplay'
 zi light zdharma-continuum/fast-syntax-highlighting
@@ -86,5 +106,6 @@ EDITOR=vim
 eval "$(/opt/homebrew/bin/brew shellenv)"
 PATH=$HOMEBREW_PREFIX/bin:$PATH
 
+source $(brew --prefix asdf)/libexec/asdf.sh
 source ~/.asdf/plugins/java/set-java-home.zsh
 source ~/.zsh/aliases.zsh
