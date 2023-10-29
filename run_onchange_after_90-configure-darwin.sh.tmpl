@@ -215,17 +215,16 @@ echo "Applying Docker, Dashboard & Hot Corners"
 dockutil --no-restart --remove all
 dockutil --no-restart --add "/Applications/Google Chrome.app"
 dockutil --no-restart --add "/Applications/Fantastical.app"
+{{ if .work -}}
+dockutil --no-restart --add "/Applications/Cisco/Cisco Secure Client.app"
+dockutil --no-restart --add "/Applications/Slack.app"
+{{ end -}}
 dockutil --no-restart --add "/Applications/iTerm.app"
 dockutil --no-restart --add "/Applications/Obsidian.app"
 dockutil --no-restart --add "/Applications/Things3.app"
 dockutil --no-restart --add "/Applications/Telegram.app"
 dockutil --no-restart --add "/Applications/Spotify.app"
 dockutil --no-restart --add "/Applications/Reeder.app"
-{{ if .work -}}
-dockutil --no-restart --add "/Applications/Slack.app"
-dockutil --no-restart --add "/Applications/Cisco/Cisco AnyConnect Secure Mobility Client.app"
-dockutil --no-restart --add "/Applications/Visual Studio Code.app"
-{{ end -}}
 dockutil --no-restart --add "/Applications/System Settings.app"
 dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
 dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded

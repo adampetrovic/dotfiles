@@ -1,0 +1,46 @@
+endpoint: https://hello.atlassian.net
+endpoint: {{ (onepasswordItemFields "xmpftrgna4k3iw3lpzm4nrixfi").endpoint.value }}
+user: {{ (onepasswordItemFields "xmpftrgna4k3iw3lpzm4nrixfi").user.value }}
+password-source: keyring
+project: {{ (onepasswordItemFields "xmpftrgna4k3iw3lpzm4nrixfi").project.value }}
+
+custom-commands:
+  - name: mine
+    help: display issues assigned to me
+    script: |-
+      if [ -n "$JIRA_PROJECT" ]; then
+        # if `project: ...` configured just list the issues for current project
+        {{ "{{" }}jira{{ "}}" }} list --template table --query "resolution = unresolved and assignee=currentuser() and project = $JIRA_PROJECT ORDER BY priority asc, created"
+      else
+        # otherwise list issues for all project
+        {{ "{{" }}jira{{ "}}" }} list --template table --query "resolution = unresolved and assignee=currentuser() ORDER BY priority asc, created"
+      fi
+  - name: sprint
+    help: display issues for active sprint
+    script: |-
+      if [ -n "$JIRA_PROJECT" ]; then
+        # if `project: ...` configured just list the issues for current project
+        {{ "{{" }}jira{{ "}}"}} list --template table --query "cf[11880] in openSprints() and type != epic and resolution = unresolved and project=$JIRA_PROJECT ORDER BY rank asc, created"
+      else
+        # otherwise list issues for all project
+        {{ "{{" }}jira{{ "}}" }} list --template table --query "cf[11880] in openSprints() and type != epic and resolution = unresolved ORDER BY rank asc, created"
+      fi
+  - name: sprint-add
+    help: add issue to active sprint for project
+    options:
+      - name: next
+        short: 'n'
+        type: bool
+        help: add issue to next sprint, rather than the active one
+    args:
+      - name: ISSUE
+        required: true
+    script: |
+        state={{ "{{" }}if options.next{{ "}}" }}future{{ "{{" }}else{{ "}}" }}active{{ "{{" }}end{{ "}}" }}
+        board_id=$({{ "{{" }}jira{{ "}}" }} req "/rest/agile/1.0/board?projectKeyOrId=$JIRA_PROJECT&type=scrum" --gjq values.0.id)
+        sprint_id=$({{ "{{" }}jira{{ "}}" }} req "/rest/agile/1.0/board/$board_id/sprint?state=$state" --gjq values.0.id)
+        if [ "$sprint_id" = "" ]; then
+            echo "ERROR: No $state sprint" >&2
+            exit 1
+        fi
+        {{ "{{" }}jira{{ "}}" }} req -M POST "/rest/agile/1.0/sprint/$sprint_id/issue" "{\"issues\":[\"{{ "{{" }}args.ISSUE{{ "}}" }}\"]}"

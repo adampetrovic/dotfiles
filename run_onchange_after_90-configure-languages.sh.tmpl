@@ -34,4 +34,10 @@ done
 
 asdf global golang 1.17.3
 asdf global python 3.10.0
+
+
+{{- if .work -}}
+tfenv install 0.13.4
+tfenv use 0.13.4
+{{- end -}}
 {{ end }}

@@ -105,7 +105,10 @@ EDITOR=vim
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 PATH=$HOMEBREW_PREFIX/bin:$PATH
-
+{{- if .work }}
+eval "$(jira --completion-script-zsh)"
+eval "$(tfenv init)"
+{{ end -}}
 source $(brew --prefix asdf)/libexec/asdf.sh
 source ~/.asdf/plugins/java/set-java-home.zsh
 source ~/.zsh/aliases.zsh

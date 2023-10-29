@@ -97,19 +97,23 @@
 
 {{/* work-specific packages */}}
 {{- if .work -}}
+{{- $taps = concat $taps (list) -}}
+
 {{  $customTaps = merge $customTaps (dict
     "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git"
     "atlassian/cloudtoken" "ssh://git@bitbucket.org/atlassian/cloudtoken-homebrew-tap.git"
     "atlassian/kubetoken" "ssh://git@stash.atlassian.com:7997/kube/homebrew-kubetoken.git") -}}
 
 {{  $brews = concat $brews (list
-    "atlas-cli") -}}
+    "atlas-cli"
+    "go-jira"
+    "tfenv") -}}
 
 {{  $casks = concat $casks (list
     "brainfm"
     "cloudtoken"
     "docker"
-    "slack"
+    "slack-beta"
     "visual-studio-code"
     "zoom") -}}
 
