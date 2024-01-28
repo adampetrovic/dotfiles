@@ -100,6 +100,8 @@
     bM = branch -M
     bs = show-branch
     bS = show-branch -a
+    cleanup = "!git branch --merged main | grep  -v '\\*\\|main\\|develop' | xargs -n 1 -r git branch -d"
+
 
     # checkout/fetch/merge/push/rebase
     # checkout
@@ -140,10 +142,11 @@
     cp     = cherry-pick
 
     # diff
-    d    = diff          # Diff working dir to index
-    ds   = diff --staged # Diff index to HEAD
-    dc   = diff --staged # Diff index to HEAD
-    dh   = diff HEAD     # Diff working dir and index to HEAD
+    d    = diff             # Diff working dir to index
+    ds   = diff --staged    # Diff index to HEAD
+    dc   = diff --staged    # Diff index to HEAD
+    dh   = diff HEAD        # Diff working dir and index to HEAD
+    du   = diff @{upstream} # Diff HEAD to upstream
     hub  = browse
     hubd = compare
 
@@ -161,6 +164,7 @@
     lga = log --topo-order --all --graph --pretty=format:'%C(yellow)%h %C(cyan)%cn%C(reset) %s %C(red)%d%C(reset)%n'
     lm  = log --topo-order --pretty=format:'%s'
     lh  = shortlog --summary --numbered
+    lu  = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit @{upstream}..
     llf = fsck --lost-found
 
     lg1 = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
