@@ -3,8 +3,10 @@
     name = "Adam Petrovic"
 {{- if .work }}
     email = "apetrovic@atlassian.com"
+    signingkey = {{ (onepasswordDetailsFields "46cauqkszyrupjn2vh7hgurks4").public_key.value }}
 {{- else }}
     email = "adam@petrovic.com.au"
+    signingkey = {{ (onepasswordDetailsFields "krax3py6xt2nkn3peqyjgw7nmm").public_key.value }}
 {{- end }}
 
 [url "https://github.com"]
@@ -47,6 +49,15 @@
     changed = green
     untracked = cyan
     branch = magenta
+
+[commit]
+    gpgsign = true
+
+[gpg]
+  format = ssh
+
+[gpg "ssh"]
+  program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 
 [push]
     default = simple
