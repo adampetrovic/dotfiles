@@ -7,6 +7,8 @@ source "${ZINIT_HOME}/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
+zinit light NICHOLAS85/z-a-eval
+
 zi ice pick"spaceship.zsh" as"theme" depth"1"
 zi light spaceship-prompt/spaceship-prompt
 SPACESHIP_PROMPT_ORDER=(
@@ -50,13 +52,12 @@ SPACESHIP_GIT_STATUS_BEHIND="⇣"
 SPACESHIP_GIT_STATUS_DIVERGED="⇕"
 
 zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpcompinit; zpcdreplay'
-zi light zdharma-continuum/fast-syntax-highlighting
-
-zi ice wait lucid blockf
-zi light zsh-users/zsh-completions 
-
-zi wait lucid light-mode for \
-    atload'_zsh_autosuggest_start' \
+zi wait lucid for \
+    atinit'ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay' \
+        zdharma-continuum/fast-syntax-highlighting \
+    blockf \
+        zsh-users/zsh-completions \
+    atload'!_zsh_autosuggest_start' \
         zsh-users/zsh-autosuggestions \
         zdharma-continuum/history-search-multi-word
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
@@ -103,12 +104,15 @@ zle -N bracketed-paste bracketed-paste-magic
 # EDITOR
 EDITOR=vim
 
+zi ice lucid wait="0" pick="asdf.sh"
+zi light $(brew --prefix asdf)/libexec
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
 PATH=$HOMEBREW_PREFIX/bin:$PATH
 {{- if .work }}
 eval "$(jira --completion-script-zsh)"
 eval "$(tfenv init)"
 {{ end -}}
-source $(brew --prefix asdf)/libexec/asdf.sh
-source ~/.asdf/plugins/java/set-java-home.zsh
+#source $(brew --prefix asdf)/libexec/asdf.sh
+#source ~/.asdf/plugins/java/set-java-home.zsh
 source ~/.zsh/aliases.zsh
