@@ -6,12 +6,23 @@ alias dns="sudo killall -hUP mDNSResponder"
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 {{- end }}
 
+function stash-yt() {
+    if [ "$#" -eq 2 ]
+    then
+        kubectl exec pod/stash-0 -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
+    else
+        echo "Usage: $0 <tag> <url>"
+        exit 1
+    fi
+}
+
 function stash-sync() {
     if [ -d ~/Desktop/.hidden/ ]; then
         echo 'syncing files to stash...'
         kubectl cp ~/Desktop/.hidden/. media/stash-0:/media
         find ~/Desktop/.hidden/. -type f \( ! -iname "*.crdownload" ! -iname "*.part" \) -exec rm '{}' \;
-        curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { useFileMetadata: false, scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
+        curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
     else
         echo "Directory does not exist."
     fi
