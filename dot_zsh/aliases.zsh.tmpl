@@ -6,6 +6,7 @@ alias dns="sudo killall -hUP mDNSResponder"
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 {{- end }}
 
+{{ if .personal -}}
 function stash-yt() {
     if [ "$#" -eq 2 ]
     then
@@ -42,6 +43,7 @@ function stash-watch() {
     done
     echo "Directory does not exist."
 }
+{{ end -}}
 
 {{ if .work -}}
 # ssh into a dev instance. requires atlas + the atlas micros plugin to be installed
