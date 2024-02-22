@@ -207,10 +207,10 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	Privileges -bool true
 
 ###############################################################################
-# Dock, Dashboard, and hot corners                                            #
+# Dock, Desktop, Dashboard, and hot corners                                            #
 ###############################################################################
 
-echo "Applying Docker, Dashboard & Hot Corners"
+echo "Applying Dock, Desktop Dashboard & Hot Corners"
 
 dockutil --no-restart --remove all
 dockutil --no-restart --add "/Applications/Google Chrome.app"
@@ -228,6 +228,9 @@ dockutil --no-restart --add "/Applications/Reeder.app"
 dockutil --no-restart --add "/Applications/System Settings.app"
 dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
 dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
+
+# Disable "click to reveal desktop" on Sonoma and above
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
 
 # Set the icon size of Dock items to 36 pixels
 defaults write com.apple.dock tilesize -int 48
