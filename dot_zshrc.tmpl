@@ -73,6 +73,9 @@ zinit light trapd00r/LS_COLORS
 zinit ice wait lucid
 zinit light andrewferrier/fzf-z
 
+# direnv
+zinit light ptavares/zsh-direnv
+
 # omz libraries
 zi snippet OMZL::clipboard.zsh
 zi snippet OMZL::history.zsh
@@ -104,6 +107,7 @@ zle -N bracketed-paste bracketed-paste-magic
 # EDITOR
 EDITOR=vim
 
+ASDF_FORCE_PREPEND=false
 zi ice lucid wait="0" pick="asdf.sh"
 zi light $(brew --prefix asdf)/libexec
 
