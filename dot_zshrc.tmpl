@@ -112,7 +112,7 @@ zi ice lucid wait="0" pick="asdf.sh"
 zi light $(brew --prefix asdf)/libexec
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
-PATH=$HOMEBREW_PREFIX/bin:$PATH
+PATH=$HOME/.krew/bin:$PATH
 {{- if .work }}
 eval "$(jira --completion-script-zsh)"
 eval "$(tfenv init)"
