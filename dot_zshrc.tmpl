@@ -55,6 +55,7 @@ zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpco
 zi wait lucid for \
     atinit'ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay' \
         zdharma-continuum/fast-syntax-highlighting \
+    atload"fast-theme -q clean" \
     blockf \
         zsh-users/zsh-completions \
     atload'!_zsh_autosuggest_start' \
@@ -116,5 +117,5 @@ PATH=$HOME/.krew/bin:$PATH
 {{- if .work }}
 eval "$(jira --completion-script-zsh)"
 eval "$(tfenv init)"
-{{ end -}}
+{{ end }}
 source ~/.zsh/aliases.zsh

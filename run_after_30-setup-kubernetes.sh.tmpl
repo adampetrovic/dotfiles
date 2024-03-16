@@ -14,7 +14,7 @@ export SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/keys.txt
 
 # Step 3: Run talhelper to generate config
 cd $HOME/code/home-ops/kubernetes/bootstrap/talos
-talhelper genconfig --no-gitignore --config-file talconfig.yaml --secret-file clusterconfig -o /tmp
+talhelper genconfig --no-gitignore -o /tmp
 
 # Step 4: Move talosconfig to ~/.talos/config and delete /tmp/*.yaml
 mv /tmp/talosconfig ~/.talos/config
