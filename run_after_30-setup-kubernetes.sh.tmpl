@@ -2,36 +2,41 @@
 #!/bin/bash
 
 # Step 1: Check if ~/code/home-ops doesn't exist. If it does, exit.
-if [ -d "$HOME/code/home-ops" ]; then
-    echo "~/code/home-ops already exists. Exiting."
-    exit 0
+if [ ! -d "$HOME/code/home-ops" ]; then
+    # Step 2: Clone the repository to $HOME/code/home-ops
+    git clone -q git@github.com:adampetrovic/home-ops.git "$HOME/code/home-ops"
 fi
-
-# Step 2: Clone the repository to $HOME/code/home-ops
-git clone git@github.com:adampetrovic/home-ops.git "$HOME/code/home-ops"
-
-export SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/keys.txt
 
 # Step 3: Run talhelper to generate config
-cd $HOME/code/home-ops/kubernetes/bootstrap/talos
-talhelper genconfig --no-gitignore -o /tmp
+if [ ! -f "$HOME/.talos/config" ]; then
+    cd $HOME/code/home-ops/kubernetes/bootstrap/talos
+    SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/keys.txt talhelper genconfig --no-gitignore -o /tmp >/dev/null
+    # Step 4: Move talosconfig to ~/.talos/config and delete /tmp/*.yaml
+    mkdir -p ~/.talos
+    mv /tmp/talosconfig $HOME/.talos/config
+    rm /tmp/*.yaml
 
-# Step 4: Move talosconfig to ~/.talos/config and delete /tmp/*.yaml
-mv /tmp/talosconfig ~/.talos/config
-rm /tmp/*.yaml
+    # Step 5: Test the command `talosctl time` runs and exits correctly
+    if ! talosctl time >/dev/null 2>&1; then
+        echo "talosctl command failed. setup manually"
+        exit 1
+    fi
 
-# Step 5: Test the command `talosctl time` runs and exits correctly
-if ! talosctl time >/dev/null 2>&1; then
-    echo "talosctl command failed. setup manually"
-    exit 1
+else
+    echo "talosctl already setup. skipping..."
 fi
 
-# Step 6: Run talosctl to generate kubeconfig
-talosctl kubeconfig -n 10.0.80.10 ~/.kube/config
 
-# Step 7: Confirm `kubectl get nodes` runs and exits correctly
-if ! kubectl get nodes >/dev/null 2>&1; then
-    echo "kubectl command failed. setup manually"
-    exit 1
+# Step 6: Run talosctl to generate kubeconfig
+if [ ! -f "$HOME/.kube/config" ]; then
+    talosctl kubeconfig -n 10.0.80.10 ~/.kube/config
+
+    # Step 7: Confirm `kubectl get nodes` runs and exits correctly
+    if ! kubectl get nodes >/dev/null 2>&1; then
+        echo "kubectl command failed. setup manually"
+        exit 1
+    fi
+else
+    echo "kubectl already setup. skipping..."
 fi
 {{- end -}}
