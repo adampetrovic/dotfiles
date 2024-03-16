@@ -9,6 +9,7 @@
     "go-task/tap"
     "weaveworks/tap"
     "robusta-dev/homebrew-krr"
+    "siderolabs/tap"
     "hpedrorodrigues/tools" -}}
 
 {{- $customTaps := dict -}}
@@ -18,7 +19,9 @@
     "bat"
     "bind"
     "chezmoi"
+	"cilium-cli"
     "coreutils"
+	"direnv"
     "entr"
     "exa"
     "fzf"
@@ -32,15 +35,18 @@
     "httpstat"
     "httpie"
     "jq"
+    "krew"
     "krr"
 	"kubectl"
     "mas"
     "pipenv"
     "ripgrep"
     "rsync"
+    "sops"
+    "talosctl"
+    "talhelper"
     "vim"
     "watch"
-	"weaveworks/tap/gitops"
     "wget"
     "yq"
     "zsh" -}}
@@ -63,7 +69,6 @@
     "rectangle-pro"
     "rustrover"
     "spotify"
-    "tomatobar"
     "telegram" 
     "visual-studio-code" -}}
 
@@ -76,20 +81,11 @@
 {{- if .personal -}}
 {{- $taps = concat $taps (list) -}}
 
-{{-  $brews = concat $brews (list
-	"cilium-cli"
-	"direnv"
-    "krew"
-	"ipcalc"
-	"jq"
-	"pre-commit"
-	"yq") -}}
+{{-  $brews = concat $brews (list) -}}
 
 {{-  $casks = concat $casks (list
     "brave-browser"
     "calibre"
-    "autodesk-fusion360"
-    "handbrake"
     "kindle-previewer") -}}
 
 {{-  $mas = merge $mas (dict
