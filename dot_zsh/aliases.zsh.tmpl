@@ -10,7 +10,8 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 function stash-yt() {
     if [ "$#" -eq 2 ]
     then
-        kubectl exec pod/stash-0 -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
+        kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
         curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
     else
         echo "Usage: $0 <tag> <url>"
@@ -21,7 +22,8 @@ function stash-yt() {
 function stash-sync() {
     if [ -d ~/Desktop/.hidden/ ]; then
         echo 'syncing files to stash...'
-        kubectl cp ~/Desktop/.hidden/. media/stash-0:/media
+        pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
+        kubectl cp ~/Desktop/.hidden/. media/$pod:/media
         find ~/Desktop/.hidden/. -type f \( ! -iname "*.crdownload" ! -iname "*.part" \) -exec rm '{}' \;
         curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
     else
