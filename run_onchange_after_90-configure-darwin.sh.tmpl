@@ -57,7 +57,7 @@ defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 # Trackpad, mouse, keyboard, Bluetooth accessories, and input                 #
 ###############################################################################
 
-echo "Applying Trackpad, Mouse, keyboard etc"
+echo "Applying Trackpad, Mouse, Keyboard etc"
 
 # Trackpad: enable tap to click for this user and for the login screen
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
@@ -87,6 +87,9 @@ defaults write NSGlobalDomain AppleKeyboardUIMode -int 3
 # Set a blazingly fast keyboard repeat rate
 defaults write NSGlobalDomain KeyRepeat -int 1
 defaults write NSGlobalDomain InitialKeyRepeat -int 10
+
+# Enable Key-Repeating
+defaults write -g ApplePressAndHoldEnabled -bool false
 
 # Set language and text formats
 # Note: if you’re in the US, replace `EUR` with `USD`, `Centimeters` with
@@ -225,7 +228,7 @@ dockutil --no-restart --add "/Applications/Things3.app"
 dockutil --no-restart --add "/Applications/Telegram.app"
 dockutil --no-restart --add "/Applications/Spotify.app"
 dockutil --no-restart --add "/Applications/Reeder.app"
-dockutil --no-restart --add "/Applications/System Settings.app"
+dockutil --no-restart --add "/System/Applications/System Settings.app"
 dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
 dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
 
