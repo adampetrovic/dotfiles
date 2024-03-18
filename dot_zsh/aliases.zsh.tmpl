@@ -20,15 +20,11 @@ function stash-yt() {
 }
 
 function stash-sync() {
-    if [ -d ~/Desktop/.hidden/ ]; then
-        echo 'syncing files to stash...'
-        pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
-        kubectl cp ~/Desktop/.hidden/. media/$pod:/media
-        find ~/Desktop/.hidden/. -type f \( ! -iname "*.crdownload" ! -iname "*.part" \) -exec rm '{}' \;
-        curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
-    else
-        echo "Directory does not exist."
-    fi
+    echo 'syncing files to stash...'
+    pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
+    kubectl cp ~/Desktop/.hidden/. media/$pod:/media
+    find ~/Desktop/.hidden/. -type f \( ! -iname "*.crdownload" ! -iname "*.part" \) -exec rm '{}' \;
+    curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
 }
 
 function stash-watch() {
@@ -37,13 +33,13 @@ function stash-watch() {
     then
         echo "Can't connect to stash. Check network and try again."
     fi
+    mkdir -p ~/Desktop/.hidden/{gymnast,fbb,candid}
     echo 'stash-watch: waiting for new files. Ctrl+C to exit'
     stash-sync
     while [ -d ~/Desktop/.hidden/ ] ; do
         find ~/Desktop/.hidden/. -type d | entr -d echo ''
         stash-sync
     done
-    echo "Directory does not exist."
 }
 {{ end -}}
 
