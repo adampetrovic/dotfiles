@@ -297,7 +297,7 @@ available_themes=$(find "{{ .chezmoi.sourceDir }}/iterm/colors" -name "*.itermco
 
 installable_themes=$(comm -23 <(echo "$available_themes") <(echo "$installed_themes"))
 for theme in $installable_themes; do
-    open "{{ .chezmoi.sourceDir}}/iterm/colors/$theme.itermcolors"
+    open "{{ .chezmoi.sourceDir }}/iterm/colors/$theme.itermcolors"
 done
 
 # Don’t display the annoying prompt when quitting iTerm
