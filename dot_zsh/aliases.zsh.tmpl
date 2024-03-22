@@ -11,7 +11,14 @@ function stash-yt() {
     if [ "$#" -eq 2 ]
     then
         pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
-        kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        if [ -f /tmp/cookies.txt ]
+        then
+            echo "downloading with cookies"
+            kubectl cp /tmp/cookies.txt media/$pod:/tmp/cookies.txt
+            kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp --cookies /tmp/cookies.txt -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        else
+            kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        fi
         curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
     else
         echo "Usage: $0 <tag> <url>"
