@@ -31,12 +31,39 @@ fi
 if [ ! -f "$HOME/.kube/config" ]; then
     talosctl kubeconfig -n 10.0.80.10 ~/.kube/config
 
-    # Step 7: Confirm `kubectl get nodes` runs and exits correctly
     if ! kubectl get nodes >/dev/null 2>&1; then
         echo "kubectl command failed. setup manually"
         exit 1
     fi
 else
     echo "kubectl already setup. skipping..."
+fi
+
+if kubectl krew >/dev/null 2>&1; then
+    krew_indexes=(
+        "netshoot https://github.com/nilic/kubectl-netshoot.git"
+    )
+    for idx in "${krew_indexes[@]}"
+    do
+        kubectl krew index add ${idx}
+    done
+
+    krew_pkgs=(
+        "clog"
+        "cnpg"
+        "exec-cronjob"
+        "images"
+        "klock"
+        "ktop"
+        "netshoot/netshoot"
+        "oomd"
+        "restart"
+        "rook-ceph"
+        "sick-pods"
+        "view-secret"
+    )
+    kubectl krew install ${krew_pkgs[@]}
+
+
 fi
 {{- end -}}
