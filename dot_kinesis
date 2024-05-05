@@ -25,6 +25,7 @@
 
 * right thumb cluster
 [rwin]>[ralt]
+[ralt]>[rwin]
 [rctrl]>[hyper]
 [space]>[enter]
 [enter]>[delete]
@@ -38,7 +39,6 @@
 * swap Escape and Caps keys
 [escape]>[caps]
 [caps]>[escape]
-
 
 * =================
 * Macro Definitions
