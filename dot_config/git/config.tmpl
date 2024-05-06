@@ -128,7 +128,7 @@
 
     # merge
     m   = merge
-    mom = merge origin/master
+    mom = merge origin/main
 
     # push
     p   = push
@@ -143,7 +143,9 @@
     rs  = rebase --skip
     rom = rebase origin/main
 
+    # rebase advanced
     fixup = "!sh -c '(git diff-files --quiet || (echo Unstaged changes, please commit or stash with --keep-index; exit 1)) && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && git rebase -i --autosquash $COMMIT~1' -"
+    rbi = "!sh -c 'git rebase -i $(git merge-base HEAD origin/main)'"
 
     # commit
     c      = commit -v
