@@ -4,6 +4,8 @@ alias g='git'
 alias ls="gls --color"
 alias dns="sudo killall -hUP mDNSResponder"
 alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias kl='kubectl autons logs'
+alias kgp='k get pods -A | grep'
 {{- end }}
 
 {{ if .personal -}}
