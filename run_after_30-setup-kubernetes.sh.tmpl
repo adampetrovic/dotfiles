@@ -1,7 +1,7 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
 
-# Step 1: Check if ~/code/home-ops doesn't exist. If it does, exit.
+# Step 1: Check if ~/code/home-ops doesn't exist. If it does, skip cloning.
 if [ ! -d "$HOME/code/home-ops" ]; then
     # Step 2: Clone the repository to $HOME/code/home-ops
     git clone -q git@github.com:adampetrovic/home-ops.git "$HOME/code/home-ops"
