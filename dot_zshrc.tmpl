@@ -108,7 +108,7 @@ zle -N bracketed-paste bracketed-paste-magic
 # EDITOR
 EDITOR=vim
 
-ASDF_FORCE_PREPEND=false
+export ASDF_FORCE_PREPEND=no
 zi ice lucid wait="0" pick="asdf.sh"
 zi light $(brew --prefix asdf)/libexec
 
