@@ -131,9 +131,10 @@
     mom = merge origin/main
 
     # push
-    p   = push
-    pa  = push --all
-    pt  = push --tags
+    p       = push
+    pa      = push --all
+    pt      = push --tags
+    pushf   = push --force-with-lease
 
     # rebase
     r   = rebase
@@ -212,3 +213,17 @@
 	newNormal = green bold
 	newHighlight = green bold 22
 
+[stgit]
+
+[stgit "alias"]
+    list = series -d
+
+[stgit "edit"]
+    verbose = true
+
+[stgit "color"]
+	# Specify output colors for series commands
+	applied = green_foreground
+	current = red_foreground
+	unapplied = white_foreground
+	hidden = cyan_foreground
