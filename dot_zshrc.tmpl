@@ -51,6 +51,18 @@ SPACESHIP_GIT_STATUS_AHEAD="⇡"
 SPACESHIP_GIT_STATUS_BEHIND="⇣"
 SPACESHIP_GIT_STATUS_DIVERGED="⇕"
 
+# override git branch name when detached by branchless
+spaceship_git_branch () {
+	[[ $SPACESHIP_GIT_BRANCH_SHOW == false ]] && return
+	vcs_info
+	local git_current_branch="$vcs_info_msg_0_"
+	[[ -z "$git_current_branch" ]] && return
+	[[ "$git_current_branch" == branchless/* ]] && git_current_branch="(detached)"
+	git_current_branch="${git_current_branch#heads/}"
+	git_current_branch="${git_current_branch/.../}"
+	spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$SPACESHIP_GIT_BRANCH_PREFIX$git_current_branch$SPACESHIP_GIT_BRANCH_SUFFIX"
+}
+
 zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpcompinit; zpcdreplay'
 zi wait lucid for \
     atinit'ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay' \
