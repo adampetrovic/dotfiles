@@ -42,7 +42,7 @@ function stash-watch() {
     then
         echo "Can't connect to stash. Check network and try again."
     fi
-    mkdir -p ~/Desktop/.hidden/{gymnast,fbb,candid}
+    mkdir -p ~/Desktop/.hidden/{g,f,c}
     echo 'stash-watch: waiting for new files. Ctrl+C to exit'
     stash-sync
     while [ -d ~/Desktop/.hidden/ ] ; do
