@@ -8,50 +8,6 @@ alias kl='kubectl autons logs'
 alias kgp='k get pods -A | grep'
 {{- end }}
 
-{{ if .personal -}}
-function stash-yt() {
-    if [ "$#" -eq 2 ]
-    then
-        pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
-        if [ -f /tmp/cookies.txt ]
-        then
-            echo "downloading with cookies"
-            kubectl cp /tmp/cookies.txt media/$pod:/tmp/cookies.txt
-            kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp --cookies /tmp/cookies.txt -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
-        else
-            kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
-        fi
-        curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
-    else
-        echo "Usage: $0 <tag> <url>"
-        exit 1
-    fi
-}
-
-function stash-sync() {
-    echo 'syncing files to stash...'
-    pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
-    kubectl cp ~/Desktop/.config/. media/$pod:/media
-    find ~/Desktop/.config/. -type f \( ! -iname "*.crdownload" ! -iname "*.part" \) -exec rm '{}' \;
-    curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
-}
-
-function stash-watch() {
-    curl --connect-timeout 1 {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}} &> /dev/null
-    if [ ! $? -eq 0 ]
-    then
-        echo "Can't connect to stash. Check network and try again."
-    fi
-    mkdir -p ~/Desktop/.config/{g,f,c}
-    echo 'stash-watch: waiting for new files. Ctrl+C to exit'
-    stash-sync
-    while [ -d ~/Desktop/.config/ ] ; do
-        find ~/Desktop/.config/. -type d | entr -d echo ''
-        stash-sync
-    done
-}
-{{ end -}}
-
 {{ if .work -}}
 # ssh into a dev instance. requires atlas + the atlas micros plugin to be installed
 function micros-ssh() { 
@@ -161,3 +117,48 @@ END
     echo $JSON_RESP | jq
 }
 {{ end -}}
+
+{{ if .personal -}}
+function stash-yt() {
+    if [ "$#" -eq 2 ]
+    then
+        pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
+        if [ -f /tmp/cookies.txt ]
+        then
+            echo "downloading with cookies"
+            kubectl cp /tmp/cookies.txt media/$pod:/tmp/cookies.txt
+            kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp --cookies /tmp/cookies.txt -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        else
+            kubectl exec pod/$pod -n media -ti -- /usr/bin/yt-dlp -f 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/mp4' -o "/media/$1/%(title)s.%(ext)s" $2
+        fi
+        curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
+    else
+        echo "Usage: $0 <tag> <url>"
+        exit 1
+    fi
+}
+
+function stash-sync() {
+    echo 'syncing files to stash...'
+    pod=$(kubectl get pods -n media -l app.kubernetes.io/name=stash -o jsonpath="{.items[0].metadata.name}")
+    kubectl cp ~/Desktop/.hidden/. media/$pod:/media
+    find ~/Desktop/.hidden/. -type f \( ! -iname "*.crdownload" ! -iname "*.part" \) -exec rm '{}' \;
+    curl --silent -H "ApiKey: {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").apikey.value }}" -H "Content-Type: application/json" --data '{  "query": "mutation { metadataScan ( input: { scanGenerateCovers: true, scanGenerateThumbnails: true } ) } "}' https://{{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}}/graphql > /dev/null && echo 'stash synced successfully'
+}
+
+function stash-watch() {
+    curl --connect-timeout 1 {{ (onepasswordItemFields "s6vvx3amthzsur5sebo2re7xje").url.value -}} &> /dev/null
+    if [ ! $? -eq 0 ]
+    then
+        echo "Can't connect to stash. Check network and try again."
+    fi
+    mkdir -p ~/Desktop/.hidden/{g,f,c}
+    echo 'stash-watch: waiting for new files. Ctrl+C to exit'
+    stash-sync
+    while [ -d ~/Desktop/.hidden/ ] ; do
+        find ~/Desktop/.hidden/. -type d | entr -d echo ''
+        stash-sync
+    done
+}
+{{ end -}}
+
