@@ -1,5 +1,7 @@
 iterm
 README.md
+kinesis
+
 {{ if .work -}}
 # work files
 # these files will be ignored on work machine
