@@ -30,19 +30,15 @@ endif
 
 " Allow NeoBundle to update itself O.o
 NeoBundleFetch 'Shougo/neobundle.vim'
-NeoBundle 'marciomazza/vim-brogrammer-theme'
+NeoBundle 'kaicataldo/material.vim'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-git'
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'ctrlpvim/ctrlp.vim'
-NeoBundle 'mattn/gist-vim'
-NeoBundle 'mattn/webapi-vim'
-NeoBundle 'altercation/vim-colors-solarized'
 NeoBundle 'vim-airline/vim-airline'
 NeoBundle 'vim-airline/vim-airline-themes'
 NeoBundle 'scrooloose/nerdtree'
 NeoBundle 'scrooloose/nerdcommenter'
-NeoBundle 'Shougo/neocomplete.vim'
 NeoBundle 'majutsushi/tagbar'
 
 " Language plugins

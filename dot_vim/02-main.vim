@@ -1,7 +1,12 @@
 set background=dark " Nicer colour scheme for darker terminal backgrounds
 
 set t_Co=256                      " Make vim aware of 256 colorspace
-colorscheme brogrammer
+colorscheme material
+let g:material_theme_style='darker' " Material darker colorscheme
+
+if (has('termguicolors'))
+  set termguicolors                 " needed for line numbers to show
+endif
 
 syntax enable " syntax highlighting
 filetype plugin indent on
