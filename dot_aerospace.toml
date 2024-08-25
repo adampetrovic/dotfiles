@@ -1,7 +1,8 @@
 # Reference: https://github.com/i3/i3/blob/next/etc/config
 
 after-startup-command = [
-  'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0'
+  'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0',
+  #'exec-and-forget sketchybar'
 ]
 
 # i3 doesn't have "normalizations" feature that why we disable them here.
@@ -11,16 +12,20 @@ after-startup-command = [
 enable-normalization-flatten-containers = false
 enable-normalization-opposite-orientation-for-nested-containers = false
 
+#exec-on-workspace-change = ['/bin/bash', '-c',
+    #'sketchybar --trigger aerospace_workspace_change AEROSPACE_FOCUSED_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE AEROSPACE_PREV_WORKSPACE=$AEROSPACE_PREV_WORKSPACE'
+#]
+
 # Mouse follows focus when focused monitor changes
 on-focused-monitor-changed = ['move-mouse monitor-lazy-center']
 
 [gaps]
 inner.horizontal = 8
 inner.vertical =   8
-outer.left =       8
+outer.left =       0
 outer.bottom =     0
 outer.top =        0
-outer.right =      8
+outer.right =      0
 
 [mode.main.binding]
 alt-enter = 'exec-and-forget open -n /Applications/WezTerm.app'
@@ -64,6 +69,7 @@ alt-7 = 'workspace 7'
 alt-8 = 'workspace 8'
 alt-9 = 'workspace 9'
 alt-0 = 'workspace 10'
+alt-b = 'workspace B'
 
 alt-shift-1 = 'move-node-to-workspace 1'
 alt-shift-2 = 'move-node-to-workspace 2'
@@ -88,3 +94,32 @@ l = 'resize width +50'
 r = ['flatten-workspace-tree', 'mode main']
 enter = 'mode main'
 esc = 'mode main'
+
+
+[[on-window-detected]]
+if.app-id = 'com.google.Chrome'
+run = "move-node-to-workspace B"
+
+[[on-window-detected]]
+if.app-id = 'com.github.wez.wezterm'
+run = "move-node-to-workspace 2"
+
+[[on-window-detected]]
+if.app-id = 'com.jetbrains.intellij'
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'com.jetbrains.goland'
+run = 'move-node-to-workspace 3'
+
+[[on-window-detected]]
+if.app-id = 'com.jetbrains.pycharm'
+run = ['move-node-to-workspace 3']
+
+[[on-window-detected]]
+if.app-id = 'com.1password.1password'
+run = 'layout floating'
+
+[[on-window-detected]]
+if.app-id = 'com.apple.MobileSMS'
+run = 'layout floating'

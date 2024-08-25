@@ -24,6 +24,9 @@ echo "Applying General UI/UX"
 
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
 
+# Disable window animations
+defaults write -g NSAutomaticWindowAnimationsEnabled -bool false
+
 # Always show scrollbars
 defaults write NSGlobalDomain AppleShowScrollBars -string "Always"
 # Possible values: `WhenScrolling`, `Automatic` and `Always`
