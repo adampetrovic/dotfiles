@@ -194,6 +194,11 @@
     rex = remote rm
     rem = remote rename
 
+    # branchless
+    swm = "!f() { git sync --pull && git switch -d $(git symbolic-ref refs/remotes/origin/HEAD | sed \"s@^refs/remotes/origin/@@\"); }; f"
+    swi = branchless switch -d -i
+
+
 [remote "origin"]
 	receivepack = git-receive-pack
 
