@@ -124,10 +124,11 @@ export ASDF_FORCE_PREPEND=no
 zi ice lucid wait="0" pick="asdf.sh"
 zi light $(brew --prefix asdf)/libexec
 
+
+# aliases / custom config etc
+for file in ~/.zsh/*.zsh; do
+    source "$file"
+done
+
 eval "$(/opt/homebrew/bin/brew shellenv)"
-PATH=$HOME/.krew/bin:$PATH
-{{- if .work }}
-eval "$(jira --completion-script-zsh)"
-eval "$(tfenv init)"
-{{ end }}
-source ~/.zsh/aliases.zsh
+ATH=$HOME/.krew/bin:$PATH

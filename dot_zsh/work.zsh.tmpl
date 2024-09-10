@@ -1,0 +1,163 @@
+{{ if .work -}}
+alias as="assume-service"
+alias asc="assume-service -c"
+alias asi="assume-service -i"
+
+function assume-service() {
+
+    flag="-c"
+    message="Generating AWS Console URL..."
+
+    while getopts "ci" opt; do
+        case $opt in
+            i)
+                flag=""
+                message="Generating Environment Variables..."
+                ;;
+        esac
+    done
+    
+    shift $((OPTIND-1))
+
+    env=$1
+    if [[ -z "$1" ]]; then
+        env=$(
+            gum spin --spinner dot --title "Fetching List of Environments..." --show-output -- \
+            atlas micros service show -s tdp-os -o json \
+            | jq -r '.environments | keys[] as $env | .[$env].url | select(. != "Not found") | $env' \
+            | gum choose --limit=1
+        )
+    fi
+
+    console=$(gum spin --spinner monkey --title "$message" --show-output --title.foreground 99 -- \
+        atlas micros role assume service -s tdp-os -e "$env" $flag
+    )
+
+    if [[ "$flag" == "-c" ]]; then
+        if [[ "$console" =~ https://.* ]]; then
+            open "$console"
+        else
+            echo "No valid URL found in the output."
+        fi
+    else
+        eval "$console"
+    fi    
+}
+
+function stacks() {
+    if [ "$#" -eq 2 ]
+    then
+        PARAM='.environments | "'$2'" as $k'
+    elif [ "$#" -eq 1 ]
+    then
+        PARAM='.environments | keys[] as $k'
+    else
+        echo "Usage: $0 <service> [<env>]"
+        kill -INT $$
+    fi
+
+    read -r -d '' JQ_EXPR << END
+        [
+            $PARAM | select(.[\$k].url != "Not found") |
+            {
+                env: \$k,
+                url: .[\$k].url,
+                stacks: {
+                    stable: {
+                        traffic: .[\$k].stable.traffic,
+                        id: .[\$k].stable.id
+                    },
+                    canary: {
+                        traffic: .[\$k].canary.traffic,
+                        id: .[\$k].canary.id
+                    },
+                    previous: {
+                        traffic: .[\$k].previous.traffic,
+                        id: .[\$k].previous.id
+                    }
+                }
+            }
+        ]
+END
+
+    JSON_RESP=$(atlas micros service show --service $1 --output json | jq -r "$JQ_EXPR")
+    echo $JSON_RESP | gum format -t code
+}
+
+function service-dns() {
+    if [ "$#" -eq 2 ]
+    then
+        atlas micros service show -s $1 -e $2 -o json | jq -r '.environments | keys[] as $env | .[$env].url | select(. != "Not found")'
+    elif [ "$#" -eq 1 ]
+    then
+        atlas micros service show -s $1 -o json | jq -r '.environments | keys[] as $env | .[$env].url | select(. != "Not found")'
+    else
+        echo "Usage: $0 <service> [<env>]"
+        exit 1
+    fi
+}
+
+function instance-type() {
+    if [ "$#" -eq 2 ]
+    then
+        PARAM='.stacks | "'$2'" as $k'
+    elif [ "$#" -eq 1 ]
+    then
+        PARAM='.stacks | keys[] as $k'
+    else
+        echo "Usage: $0 <name> <end>"
+        exit 1
+    fi
+
+    read -r -d '' JQ_EXPR << END
+        [
+            $PARAM |
+            {
+                env: \$k, 
+                instanceType: .[\$k][].outputs.WebServerInstance
+            }
+        ]
+END
+
+    JSON_RESP=$(atlas micros service show --service $1 --output json | jq -r "$JQ_EXPR")
+    echo $JSON_RESP | jq
+}
+
+function heimdall-config() {
+    if [ "$#" -eq 2 ]
+    then
+        PARAM='.stacks."'$2'"[]'
+    elif [ "$#" -eq 1 ]
+    then
+        PARAM='.stacks[][]'
+    else
+        echo "Usage: $0 <name> <end>"
+        exit 1
+    fi
+
+    JSON_RESP=$(micros service:show --json $1 | jq -r "$PARAM | {env: .env, sidecars: .platformComponents}")
+    echo $JSON_RESP | jq
+}
+
+function list-prs() {
+    repo_slug="atlassian/tdp-os"
+    username={{ (onepasswordDetailsFields "3aqykkapy5evpp7bpw5a6xbw6q").username.value }}
+    password={{ (onepasswordItemFields "3aqykkapy5evpp7bpw5a6xbw6q").appPassword.value }}
+    if [ "$#" -eq 1 ]
+    then
+        repo_slug=$1
+    fi
+
+    read -r -d '' JQ_EXPR << END
+        .values[] |
+        "{{ "{{ " }} \"" + .source.branch.name + "\" {{ "}}\t" }}"
+END
+
+    JSON_RESP=$(
+        gum spin --spinner dot --title "Fetching Pull Requests..." -- \
+        curl -su $username:$password https://api.bitbucket.org/2.0/repositories/$repo_slug/pullrequests \
+            | jq -r "$JQ_EXPR"
+    )
+    echo $JSON_RESP | gum format -t template
+}
+{{ end -}}

@@ -113,8 +113,7 @@
     bM = branch -M
     bs = show-branch
     bS = show-branch -a
-    cleanup = "!git branch --merged main | grep  -v '\\*\\|main\\|develop' | xargs -n 1 -r git branch -d"
-
+    cleanup = "!git branch | cut -c 3- | grep -vE '\\*|main|master' | gum choose --no-limit | xargs git branch -D"
 
     # checkout/fetch/merge/push/rebase
     # checkout
@@ -195,6 +194,7 @@
     rem = remote rename
 
     # branchless
+    bs =  "!f() { if [ -z "$1" ]; then echo "Error: branch name required"; exit 1; fi; git branch -f "$1" && git submit -c; }; f"
     swm = "!f() { git sync --pull && git switch -d $(git symbolic-ref refs/remotes/origin/HEAD | sed \"s@^refs/remotes/origin/@@\"); }; f"
     swi = branchless switch -d -i
 
