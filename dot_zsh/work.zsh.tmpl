@@ -3,8 +3,19 @@ alias as="assume-service"
 alias asc="assume-service -c"
 alias asi="assume-service -i"
 
-function assume-service() {
+function awsm() {
+    if [ "$#" -le 2 ]; then
+        echo "Usage: awsm <env> <subcommand>"
+        kill -INT $$
+    fi
+    local env="$1"
+    shift
+    local aws_command=("$@")
+    eval "$(atlas micros role assume service -s tdp-os -e $env)"
+    aws "${aws_command[@]}"
+}
 
+function assume-service() {
     flag="-c"
     message="Generating AWS Console URL..."
 
