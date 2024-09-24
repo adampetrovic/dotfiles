@@ -1,3 +1,12 @@
 {{- if .work }}
-eval "$(jira --completion-script-zsh)"
+eval $(jira completion zsh)
+
+jira() {
+    if [ "$1" = "mine" ]; then
+        shift
+        command jira issue list -a "$(jira me)" "$@"
+    else
+        command jira "$@"
+    fi
+}
 {{ end }}

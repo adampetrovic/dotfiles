@@ -1,5 +1,4 @@
 {{ if .work -}}
-alias as="assume-service"
 alias asc="assume-service -c"
 alias asi="assume-service -i"
 
@@ -11,19 +10,21 @@ function awsm() {
     local env="$1"
     shift
     local aws_command=("$@")
-    eval "$(atlas micros role assume service -s tdp-os -e $env)"
+    assume-service $env
     aws "${aws_command[@]}"
 }
 
 function assume-service() {
-    flag="-c"
-    message="Generating AWS Console URL..."
-
+    local flag
+    message="Generating Environment Variables..."
     while getopts "ci" opt; do
         case $opt in
+            c)
+                flag="-c"
+                message="Generating AWS Console URL..."
+                ;;
             i)
-                flag=""
-                message="Generating Environment Variables..."
+                flag="-i"
                 ;;
         esac
     done
