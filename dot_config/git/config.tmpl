@@ -1,11 +1,10 @@
 # Global Config
 [user]
     name = "Adam Petrovic"
+    email = "{{ .email }}"
 {{- if .work }}
-    email = "apetrovic@atlassian.com"
     signingkey = {{ (onepasswordDetailsFields "46cauqkszyrupjn2vh7hgurks4").public_key.value }}
 {{- else }}
-    email = "adam@petrovic.com.au"
     signingkey = {{ (onepasswordDetailsFields "krax3py6xt2nkn3peqyjgw7nmm").public_key.value }}
 {{- end }}
 
