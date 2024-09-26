@@ -5,4 +5,16 @@ email = "{{ .email }}"
 [ui]
 editor = "vim"
 default-command = "log"
-diff.tool = ["difft", "--color=always", "$left", "$right"]
+
+[git]
+push-branch-prefix = "apetrovic/push-"
+
+[revsets]
+log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_branches()), 2)"
+
+[revset-aliases]
+"immutable_heads()" = "trunk() | tags()"
+
+[aliases]
+sync = ['git', 'fetch', '--all-remotes']
+restack = ['rebase', '--skip-emptied', '-d', 'trunk()']
