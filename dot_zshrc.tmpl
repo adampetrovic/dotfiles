@@ -133,5 +133,7 @@ done
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH=$HOME/.krew/bin:/usr/local/bin:$PATH
+export HOMEBREW_NO_ENV_HINTS=true
+
 # set custom ssh agent (for things that don't respect ~/.ssh/config)
 export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
