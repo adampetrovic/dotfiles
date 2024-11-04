@@ -5,14 +5,18 @@ email = "{{ .email }}"
 [ui]
 editor = "vim"
 default-command = "log"
-diff.tool = ["delta", "$left", "$right"]
+diff.tool = ["difft", "--color=always", "$left", "$right"]
+
+[fix.tools.detekt]
+command = ["./gradlew", "detekt"]
+patterns = ["glob:'**/*.kt'"]
 
 [git]
 auto-local-branch = false
-push-branch-prefix = "apetrovic/push-"
+push-bookmark-prefix = "apetrovic/push-"
 
 [revsets]
-log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_branches()), 2)"
+log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_bookmarks()), 2)"
 
 [revset-aliases]
 "immutable_heads()" = "trunk() | tags()"
