@@ -26,7 +26,6 @@
     "fzf"
 	"fluxcd/tap/flux"
     "git"
-    "git-branchless"
     "git-delta"
     "git-extras"
     "gnu-sed"
@@ -40,7 +39,6 @@
     "krr"
 	"kubectl"
     "mas"
-    "neovim"
     "pipenv"
     "qmk/qmk/qmk"
     "ripgrep"
@@ -131,8 +129,7 @@
     "zoom") -}}
 
 {{  $mas = merge $mas (dict
-    "Wireguard" "1451685025"
-    "Parcel" "639968404") -}}
+    "Wireguard" "1451685025") -}}
 {{- end -}}
 
 {{ range ($taps | sortAlpha | uniq) -}}
