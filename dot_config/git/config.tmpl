@@ -10,13 +10,15 @@
 
 [url "https://github.com"]
 	insteadOf = git://github.com
-
 {{- if .work }}
 [url "ssh://git@stash.atlassian.com:7997/"]
     insteadof = https://stash.atlassian.com/scm/
 [url "git@bitbucket.org:"]
 	insteadOf = https://bitbucket.org/
 {{- end }}
+
+[remote "origin"]
+	receivepack = git-receive-pack
 
 [init]
     defaultBranch = main
@@ -146,10 +148,6 @@
     rom = rebase origin/main
     fr  = "!git fetch origin && git rebase origin/main"
 
-    # rebase advanced
-    fixup = "!sh -c '(git diff-files --quiet || (echo Unstaged changes, please commit or stash with --keep-index; exit 1)) && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && git rebase -i --autosquash $COMMIT~1' -"
-    rbi = "!sh -c 'git rebase -i $(git merge-base HEAD origin/main)'"
-
     # commit
     c      = commit -v
     ca     = commit --all -v
@@ -194,44 +192,3 @@
     rea = remote add
     rex = remote rm
     rem = remote rename
-
-    # branchless
-    bs =  "!f() { if [ -z "$1" ]; then echo "Error: branch name required"; exit 1; fi; git branch -f "$1" && git submit -c; }; f"
-    swm = "!f() { git sync --pull && git switch -d $(git symbolic-ref refs/remotes/origin/HEAD | sed \"s@^refs/remotes/origin/@@\"); }; f"
-    swi = branchless switch -d -i
-
-
-[remote "origin"]
-	receivepack = git-receive-pack
-
-# tig configuration
-
-[tig]
-    show-date = relative
-    show-rev-graph = yes
-    show-refs = yes
-    show-line-numbers = yes
-    line-number-interval = 5
-    tab-size = 2
-    commit-encoding = "UTF-8"
-
-[color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
-
-[stgit]
-
-[stgit "alias"]
-    list = series -d
-
-[stgit "edit"]
-    verbose = true
-
-[stgit "color"]
-	# Specify output colors for series commands
-	applied = green_foreground
-	current = red_foreground
-	unapplied = white_foreground
-	hidden = cyan_foreground
