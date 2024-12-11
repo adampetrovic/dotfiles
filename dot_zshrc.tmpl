@@ -7,10 +7,28 @@ source "${ZINIT_HOME}/zinit.zsh"
 autoload -Uz _zinit
 (( ${+_comps} )) && _comps[zinit]=_zinit
 
+# Critical environment variables (needed early)
+export EDITOR=vim
+export HOMEBREW_NO_ENV_HINTS=true
+export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+export ASDF_FORCE_PREPEND=no
+
+# History settings
+HISTSIZE=50000
+HISTFILE=~/.zsh_history
+SAVEHIST=99999999
+setopt appendhistory
+setopt sharehistory
+setopt incappendhistory
+setopt histignorespace
+
+# Load theme first
 zinit light NICHOLAS85/z-a-eval
 
 zi ice pick"spaceship.zsh" as"theme" depth"1"
 zi light spaceship-prompt/spaceship-prompt
+
+# Theme configuration
 SPACESHIP_PROMPT_ORDER=(
     user
     dir
@@ -22,25 +40,20 @@ SPACESHIP_PROMPT_ORDER=(
     exit_code
     char
 )
-
-SPACESHIP_RPROMPT_ORDER=(
-    time
-)
-
+SPACESHIP_RPROMPT_ORDER=(time)
 SPACESHIP_PROMPT_ADD_NEWLINE=false
 SPACESHIP_TIME_SHOW=true
 SPACESHIP_EXIT_CODE_SHOW=true
 SPACESHIP_EXIT_CODE_COLOR=red
-
-# spaceship git
 SPACESHIP_GIT_BRANCH_SHOW=true
 SPACESHIP_GIT_BRANCH_ASYNC=true
 SPACESHIP_GIT_BRANCH_COLOR="magenta"
 SPACESHIP_GIT_STATUS_SHOW=false
 
+# Custom git branch function for jj support
 spaceship_git_branch () {
-    if [[ -d .jj ]]; then
-        jj_branch=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'surround(" ", " ", branches.join(", "))')
+    if [[ -d .jj ]] && command -v jj >/dev/null 2>&1; then
+        jj_branch=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'surround(" ", " ", bookmarks.join(", "))')
         jj_changes=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'surround("(", ")", change_id.shortest(6) ++ " " ++ commit_id.shortest(6))')
         spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$jj_branch$jj_changes"
     else
@@ -51,81 +64,80 @@ spaceship_git_branch () {
         [[ "$git_current_branch" == branchless/* ]] && git_current_branch="(detached)"
         git_current_branch="${git_current_branch#heads/}"
         git_current_branch="${git_current_branch/.../}"
-	    spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$SPACESHIP_GIT_BRANCH_PREFIX$git_current_branch$SPACESHIP_GIT_BRANCH_SUFFIX"
+        spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$SPACESHIP_GIT_BRANCH_PREFIX$git_current_branch$SPACESHIP_GIT_BRANCH_SUFFIX"
     fi
 }
 
-zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpcompinit; zpcdreplay'
-zi wait lucid for \
-    atinit'ZINIT[COMPINIT_OPTS]=-C; zicompinit; zicdreplay' \
-        zdharma-continuum/fast-syntax-highlighting \
-    atload"fast-theme -q clean" \
-    blockf \
-        zsh-users/zsh-completions \
-    atload'!_zsh_autosuggest_start' \
-        zsh-users/zsh-autosuggestions \
-        zdharma-continuum/history-search-multi-word
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
-ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-
-
-zinit ice atclone"/opt/homebrew/bin/gdircolors -b LS_COLORS > clrs.zsh" \
-    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
-    atload'zstyle ":completion:*" list-colors “${(s.:.)LS_COLORS}”'
-zinit light trapd00r/LS_COLORS
-
-# z / fzf (ctrl-g)
-zinit ice wait lucid
-zinit light andrewferrier/fzf-z
-
-# direnv
-zinit light ptavares/zsh-direnv
-
-# omz libraries
-zi snippet OMZL::clipboard.zsh
-zi snippet OMZL::history.zsh
-
-# omz plugins
-zi snippet OMZP::brew/brew.plugin.zsh
-zi snippet OMZP::command-not-found/command-not-found.plugin.zsh
-zi snippet OMZP::git-extras/git-extras.plugin.zsh
-zi snippet OMZP::kubectl/kubectl.plugin.zsh
-zi snippet OMZP::sudo/sudo.plugin.zsh
-
-# presto
-zi snippet PZTM::osx
-
-# history settings
-HISTSIZE=50000              #How many lines of history to keep in memory
-HISTFILE=~/.zsh_history     #Where to save history to disk
-SAVEHIST=99999999           #Number of history entries to save to disk
-setopt    appendhistory     #Append history to the history file (no overwriting)
-setopt    sharehistory      #Share history across terminals
-setopt    incappendhistory  #Immediately append to the history file, not just when a term is killed
-setopt    histignorespace   #Prefix command with space for it not to show in zsh history
-
-# automatically escape characters in URL paste
+# URL magic
 autoload -U url-quote-magic bracketed-paste-magic
 zle -N self-insert url-quote-magic
 zle -N bracketed-paste bracketed-paste-magic
 
-# EDITOR
-EDITOR=vim
+# compinit / completions
+autoload -Uz compinit
+[[ ! -d ~/.local/share/zinit/completions ]] && mkdir -p ~/.local/share/zinit/completions
+compinit -u -C
 
-export ASDF_FORCE_PREPEND=no
-zi ice lucid wait="0" pick="asdf.sh"
-zi light $(brew --prefix asdf)/libexec
+# Main plugin block
+zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpcompinit; zpcdreplay'
+zi wait lucid for \
+    zdharma-continuum/fast-syntax-highlighting \
+    atload"fast-theme -q clean" \
+    blockf \
+    zsh-users/zsh-completions \
+    atload'!_zsh_autosuggest_start' \
+    zsh-users/zsh-autosuggestions \
+    zdharma-continuum/history-search-multi-word
 
-eval "$(zoxide init --cmd cd zsh)"
+# zinit completion
+zi ice has"jj" as"completion" id-as"jj-completion" \
+    atclone"mkdir -p ~/.local/share/zinit/completions" \
+    atload'source <(jj util completion zsh); source <(COMPLETE=zsh jj)'
+zi light zdharma-continuum/null
 
-# aliases / custom config etc
-for file in ~/.zsh/*.zsh; do
-    source "$file"
-done
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH=$HOME/.krew/bin:/usr/local/bin:$PATH
-export HOMEBREW_NO_ENV_HINTS=true
+# Colors
+zinit ice atclone"/opt/homebrew/bin/gdircolors -b LS_COLORS > clrs.zsh" \
+    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
+zinit light trapd00r/LS_COLORS
 
-# set custom ssh agent (for things that don't respect ~/.ssh/config)
-export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+# Tools and utilities
+zinit wait lucid for \
+    andrewferrier/fzf-z \
+    ptavares/zsh-direnv
+
+# OMZ snippets
+zi wait"0" lucid for \
+    OMZL::clipboard.zsh \
+    OMZL::history.zsh \
+    OMZP::brew/brew.plugin.zsh \
+    OMZP::command-not-found/command-not-found.plugin.zsh \
+    OMZP::git-extras/git-extras.plugin.zsh \
+    OMZP::kubectl/kubectl.plugin.zsh \
+    OMZP::sudo/sudo.plugin.zsh \
+    PZTM::osx
+
+# Environment setup
+zi wait lucid for \
+    atload'eval "$(/opt/homebrew/bin/brew shellenv)"' \
+    zdharma-continuum/null \
+    atload'export PATH=$HOME/.krew/bin:/usr/local/bin:$PATH' \
+    zdharma-continuum/null \
+    has"zoxide" \
+    atload'eval "$(zoxide init --cmd cd zsh)"' \
+    zdharma-continuum/null
+
+# asdf
+zi ice lucid wait="0" atload'
+    ASDF_DIR="$(brew --prefix asdf)/libexec"
+    export ASDF_DIR
+    source $ASDF_DIR/asdf.sh
+'
+zi light zdharma-continuum/null
+
+# Custom configs
+zi ice wait="1" lucid multisrc"~/.zsh/*.zsh"
+zi light zdharma-continuum/null
