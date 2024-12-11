@@ -5,7 +5,7 @@ email = "{{ .email }}"
 [ui]
 editor = "vim"
 default-command = "log"
-diff.tool = ["difft", "--color=always", "$left", "$right"]
+diff.tool = ["delta", "--dark", "$left", "$right"]
 
 [fix.tools.detekt]
 command = ["./gradlew", "detekt"]
