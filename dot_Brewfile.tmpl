@@ -85,7 +85,8 @@
     "Amphetamine" "937984704"
     "Reeder" "1529448980"
     "SnippetsLab" "1006087419"
-    "Things3" "904280696" -}}
+    "Things3" "904280696" 
+    "Wireguard" "1451685025" -}}
 
 {{/* personal-specific packages */}}
 {{- if .personal -}}
@@ -100,9 +101,7 @@
     "telegram") -}}
 
 {{-  $mas = merge $mas (dict
-    "Wireguard" "1451685025"
-    "Parcel" "639968404"
-    "Stockfish Chess" "801463932") -}}
+    "Parcel" "639968404") -}}
 {{- end -}}
 
 
@@ -117,6 +116,7 @@
 
 {{  $brews = concat $brews (list
     "atlas-cli"
+    "go-jira"
     "tfenv") -}}
 
 {{  $casks = concat $casks (list
@@ -129,8 +129,7 @@
     "yubico-yubikey-manager"
     "zoom") -}}
 
-{{  $mas = merge $mas (dict
-    "Wireguard" "1451685025") -}}
+{{  $mas = merge $mas (dict) -}}
 {{- end -}}
 
 {{ range ($taps | sortAlpha | uniq) -}}

@@ -12,6 +12,8 @@ export EDITOR=vim
 export HOMEBREW_NO_ENV_HINTS=true
 export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
 export ASDF_FORCE_PREPEND=no
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH=$HOME/.krew/bin:/usr/local/bin:$PATH
 
 # History settings
 HISTSIZE=50000
@@ -122,10 +124,6 @@ zi wait"0" lucid for \
 
 # Environment setup
 zi wait lucid for \
-    atload'eval "$(/opt/homebrew/bin/brew shellenv)"' \
-    zdharma-continuum/null \
-    atload'export PATH=$HOME/.krew/bin:/usr/local/bin:$PATH' \
-    zdharma-continuum/null \
     has"zoxide" \
     atload'eval "$(zoxide init --cmd cd zsh)"' \
     zdharma-continuum/null
