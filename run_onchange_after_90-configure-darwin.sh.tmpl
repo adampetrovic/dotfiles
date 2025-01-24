@@ -293,22 +293,10 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 # Terminal & iTerm 2                                                          #
 ###############################################################################
 
-echo "Applying Terminal & iTerm"
+echo "Applying Terminal"
 
 # Only use UTF-8 in Terminal.app
 defaults write com.apple.terminal StringEncodings -array 4
-
-# Install iTerm2 Themes
-installed_themes=$(defaults read com.googlecode.iterm2.plist "Custom Color Presets" | ggrep -oP '\s{4}\K(\w|").*"?(?= =)' | tr -d '"' | sort | uniq)
-available_themes=$(find "{{ .chezmoi.sourceDir }}/iterm/colors" -name "*.itermcolors" -exec basename "{}" .itermcolors \; | sort)
-
-installable_themes=$(comm -23 <(echo "$available_themes") <(echo "$installed_themes"))
-for theme in $installable_themes; do
-    open "{{ .chezmoi.sourceDir }}/iterm/colors/$theme.itermcolors"
-done
-
-# Don’t display the annoying prompt when quitting iTerm
-defaults write com.googlecode.iterm2 PromptOnQuit -bool false
 
 ###############################################################################
 # Activity Monitor                                                            #

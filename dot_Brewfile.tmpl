@@ -4,10 +4,9 @@
     "homebrew/bundle"
     "buo/cask-upgrade"
     "FelixKratz/formulae"  
-    "fluxcd/tap"
     "go-task/tap"
+    "qmk/qmk"
     "weaveworks/tap"
-    "robusta-dev/homebrew-krr"
     "siderolabs/tap" -}}
 
 {{- $customTaps := dict -}}
@@ -17,14 +16,12 @@
     "bat"
     "bind"
     "chezmoi"
-	"cilium-cli"
     "coreutils"
 	"direnv"
     "dockutil"
     "doggo"
     "entr"
     "fzf"
-	"fluxcd/tap/flux"
     "git"
     "git-delta"
     "git-extras"
@@ -38,11 +35,10 @@
     "jj"
     "jq"
     "krew"
-    "krr"
 	"kubectl"
     "mas"
     "pipenv"
-    "qmk/qmk/qmk"
+    "qmk"
     "ripgrep"
     "rsync"
     "sops"
@@ -110,9 +106,7 @@
 {{- $taps = concat $taps (list) -}}
 
 {{  $customTaps = merge $customTaps (dict
-    "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git"
-    "atlassian/cloudtoken" "ssh://git@bitbucket.org/atlassian/cloudtoken-homebrew-tap.git"
-    "atlassian/kubetoken" "ssh://git@stash.atlassian.com:7997/kube/homebrew-kubetoken.git") -}}
+    "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git") -}}
 
 {{  $brews = concat $brews (list
     "atlas-cli"
@@ -121,11 +115,11 @@
 
 {{  $casks = concat $casks (list
     "amazon-workspaces"
-    "cloudtoken"
+    "cloudflare-warp"
     "docker"
     "loom"
     "postman"
-    "slack-beta"
+    "slack@beta"
     "yubico-yubikey-manager"
     "zoom") -}}
 

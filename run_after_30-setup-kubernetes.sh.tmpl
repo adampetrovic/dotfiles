@@ -40,24 +40,9 @@ else
 fi
 
 if kubectl krew >/dev/null 2>&1; then
-    krew_indexes=(
-        "netshoot https://github.com/nilic/kubectl-netshoot.git"
-    )
-    for idx in "${krew_indexes[@]}"
-    do
-        kubectl krew index add ${idx}
-    done
-
     krew_pkgs=(
-        "autons"
-        "clog"
         "cnpg"
-        "images"
         "klock"
-        "ktop"
-        "netshoot/netshoot"
-        "oomd"
-        "restart"
         "rook-ceph"
         "sick-pods"
         "view-secret"
