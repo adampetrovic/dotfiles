@@ -1,7 +1,7 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
 
-# current dock: {{ output "dockutil" "-L" | splitList "\n" }}
+# current dock: {{ output "/opt/homebrew/bin/dockutil" "-L" | splitList "\n" }}
 
 set -eufo pipefail
 
@@ -218,26 +218,25 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 
 echo "Applying Dock, Desktop Dashboard & Hot Corners"
 
-dockutil --no-restart --remove all
-dockutil --no-restart --add "/Applications/Google Chrome.app"
-dockutil --no-restart --add "/Applications/Fantastical.app"
+/opt/homebrew/bin/dockutil --no-restart --remove all
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Google Chrome.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Fantastical.app"
 {{ if .work -}}
-dockutil --no-restart --add "/Applications/Cisco/Cisco Secure Client.app"
-dockutil --no-restart --add "/Applications/Slack.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Slack.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/IntelliJ IDEA.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/PyCharm.app"
 {{ end -}}
-dockutil --no-restart --add "/Applications/WezTerm.app"
-dockutil --no-restart --add "/Applications/Obsidian.app"
-dockutil --no-restart --add "/Applications/Things3.app"
-{{ if .work -}}
-dockutil --no-restart --add "/Users/apetrovic/Applications/Chrome Apps.localized/Telegram Web.app"
-{{ else }}
-dockutil --no-restart --add "/Applications/Telegram.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/WezTerm.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Obsidian.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Things3.app"
+{{ if .personal -}}
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Telegram.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Spotify.app"
 {{ end -}}
-dockutil --no-restart --add "/Applications/Spotify.app"
-dockutil --no-restart --add "/Applications/Reeder.app"
-dockutil --no-restart --add "/System/Applications/System Settings.app"
-dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
-dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Reeder.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/System/Applications/System Settings.app"
+/opt/homebrew/bin/dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
+/opt/homebrew/bin/dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
 
 # Disable "click to reveal desktop" on Sonoma and above
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
@@ -285,9 +284,13 @@ defaults write com.apple.dock show-recents -bool false
 defaults write com.apple.dock wvous-tl-corner -int 2
 defaults write com.apple.dock wvous-tl-modifier -int 524288
 
-# Top right screen corner → Desktop
+# Top right screen corner → Screensaver
 defaults write com.apple.dock wvous-tr-corner -int 5
 defaults write com.apple.dock wvous-tr-modifier -int 0
+
+# Bottom right screen corner → Sleep display
+defaults write com.apple.dock wvous-br-corner -int 10
+defaults write com.apple.dock wvous-br-modifier -int 0
 
 ###############################################################################
 # Terminal & iTerm 2                                                          #
