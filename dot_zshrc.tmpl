@@ -128,13 +128,11 @@ zi wait lucid for \
     atload'eval "$(zoxide init --cmd cd zsh)"' \
     zdharma-continuum/null
 
-# asdf
-zi ice lucid wait="0" atload'
-    ASDF_DIR="$(brew --prefix asdf)/libexec"
-    export ASDF_DIR
-    source $ASDF_DIR/asdf.sh
-'
-zi light zdharma-continuum/null
+# mise
+zi wait lucid for \
+    has"zoxide" \
+    atload'eval "$(mise activate zsh)"' \
+    zdharma-continuum/null
 
 # Custom configs
 zi ice wait="1" lucid multisrc"~/.zsh/*.zsh"
