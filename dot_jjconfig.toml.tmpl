@@ -20,6 +20,7 @@ patterns = ["glob:'**/*.kt'"]
 [git]
 auto-local-bookmark = false
 push-bookmark-prefix = "apetrovic/push-"
+push-new-bookmarks = true
 
 [revsets]
 log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_bookmarks()), 2)"

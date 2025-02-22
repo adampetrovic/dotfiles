@@ -36,6 +36,11 @@ vnoremap > >gv
 nnoremap j gj
 nnoremap k gk
 
+" delete to blackhole register
+nnoremap d "_d
+vnoremap d "_d
+nnoremap D "_D
+
 " Golang Mappings
 au FileType go nmap <Leader>i <Plug>(go-info)
 au FileType go nmap <Leader>gd <Plug>(go-doc)
