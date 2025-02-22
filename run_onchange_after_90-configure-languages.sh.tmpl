@@ -1,43 +1,5 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/usr/bin/env zsh
-
-[[ ! -f $(brew --prefix asdf)/bin/asdf ]] && echo "Unable to find asdf binary. Exiting." && exit 1
-
-asdf plugin add golang > /dev/null 2>&1
-asdf plugin add python > /dev/null 2>&1
-asdf plugin update golang
-asdf plugin update python
-
-
-# install specific versions
-go_versions=(
-    "1.16.10"
-    "1.17.3"
-)
-
-py_versions=(
-    "2.7.18"
-    "3.10.0"
-)
-
-for i in "${go_versions[@]}"
-do
-    asdf install golang ${i}
-    asdf reshim golang ${i}
-done
-
-for i in "${py_versions[@]}"
-do
-    asdf install python ${i}
-    asdf reshim python ${i}
-done
-
-asdf global golang 1.17.3
-asdf global python 3.10.0
-
-
-{{- if .work -}}
-tfenv install 0.13.4
-tfenv use 0.13.4
-{{- end -}}
+# current config: {{ include "dot_config/mise/config.toml" | sha256sum }}
+mise install
 {{ end }}
