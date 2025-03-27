@@ -89,7 +89,7 @@ wezterm.on('update-status', function(window, _)
 end)
 
 -- key bindings
-config.leader = { key = 'a', mods = 'CTRL', timeout_milliseconds = 1000 }
+config.leader = { key = ',', mods = 'CTRL', timeout_milliseconds = 1000 }
 config.keys = {
     {
         key = ',',

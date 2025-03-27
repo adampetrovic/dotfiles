@@ -4,7 +4,6 @@
     "homebrew/bundle"
     "buo/cask-upgrade"
     "FelixKratz/formulae"  
-    "go-task/tap"
     "qmk/qmk"
     "weaveworks/tap"
     "siderolabs/tap" -}}
@@ -33,10 +32,12 @@
     "jq"
     "krew"
 	"kubectl"
+	"llm"
     "mas"
     "mise"
     "pipenv"
     "qmk"
+    "repomix"
     "ripgrep"
     "rsync"
     "sops"
@@ -64,6 +65,7 @@
     "intellij-idea"
     "istat-menus"
     "keyboardcleantool"
+    "keymapp"
     "mitmproxy"
     "obsidian"
     "pycharm"
@@ -108,14 +110,14 @@
 
 {{  $brews = concat $brews (list
     "atlas-cli"
-    "go-jira"
+    "jira-cli"
     "tfenv") -}}
 
 {{  $casks = concat $casks (list
     "amazon-workspaces"
-    "brainfm"
     "cloudflare-warp"
     "docker"
+    "logitech-g-hub"
     "loom"
     "postman"
     "slack@beta"
