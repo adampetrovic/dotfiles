@@ -2,6 +2,25 @@
 alias asc="assume-service -c"
 alias asi="assume-service -i"
 
+function micros-login() {
+    # Run the command and capture all output
+    local output=$(atlas micros login 2>&1)
+    
+    # If we're being prompted for credentials (contains "Available authentication methods")
+    if [[ "$output" == *"Available authentication methods"* ]]; then
+        echo "$output"
+        return 0
+    fi
+    
+    # If we're already logged in, suppress the "Successfully logged in" message
+    if [[ "$output" == "Successfully logged in" ]]; then
+        return 0
+    fi
+    
+    # For any other output (like errors), show it
+    echo "$output"
+}
+
 function awsm() {
     if [ "$#" -le 2 ]; then
         echo "Usage: awsm <env> <subcommand>"
@@ -135,22 +154,6 @@ END
     echo $JSON_RESP | jq
 }
 
-function heimdall-config() {
-    if [ "$#" -eq 2 ]
-    then
-        PARAM='.stacks."'$2'"[]'
-    elif [ "$#" -eq 1 ]
-    then
-        PARAM='.stacks[][]'
-    else
-        echo "Usage: $0 <name> <end>"
-        exit 1
-    fi
-
-    JSON_RESP=$(micros service:show --json $1 | jq -r "$PARAM | {env: .env, sidecars: .platformComponents}")
-    echo $JSON_RESP | jq
-}
-
 function list-prs() {
     repo_slug="atlassian/tdp-os"
     username={{ (onepasswordDetailsFields "3aqykkapy5evpp7bpw5a6xbw6q").username.value }}
@@ -171,5 +174,92 @@ END
             | jq -r "$JQ_EXPR"
     )
     echo $JSON_RESP | gum format -t template
+}
+
+function dyn-get() {
+    if [ "$#" -ne 3 ]; then
+        echo "Usage: dyn-get <env> <table-name> <key>"
+        kill -INT $$
+    fi
+
+    local env="$1"
+    local table="$2"
+    local key="$3"
+
+    awsm "$env" dynamodb get-item \
+        --table-name "$table" \
+        --key "$key" \
+        --output json | jq
+}
+
+function os-object() {
+    if [ "$#" -lt 2 ] || [ "$#" -gt 3 ]; then
+        echo "Usage: os-object <env> <id> [version-id]"
+        kill -INT $$
+    fi
+
+    local env="$1"
+    local id="$2"
+    local version="$3"
+    local table="tdp-os--${env}--objects"
+    
+    if [ -n "$version" ]; then
+        # If version is provided, use GetItem
+        local key=$(printf '{"poId": {"S": "%s"}, "vId": {"S": "%s"}}' "$id" "$version")
+        
+        # Get the specific item
+        local result=$(awsm "$env" dynamodb get-item \
+            --table-name "$table" \
+            --key "$key" \
+            --return-consumed-capacity NONE \
+            --output json)
+
+        # Check if the item exists
+        if [[ "$result" == *"Item"* ]]; then
+            echo "$result" | jq '.Item'
+        else
+            echo "No item found with poId=$id and vId=$version" >&2
+            return 1
+        fi
+    else
+        # If no version provided, use Query to get all versions
+        local expr_attr_values=$(printf '{ ":id": {"S": "%s"} }' "$id")
+        
+        # Query all versions of the object
+        local result=$(awsm "$env" dynamodb query \
+            --table-name "$table" \
+            --key-condition-expression "poId = :id" \
+            --expression-attribute-values "$expr_attr_values" \
+            --return-consumed-capacity NONE \
+            --output json)
+
+        # Check if any items were found
+        if [[ "$(echo "$result" | jq '.Count')" -gt 0 ]]; then
+            # If only one item, return just that item
+            if [[ "$(echo "$result" | jq '.Count')" -eq 1 ]]; then
+                echo "$result" | jq '.Items[0]'
+            else
+                echo "$result" | jq '.Items'
+            fi
+        else
+            echo "No items found with poId=$id" >&2
+            return 1
+        fi
+    fi
+}
+
+function ddb2json() {
+    jq 'walk(if type == "object" then
+        if .S then .S                   # String
+        elif .N then (.N | tonumber)    # Number
+        elif .BOOL != null then .BOOL   # Boolean
+        elif .NULL then null            # Null
+        elif .L then .L                 # List
+        elif .M then .M                 # Map
+        elif .SS then .SS              # String Set
+        elif .NS then [.NS[] | tonumber] # Number Set
+        elif .BS then .BS              # Binary Set
+        else . end
+    else . end)'
 }
 {{ end -}}
