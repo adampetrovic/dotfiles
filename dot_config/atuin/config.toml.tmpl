@@ -1,4 +1,4 @@
-sync_address = 'https://atuin.{{ (onepasswordItemFields "tbpoo2tehrlbx57mftxj6sjd3a").SECRET_DOMAIN.value -}}'
+sync_address = 'https://atuin.{{ (onepasswordRead "op://k8s/cluster-secrets/SECRET_DOMAIN") -}}'
 inline_height = 10
 style = "compact"
 enter_accept = false

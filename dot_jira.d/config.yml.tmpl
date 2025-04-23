@@ -1,7 +1,7 @@
-endpoint: {{ (onepasswordItemFields "xmpftrgna4k3iw3lpzm4nrixfi").endpoint.value }}
-user: {{ (onepasswordItemFields "xmpftrgna4k3iw3lpzm4nrixfi").user.value }}
+endpoint: {{ (onepasswordRead "op://Private/go-jira/endpoint") }}
+user: {{ (onepasswordRead "op://Private/go-jira/user") }}
 password-source: keyring
-project: {{ (onepasswordItemFields "xmpftrgna4k3iw3lpzm4nrixfi").project.value }}
+project: {{ (onepasswordRead "op://Private/go-jira/project") }}
 
 custom-commands:
   - name: mine

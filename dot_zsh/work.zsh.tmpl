@@ -156,8 +156,8 @@ END
 
 function list-prs() {
     repo_slug="atlassian/tdp-os"
-    username={{ (onepasswordDetailsFields "3aqykkapy5evpp7bpw5a6xbw6q").username.value }}
-    password={{ (onepasswordItemFields "3aqykkapy5evpp7bpw5a6xbw6q").appPassword.value }}
+    username={{ (onepasswordRead "op://Work/Bitbucket - Work/username") }}
+    password={{ (onepasswordRead "op://Work/Bitbucket - Work/appPassword") }}
     if [ "$#" -eq 1 ]
     then
         repo_slug=$1
