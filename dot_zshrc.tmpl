@@ -128,6 +128,12 @@ zi wait lucid for \
     atload'eval "$(zoxide init --cmd cd zsh)"' \
     zdharma-continuum/null
 
+# atuin
+zi wait lucid for \
+    has"atuin" \
+    atload'eval "$(atuin init zsh --disable-up-arrow)"' \
+    zdharma-continuum/null
+
 # mise
 zi wait lucid for \
     has"mise" \
