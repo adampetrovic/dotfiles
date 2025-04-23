@@ -1,6 +1,6 @@
 # Global Config
 [user]
-    name = "Adam Petrovic"
+    name = "{{ .full_name }}"
     email = "{{ .email }}"
 {{- if .work }}
     signingkey = {{ (onepasswordDetailsFields "46cauqkszyrupjn2vh7hgurks4").public_key.value }}
