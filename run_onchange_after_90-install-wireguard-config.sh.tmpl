@@ -1,0 +1,15 @@
+{{- if (eq .chezmoi.os "darwin") -}}
+#!/bin/bash
+set -e
+
+WIREGUARD_CONFIG_PATH="/opt/homebrew/etc/wireguard"
+mkdir -p $WIREGUARD_CONFIG_PATH
+
+{{ if .personal -}}
+# split config: {{- onepasswordDocument "bnq5g44jje6x3ghvi5erezbzyu" | sha256sum }}
+echo -n '{{- onepasswordDocument "bnq5g44jje6x3ghvi5erezbzyu" -}}' > $WIREGUARD_CONFIG_PATH/wireguard.conf
+{{ else if .work -}}
+# split config: {{ onepasswordDocument "h2dqt5zgjopljkv7bisw5d2q7i" | sha256sum }}
+echo -n '{{- onepasswordDocument "h2dqt5zgjopljkv7bisw5d2q7i" -}}' > $WIREGUARD_CONFIG_PATH/wireguard.conf
+{{ end -}}
+{{ end -}}
