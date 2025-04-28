@@ -3,7 +3,7 @@ name = "{{ .full_name }}"
 email = "{{ .email }}"
 
 [signing]
-sign-all = true
+behaviour = "own"
 backend = "ssh"
 backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 backends.ssh.allowed-signers = "~/.config/git/allowed_ssh_signers"
