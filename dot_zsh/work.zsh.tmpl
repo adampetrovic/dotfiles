@@ -262,4 +262,38 @@ function ddb2json() {
         else . end
     else . end)'
 }
+
+function os-bucket() {
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: os-bucket <env> <name>"
+        kill -INT $$
+    fi
+
+    local env="$1"
+    local name="$2"
+    local envType
+
+    # Map environment to envType
+    case "$env" in
+        stg-*)
+            envType="stg"
+            ;;
+        prod-*)
+            envType="prod"
+            ;;
+        *dev*)
+            envType="dev"
+            ;;
+    esac
+
+    if [ -z "$envType" ]; then
+        echo "Error: Could not determine environment type from '$env'"
+        kill -INT $$
+    fi
+
+    atlas slauth curl -a tdp-control -g micros-sv--tdp-os-dl-admins \
+        -e "$envType" -- --silent \
+        "https://tdp-control.sgw.prod.atl-paas.net/api/internal/admin/buckets/$name" \
+        -H "atl-paas-sp-consumer-environment: $env" | jq
+}
 {{ end -}}
