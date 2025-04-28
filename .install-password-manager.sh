@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # exit immediately if password-manager-binary is already in $PATH
-type op >/dev/null 2>&1 && echo "1password already installed" && exit
+type op >/dev/null 2>&1 && exit
 
 case "$(uname -s)" in
 Darwin)

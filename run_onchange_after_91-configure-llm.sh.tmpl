@@ -1,6 +1,0 @@
-{{- if (eq .chezmoi.os "darwin") -}}
-#!/usr/bin/env zsh
-llm install llm-anthropic
-llm keys set anthropic --value "{{ (onepasswordDetailsFields "ru642mnvxwivbatvchmk6gzdwq").credential.value }}"
-{{ end }}
-
