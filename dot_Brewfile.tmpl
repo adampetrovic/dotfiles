@@ -52,6 +52,7 @@
     "1password"
     "1password-cli"
     "alfred"
+    "bambu-studio"
     "bartender"
     "cleanshot"
     "fantastical"
@@ -76,9 +77,7 @@
     "webstorm" 
     "wezterm" -}}
 
-{{- $mas := dict
-    "Things3" "904280696" 
-    "Wireguard" "1451685025" -}}
+{{- $mas := dict -}}
 
 {{/* personal-specific packages */}}
 {{- if .personal -}}
@@ -94,7 +93,8 @@
 
 {{-  $mas = merge $mas (dict
     "Things3" "904280696" 
-    "Parcel" "639968404") -}}
+    "Parcel" "639968404"
+    "Wireguard" "1451685025") -}}
 {{- end -}}
 
 
