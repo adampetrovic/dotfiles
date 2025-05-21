@@ -26,9 +26,78 @@ push-new-bookmarks = true
 log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_bookmarks()), 2)"
 
 [revset-aliases]
+"mine()" = "author(exact:'{{ .full_name }}') | author(exact:'{{ .email }}')"
 "immutable_heads()" = "trunk() | tags()"
+"stack()" = "ancestors(mutable() & (..@ | @::), 2)"
+"streams()" = "heads(::@ & bookmarks())"
+
+'why_immutable(r)' = '(r & immutable()) | roots(r:: & immutable_heads())'
 
 [aliases]
 sync = ['git', 'fetch', '--all-remotes']
 restack = ['rebase', '--skip-emptied', '-d', 'trunk()']
-merge-main = ['new', '-r', 'trunk()', '@', '-m', '"merge main"']
+merge-main = ['new', '-r', 'trunk()', '@', '-m', 'merge main']
+start = ['new', '-r', 'trunk()', '-m']
+
+dv = [
+  "--config=templates.draft_commit_description=commit_description_verbose(self)",
+  "describe",
+]
+
+streams = [
+  "log",
+  "--no-graph",
+  "-r",
+  "streams()",
+  "-T",
+  "bookmarks.map(|b| b ++ ' ')",
+]
+
+rdiff = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+
+  target=$1
+
+  # todo: configurable stream head
+  bookmark_names=$(jj log --no-graph -r 'heads(::@ & bookmarks())' -T 'local_bookmarks.map(|l| l.name() ++ " ")')
+  IFS=" " read -ra bookmarks <<<"$bookmark_names"
+  # todo: error message
+  [ ${#bookmarks[@]} -eq 1 ] || exit 1
+  bookmark=${bookmarks[0]}
+
+  all_refs=$(jj evolog --no-graph -T 'commit_id ++ "|"' -r "$target")
+  remote=$(jj log --no-graph -T 'commit_id' -n 1 -r "($all_refs none()) & ::$bookmark@origin")
+
+  jj diff --from "$remote" --to "$target"
+  ''',
+  "",
+]
+
+[template-aliases]
+"link(target, text)" = 'raw_escape_sequence("\x1b]8;;" ++ target ++ "\x1b\\") ++ label("text link", text) ++ raw_escape_sequence("\x1b]8;;\x1b\\")'
+
+"commit_description_verbose(commit)" = '''
+concat(
+  commit_description(commit),
+  "JJ: ignore-rest\n",
+  diff.git(),
+)
+'''
+
+"commit_description(commit)" = '''
+concat(
+  commit.description(), "\n",
+  "JJ: This commit contains the following changes:\n",
+  indent("JJ:    ", diff.stat(72)),
+)
+'''
+
+[templates]
+draft_commit_description = "commit_description(self)"
