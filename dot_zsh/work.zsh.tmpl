@@ -272,17 +272,21 @@ function os-bucket() {
     local env="$1"
     local name="$2"
     local envType
+    local longEnvType
 
     # Map environment to envType
     case "$env" in
         stg-*)
             envType="stg"
+            longEnvType="staging"
             ;;
         prod-*)
             envType="prod"
+            longEnvType=$envType
             ;;
         *dev*)
             envType="dev"
+            longEnvType=$envType
             ;;
     esac
 
@@ -292,8 +296,46 @@ function os-bucket() {
     fi
 
     atlas slauth curl -a tdp-control -g micros-sv--tdp-os-dl-admins \
-        -e "$envType" -- --silent \
-        "https://tdp-control.sgw.prod.atl-paas.net/api/internal/admin/buckets/$name" \
+        -- --silent \
+        "https://tdp-control.sgw.$longEnvType.atl-paas.net/api/internal/admin/buckets/$name" \
+        -H "atl-paas-sp-consumer-environment: $env" | jq
+}
+
+function os-partition() {
+    if [ "$#" -ne 2 ]; then
+        echo "Usage: os-partition <env> <name>"
+        kill -INT $$
+    fi
+
+    local env="$1"
+    local name="$2"
+    local envType
+    local longEnvType
+
+    # Map environment to envType
+    case "$env" in
+        stg-*)
+            envType="stg"
+            longEnvType="staging"
+            ;;
+        prod-*)
+            envType="prod"
+            longEnvType=$envType
+            ;;
+        *dev*)
+            envType="dev"
+            longEnvType=$envType
+            ;;
+    esac
+
+    if [ -z "$envType" ]; then
+        echo "Error: Could not determine environment type from '$env'"
+        kill -INT $$
+    fi
+
+    atlas slauth curl -a tdp-control -g micros-sv--tdp-os-dl-admins \
+        -- --silent \
+        "https://tdp-control.sgw.$longEnvType.atl-paas.net/v1/internal/partitions/OS/$name/debug" \
         -H "atl-paas-sp-consumer-environment: $env" | jq
 }
 {{ end -}}
