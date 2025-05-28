@@ -338,4 +338,141 @@ function os-partition() {
         "https://tdp-control.sgw.$longEnvType.atl-paas.net/v1/internal/partitions/OS/$name/debug" \
         -H "atl-paas-sp-consumer-environment: $env" | jq
 }
+
+function sd-diff() {
+    local no_delete=false
+    
+    # Parse flags
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --no-delete)
+                no_delete=true
+                shift
+                ;;
+            -*)
+                echo "Unknown option: $1"
+                echo "Usage: sd-diff [--no-delete] <service-name> <old-commit> <new-commit>"
+                echo "Example: sd-diff tdp-os-stg-east-01 abc123 def456"
+                echo "         sd-diff --no-delete tdp-os-stg-east-01 abc123 def456"
+                return 1
+                ;;
+            *)
+                break
+                ;;
+        esac
+    done
+    
+    if [ "$#" -ne 3 ]; then
+        echo "Usage: sd-diff [--no-delete] <service-name> <old-commit> <new-commit>"
+        echo "Example: sd-diff tdp-os-stg-east-01 abc123 def456"
+        echo "         sd-diff --no-delete tdp-os-stg-east-01 abc123 def456"
+        return 1
+    fi
+
+    local service_name="$1"
+    local old_commit="$2"
+    local new_commit="$3"
+    
+    # Store current directory to return to later
+    local original_dir="$(pwd)"
+    
+    # Create temporary workspace directories
+    local old_workspace="/tmp/$old_commit"
+    local new_workspace="/tmp/$new_commit"
+    
+    # Store output files outside of workspaces
+    local old_descriptor="/tmp/sd-diff-${service_name}-${old_commit}.yaml"
+    local new_descriptor="/tmp/sd-diff-${service_name}-${new_commit}.yaml"
+    
+    echo "Creating temporary workspaces..."
+    
+    # Create workspace for old commit
+    if ! jj workspace add -r "$old_commit" "$old_workspace"; then
+        echo "Error: Failed to create workspace for old commit $old_commit"
+        return 1
+    fi
+    
+    # Create workspace for new commit
+    if ! jj workspace add -r "$new_commit" "$new_workspace"; then
+        echo "Error: Failed to create workspace for new commit $new_commit"
+        # Clean up old workspace before returning
+        rm -rf "$old_workspace"
+        jj workspace forget "$old_commit" 2>/dev/null || true
+        return 1
+    fi
+    
+    echo "Generating service descriptor for old commit ($old_commit)..."
+    
+    # Generate service descriptor for old commit
+    cd "$old_workspace" || {
+        echo "Error: Failed to cd to $old_workspace"
+        rm -rf "$old_workspace" "$new_workspace"
+        jj workspace forget "$old_commit" 2>/dev/null || true
+        jj workspace forget "$new_commit" 2>/dev/null || true
+        cd "$original_dir"
+        return 1
+    }
+    
+    if ! atlas sliver synth-sd -t yaml -f tdp-os/tdp-os-archetype-descriptor.yaml -o "$old_descriptor" -s "$service_name" --ignore-tags --ignore-missing-env-vars; then
+        echo "Error: Failed to generate service descriptor for old commit"
+        cd "$original_dir"
+        rm -rf "$old_workspace" "$new_workspace"
+        jj workspace forget "$old_commit" 2>/dev/null || true
+        jj workspace forget "$new_commit" 2>/dev/null || true
+        return 1
+    fi
+    
+    echo "Generating service descriptor for new commit ($new_commit)..."
+    
+    # Generate service descriptor for new commit
+    cd "$new_workspace" || {
+        echo "Error: Failed to cd to $new_workspace"
+        cd "$original_dir"
+        rm -rf "$old_workspace" "$new_workspace"
+        jj workspace forget "$old_commit" 2>/dev/null || true
+        jj workspace forget "$new_commit" 2>/dev/null || true
+        return 1
+    }
+    
+    if ! atlas sliver synth-sd -t yaml -f tdp-os/tdp-os-archetype-descriptor.yaml -o "$new_descriptor" -s "$service_name" --ignore-tags --ignore-missing-env-vars; then
+        echo "Error: Failed to generate service descriptor for new commit"
+        cd "$original_dir"
+        rm -rf "$old_workspace" "$new_workspace"
+        jj workspace forget "$old_commit" 2>/dev/null || true
+        jj workspace forget "$new_commit" 2>/dev/null || true
+        return 1
+    fi
+    
+    echo "Generating diff between service descriptors..."
+    
+    # Generate diff using difft
+    if command -v difft >/dev/null 2>&1; then
+        difft "$old_descriptor" "$new_descriptor"
+    else
+        echo "Warning: difft not found, falling back to regular diff"
+        diff -u "$old_descriptor" "$new_descriptor"
+    fi
+    
+    # Clean up: return to original directory and remove temporary workspaces
+    cd "$original_dir"
+    echo "Cleaning up temporary workspaces..."
+    
+    # Forget the jj workspaces first
+    jj workspace forget "$old_commit" 2>/dev/null || true
+    jj workspace forget "$new_commit" 2>/dev/null || true
+    
+    # Then remove the directories
+    rm -rf "$old_workspace" "$new_workspace"
+    
+    # Clean up output files unless --no-delete was specified
+    if [ "$no_delete" = true ]; then
+        echo "Output files preserved:"
+        echo "  Old: $old_descriptor"
+        echo "  New: $new_descriptor"
+    else
+        rm -f "$old_descriptor" "$new_descriptor"
+    fi
+    
+    echo "Done!"
+}
 {{ end -}}
