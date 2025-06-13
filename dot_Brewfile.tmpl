@@ -82,9 +82,11 @@
 
 {{/* personal-specific packages */}}
 {{- if .personal -}}
-{{- $taps = concat $taps (list) -}}
+{{- $taps = concat $taps (list
+    "adampetrovic/tap") -}}
 
-{{-  $brews = concat $brews (list) -}}
+{{-  $brews = concat $brews (list
+    "stash-sync") -}}
 
 {{-  $casks = concat $casks (list
     "brave-browser"
