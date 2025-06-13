@@ -37,6 +37,7 @@ log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_bookmarks()
 sync = ['git', 'fetch', '--all-remotes']
 restack = ['rebase', '--skip-emptied', '-d', 'trunk()']
 merge-main = ['new', '-r', 'trunk()', '@', '-m', 'merge main']
+tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 start = ['new', '-r', 'trunk()', '-m']
 
 dv = [
