@@ -80,13 +80,16 @@
 
 {{- $mas := dict -}}
 
+{{- $brewsWithArgs := dict -}}
+
 {{/* personal-specific packages */}}
 {{- if .personal -}}
-{{- $taps = concat $taps (list
-    "adampetrovic/tap") -}}
+{{- $taps = concat $taps (list) -}}
 
 {{-  $brews = concat $brews (list
-    "stash-sync") -}}
+    "adampetrovic/tap/stash-sync") -}}
+
+{{  $brewsWithArgs = merge $brewsWithArgs (dict) -}}
 
 {{-  $casks = concat $casks (list
     "brave-browser"
@@ -113,6 +116,9 @@
     "jira-cli"
     "tfenv") -}}
 
+{{  $brewsWithArgs = merge $brewsWithArgs (dict
+    "adampetrovic/tap/work-scripts" (list "HEAD")) -}}
+
 {{  $casks = concat $casks (list
     "amazon-workspaces"
     "cloudflare-warp"
@@ -135,6 +141,9 @@ tap "{{ $name }}", "{{ $url }}"
 {{ end -}}
 {{ range ($brews | sortAlpha | uniq) -}}
 brew "{{ . }}"
+{{ end }}
+{{ range $name, $args := $brewsWithArgs -}}
+brew "{{ $name }}", args: {{ $args | toJson }}
 {{ end }}
 {{ range ($casks | sortAlpha | uniq) -}}
 cask "{{ . }}"
