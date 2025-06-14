@@ -1,5 +1,0 @@
-{{ if .work -}}
-alias jme="jira issue list --plain --no-truncate --columns key,status,summary,assignee -q'project = BLOB AND assignee = currentuser() AND status NOT IN ("Done", "Cancelled")' --order-by status"
-alias epics="jira issue list -tEpic -q'status NOT IN (Done, Cancelled)' --plain --order-by status"
-alias jcreate="jira issue create -tTask" 
-{{ end -}}
