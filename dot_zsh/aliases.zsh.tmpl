@@ -7,3 +7,9 @@ alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias kl='kubectl autons logs'
 alias kgp='k get pods -A | grep'
 {{- end }}
+
+{{ if .work -}}
+# work aliases
+alias asc='assume-service -c'
+alias asi='assume-service -i'
+{{ end -}}

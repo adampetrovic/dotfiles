@@ -15,15 +15,6 @@ export ASDF_FORCE_PREPEND=no
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH=$HOME/.krew/bin:/usr/local/bin:$PATH
 
-# History settings
-HISTSIZE=50000
-HISTFILE=~/.zsh_history
-SAVEHIST=99999999
-setopt appendhistory
-setopt sharehistory
-setopt incappendhistory
-setopt histignorespace
-
 # Load theme first
 zinit light NICHOLAS85/z-a-eval
 
@@ -89,7 +80,6 @@ zi wait lucid for \
     zsh-users/zsh-completions \
     atload'!_zsh_autosuggest_start' \
     zsh-users/zsh-autosuggestions \
-    zdharma-continuum/history-search-multi-word
 
 # zinit completion
 zi ice has"jj" as"completion" id-as"jj-completion" \
@@ -109,12 +99,10 @@ zinit light trapd00r/LS_COLORS
 # Tools and utilities
 zinit wait lucid for \
     andrewferrier/fzf-z \
-    ptavares/zsh-direnv
 
 # OMZ snippets
 zi wait"0" lucid for \
     OMZL::clipboard.zsh \
-    OMZL::history.zsh \
     OMZP::brew/brew.plugin.zsh \
     OMZP::command-not-found/command-not-found.plugin.zsh \
     OMZP::git-extras/git-extras.plugin.zsh \

@@ -11,7 +11,7 @@ backends.ssh.allowed-signers = "~/.config/git/allowed_ssh_signers"
 [ui]
 editor = "vim"
 default-command = "log"
-diff.tool = ["delta", "--dark", "$left", "$right"]
+diff-formatter = ["delta", "--dark", "$left", "$right"]
 
 [fix.tools.detekt]
 command = ["./gradlew", "detekt"]

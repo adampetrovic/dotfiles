@@ -8,8 +8,8 @@
     signingkey = {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
 {{- end }}
 
-[url "https://github.com"]
-	insteadOf = git://github.com
+[url "git@github.com:"]
+    insteadOf = "https://github.com/"
 {{- if .work }}
 [url "ssh://git@stash.atlassian.com:7997/"]
     insteadof = https://stash.atlassian.com/scm/
