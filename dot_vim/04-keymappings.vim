@@ -8,7 +8,7 @@ nmap <C-e> :e#<CR>
 noremap <silent><Leader>/ :nohls<CR>
 
 " Map ,cf to find conflict markers
-nmap <silent> <leader>cf <ESC>/\v^[<=>]{7}( .*\|$)<CR>
+nmap <silent> <leader>cf <ESC>/\v^([<=>%]{7}( .*\|$)|\+\+\+\+\+\+\+$)<CR>
 
 " ;; = escape key
 inoremap ;; <esc>
@@ -35,11 +35,6 @@ vnoremap > >gv
 " Improve up / down movement
 nnoremap j gj
 nnoremap k gk
-
-" delete to blackhole register
-nnoremap d "_d
-vnoremap d "_d
-nnoremap D "_D
 
 " Golang Mappings
 au FileType go nmap <Leader>i <Plug>(go-info)
