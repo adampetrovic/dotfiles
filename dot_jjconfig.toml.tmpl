@@ -23,13 +23,17 @@ push-bookmark-prefix = "apetrovic/push-"
 push-new-bookmarks = true
 
 [revsets]
-log = "ancestors(immutable_heads()..(heads(all()) ~ untracked_remote_bookmarks()), 2)"
+log = "ancestors(immutable_heads()..(immutable_heads() | bookmarks() | @), 2)"
 
 [revset-aliases]
 "mine()" = "author(exact:'{{ .full_name }}') | author(exact:'{{ .email }}')"
 "immutable_heads()" = "trunk() | tags()"
 "stack()" = "ancestors(mutable() & (..@ | @::), 2)"
 "streams()" = "heads(::@ & bookmarks())"
+"change()" = "::@ ~ ::main@origin"
+"branch_point()" = "roots(::@ ~ ::main@origin)-"
+"remote_head()" = "remote_bookmarks() & ancestors(@) & heads(remote_bookmarks())"
+"local_changes()" = "@ ~ remote_head()"
 
 'why_immutable(r)' = '(r & immutable()) | roots(r:: & immutable_heads())'
 
@@ -39,6 +43,53 @@ restack = ['rebase', '--skip-emptied', '-d', 'trunk()']
 merge-main = ['new', '-r', 'trunk()', '@', '-m', 'merge main']
 tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 start = ['new', '-r', 'trunk()', '-m']
+forget = ['bookmark', 'forget']
+
+track = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+
+  # Sync remotes first
+  jj git fetch --all-remotes
+
+  # Track the remote bookmark
+  jj bookmark track "$1@origin"
+
+  # Create new changeset on top of the tracked bookmark
+  jj new -r "$1"
+  ''',
+  "",
+]
+
+local-diff = [
+  "util",
+  "exec", 
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+  
+  # Get the current bookmark name using jj from same working directory
+  bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
+  
+  if [[ -z "$bookmark" ]]; then
+    echo "No local bookmark found at current commit"
+    exit 1
+  fi
+  
+  # Diff against the remote version
+  jj diff --from "${bookmark}@origin" --to @
+  ''',
+  "",
+]
 
 dv = [
   "--config=templates.draft_commit_description=commit_description_verbose(self)",
