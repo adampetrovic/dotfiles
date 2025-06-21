@@ -23,7 +23,7 @@ push-bookmark-prefix = "apetrovic/push-"
 push-new-bookmarks = true
 
 [revsets]
-log = "ancestors(immutable_heads()..(immutable_heads() | bookmarks() | @), 2)"
+log = "trunk() | (mutable() & mine()) ~ remote_bookmarks() | ancestors(immutable_heads()..heads(bookmarks()), 2)"
 
 [revset-aliases]
 "mine()" = "author(exact:'{{ .full_name }}') | author(exact:'{{ .email }}')"
@@ -34,8 +34,7 @@ log = "ancestors(immutable_heads()..(immutable_heads() | bookmarks() | @), 2)"
 "branch_point()" = "roots(::@ ~ ::main@origin)-"
 "remote_head()" = "remote_bookmarks() & ancestors(@) & heads(remote_bookmarks())"
 "local_changes()" = "@ ~ remote_head()"
-
-'why_immutable(r)' = '(r & immutable()) | roots(r:: & immutable_heads())'
+"merged_remotes()" = "remote_bookmarks() & ::main@origin & heads(remote_bookmarks() & mine())"
 
 [aliases]
 sync = ['git', 'fetch', '--all-remotes']
@@ -44,6 +43,7 @@ merge-main = ['new', '-r', 'trunk()', '@', '-m', 'merge main']
 tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 start = ['new', '-r', 'trunk()', '-m']
 forget = ['bookmark', 'forget']
+a = ['abandon']
 
 track = [
   "util",
@@ -67,7 +67,7 @@ track = [
   "",
 ]
 
-local-diff = [
+remote-diff = [
   "util",
   "exec", 
   "--",
@@ -105,7 +105,7 @@ streams = [
   "bookmarks.map(|b| b ++ ' ')",
 ]
 
-rdiff = [
+reset-to-remote = [
   "util",
   "exec",
   "--",
@@ -114,20 +114,36 @@ rdiff = [
   '''
   #!/usr/bin/env bash
   set -eu -o pipefail
-
-  target=$1
-
-  # todo: configurable stream head
-  bookmark_names=$(jj log --no-graph -r 'heads(::@ & bookmarks())' -T 'local_bookmarks.map(|l| l.name() ++ " ")')
-  IFS=" " read -ra bookmarks <<<"$bookmark_names"
-  # todo: error message
-  [ ${#bookmarks[@]} -eq 1 ] || exit 1
-  bookmark=${bookmarks[0]}
-
-  all_refs=$(jj evolog --no-graph -T 'commit_id ++ "|"' -r "$target")
-  remote=$(jj log --no-graph -T 'commit_id' -n 1 -r "($all_refs none()) & ::$bookmark@origin")
-
-  jj diff --from "$remote" --to "$target"
+  
+  # Get the current bookmark name
+  bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
+  
+  if [[ -z "$bookmark" ]]; then
+    echo "No local bookmark found at current commit"
+    exit 1
+  fi
+  
+  echo "Warning: This will discard all local changes and reset to ${bookmark}@origin"
+  echo "Child commits will be rebased on top of the remote commit"
+  echo "Press Enter to continue or Ctrl+C to cancel..."
+  read
+  
+  # Get the children of the current commit before we modify anything
+  children=$(jj log --no-graph -r "@+" -T 'commit_id' 2>/dev/null || echo "")
+  
+  # Rebase children onto the remote bookmark
+  if [[ -n "$children" ]]; then
+    jj rebase -s "@+" -d "${bookmark}@origin"
+  fi
+  
+  # Abandon the current commit
+  jj abandon @
+  
+  # Move the bookmark to point to the remote commit
+  jj bookmark set "${bookmark}" -r "${bookmark}@origin"
+  
+  # Move to the remote commit
+  jj edit "${bookmark}@origin"
   ''',
   "",
 ]
