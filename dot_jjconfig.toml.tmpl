@@ -45,6 +45,7 @@ start = ['new', '-r', 'trunk()', '-m']
 forget = ['bookmark', 'forget']
 a = ['abandon']
 
+# track a remote branch by fetching first
 track = [
   "util",
   "exec",
@@ -67,6 +68,8 @@ track = [
   "",
 ]
 
+# perform a diff of local changes against the remote bookmark pointing to the same change
+# useful to see what a jj git push will change against the remote
 remote-diff = [
   "util",
   "exec", 
@@ -91,20 +94,15 @@ remote-diff = [
   "",
 ]
 
-dv = [
-  "--config=templates.draft_commit_description=commit_description_verbose(self)",
-  "describe",
-]
+# Reset the current set of changes to whatever is on the remote
 
-streams = [
-  "log",
-  "--no-graph",
-  "-r",
-  "streams()",
-  "-T",
-  "bookmarks.map(|b| b ++ ' ')",
-]
-
+# Often when you accidentally make some local changes into a changeset you've already
+# pushed up, removing those changes leads to a new changeset that differs from the remote
+# so pushing it up will cause a rewrite of history (i.e. when its in review).
+#
+# assuming you are on a changeset that is the HEAD of the remote bookmark, running this command
+# will change your local changeset history to match the remote bookmark's and will then rebase
+# any subsequent changes on top that haven't been pushed yet.
 reset-to-remote = [
   "util",
   "exec",
