@@ -1,3 +1,7 @@
 [tools]
 golang = '1.24'
 python = '3.13'
+node = '20'
+
+[settings]
+idiomatic_version_file_enable_tools = ["java"]

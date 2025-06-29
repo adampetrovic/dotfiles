@@ -38,7 +38,24 @@ log = "trunk() | (mutable() & mine()) ~ remote_bookmarks() | ancestors(immutable
 
 [aliases]
 sync = ['git', 'fetch', '--all-remotes']
-restack = ['rebase', '--skip-emptied', '-d', 'trunk()']
+restack = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+  
+  # Sync remotes first
+  jj git fetch --all-remotes
+  
+  # Restack on trunk
+  jj rebase --skip-emptied -d trunk()
+  ''',
+  "",
+]
 merge-main = ['new', '-r', 'trunk()', '@', '-m', 'merge main']
 tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 start = ['new', '-r', 'trunk()', '-m']

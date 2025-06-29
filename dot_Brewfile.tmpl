@@ -54,7 +54,7 @@
     "bambu-studio"
     "bartender"
     "cleanshot"
-    "docker"
+    "docker-desktop"
     "fantastical"
     "font-hack-nerd-font"
     "font-fira-code"
@@ -109,10 +109,12 @@
 {{- $taps = concat $taps (list) -}}
 
 {{  $customTaps = merge $customTaps (dict
+    "atlassian/lanyard" "git@bitbucket.org:atlassian/lanyard-tap.git"
     "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git") -}}
 
 {{  $brews = concat $brews (list
     "atlas-cli"
+    "awscli"
     "jira-cli"
     "tfenv") -}}
 
@@ -125,6 +127,7 @@
     "cursor"
     "docker"
     "drawio"
+    "lanyard"
     "logitech-g-hub"
     "loom"
     "postman"
