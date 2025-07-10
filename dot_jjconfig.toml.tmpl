@@ -52,13 +52,30 @@ restack = [
   jj git fetch --all-remotes
   
   # Restack on trunk
-  jj rebase --skip-emptied -d trunk()
+  jj rebase --skip-emptied -d 'trunk()'
+  ''',
+  ""
+]
+start = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+  
+  # Sync remotes first
+  jj git fetch --all-remotes
+
+  # new commit off trunk
+  jj new -r 'trunk()' -m "$1"
   ''',
   "",
 ]
 merge-main = ['new', '-r', 'trunk()', '@', '-m', 'merge main']
 tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
-start = ['new', '-r', 'trunk()', '-m']
 forget = ['bookmark', 'forget']
 a = ['abandon']
 
@@ -96,6 +113,9 @@ remote-diff = [
   '''
   #!/usr/bin/env bash
   set -eu -o pipefail
+
+  # Sync remotes first
+  jj git fetch --all-remotes
   
   # Get the current bookmark name using jj from same working directory
   bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
@@ -129,6 +149,9 @@ reset-to-remote = [
   '''
   #!/usr/bin/env bash
   set -eu -o pipefail
+
+  # Sync remotes first
+  jj git fetch --all-remotes
   
   # Get the current bookmark name
   bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
