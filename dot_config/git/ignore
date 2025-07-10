@@ -1,0 +1,4 @@
+**/.claude/settings.local.json
+
+# intellij module files
+*.iml
