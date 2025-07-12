@@ -2,6 +2,10 @@
 golang = '1.24'
 python = '3.13'
 node = '20'
+{{ if .work -}}
+java = 'corretto-17.0.15.6.1'
+{{ end -}}
+
 
 [settings]
 idiomatic_version_file_enable_tools = ["java"]
