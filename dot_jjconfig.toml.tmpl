@@ -75,7 +75,7 @@ start = [
   jj git fetch --all-remotes
 
   # new commit off trunk
-  jj new -r 'trunk()' -m "$1"
+  jj new -r 'trunk()' -m "${1:-}"
   ''',
   "",
 ]
@@ -187,6 +187,62 @@ reset-to-remote = [
   
   # Move to the remote commit
   jj edit "${bookmark}@origin"
+  ''',
+  "",
+]
+
+# Split all local changes into a separate changeset on top of the remote
+# This takes all local changes that haven't been pushed and creates a new changeset
+# containing those changes, then resets the current changeset to match the remote
+split-changes = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+
+  # Sync remotes first
+  jj git fetch --all-remotes
+  
+  # Get the current bookmark name
+  bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
+  
+  if [[ -z "$bookmark" ]]; then
+    echo "No local bookmark found at current commit"
+    exit 1
+  fi
+  
+  # Check if there are any local changes to split
+  if ! jj diff --from "${bookmark}@origin" --to @ --stat | grep -q "0 files changed"; then
+    echo "Splitting local changes from ${bookmark} into a new changeset..."
+    
+    # Rebase the bookmark to point to the remote
+    jj rebase -d "${bookmark}@origin" -b "${bookmark}"
+    
+    # Duplicate the current commit to preserve local changes
+    jj duplicate -r @
+    duplicate_id=$(jj log --color never --no-graph -r 'latest(all() ~ @)' -T 'change_id.short()')
+    
+    # Abandon the original commit with local changes
+    jj abandon -r "${bookmark}"
+    
+    # Move the bookmark to point to the duplicate
+    jj bookmark set "${bookmark}" -r "${duplicate_id}" --allow-backwards
+    
+    # Edit the bookmark commit
+    jj edit "${bookmark}"
+
+    # Set empty description
+    jj describe -m ""
+    
+    echo "Local changes have been split into a new changeset"
+    echo "Current changeset now exactly matches ${bookmark}@origin"
+  else
+    echo "No local changes found to split"
+  fi
   ''',
   "",
 ]

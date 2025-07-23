@@ -48,7 +48,7 @@ spaceship_git_branch () {
     if command -v jj >/dev/null 2>&1 && jj root >/dev/null 2>&1; then
         jj_branch=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'if(bookmarks, bookmarks.join(", "), "")')
         jj_changes=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'surround("(", ")", change_id.shortest(6) ++ " " ++ commit_id.shortest(6))')
-        spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$jj_branch$jj_changes"
+        spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$jj_branch $jj_changes"
     else
         [[ $SPACESHIP_GIT_BRANCH_SHOW == false ]] && return
         vcs_info

@@ -107,14 +107,15 @@
 
 {{/* work-specific packages */}}
 {{- if .work -}}
-{{- $taps = concat $taps (list) -}}
+{{- $taps = concat $taps (list
+    "atlassian/homebrew-acli") -}}
 
 {{  $customTaps = merge $customTaps (dict
     "atlassian/lanyard" "git@bitbucket.org:atlassian/lanyard-tap.git"
     "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git") -}}
 
 {{  $brews = concat $brews (list
-    "atlas-cli"
+    "acli"
     "awscli"
     "jira-cli"
     "tfenv") -}}

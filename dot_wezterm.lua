@@ -23,6 +23,23 @@ config.show_tab_index_in_tab_bar = false
 config.show_tabs_in_tab_bar = true
 config.window_close_confirmation = "NeverPrompt"
 
+
+config.hyperlink_rules = wezterm.default_hyperlink_rules()
+
+-- JIRA issue pattern (e.g., ABCDE-12345)
+-- This will match project codes with uppercase letters followed by hyphen and numbers
+table.insert(config.hyperlink_rules, {
+  regex = [[\b([A-Z]+)-(\d+)\b]],
+  format = 'https://hello.jira.atlassian.cloud/browse/$1-$2',
+})
+
+-- Branch pattern for apetrovic/push- branches
+-- This will match branches like apetrovic/push-mvnutlzpnvyk
+table.insert(config.hyperlink_rules, {
+  regex = [[apetrovic/push-([a-zA-Z0-9-]+)]],
+  format = 'https://bitbucket.org/atlassian/tdp-os/branch/apetrovic/push-$1',
+})
+
 config.window_padding = {
   left = '1cell',
   right = '1cell',
