@@ -20,7 +20,7 @@ config.cursor_thickness = 3
 config.enable_scroll_bar = true
 config.show_new_tab_button_in_tab_bar = false
 config.show_tab_index_in_tab_bar = false
-config.show_tabs_in_tab_bar = false
+config.show_tabs_in_tab_bar = true
 config.window_close_confirmation = "NeverPrompt"
 
 config.window_padding = {
