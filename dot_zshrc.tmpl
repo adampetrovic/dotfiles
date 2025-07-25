@@ -130,4 +130,7 @@ zi wait lucid for \
 
 # Custom configs
 zi ice wait="1" lucid multisrc"~/.zsh/*.zsh"
+{{ if .work -}}
+zi ice wait="1" lucid if"[[ -f $(brew --prefix)/share/work-scripts/aliases.zsh ]]" multisrc"$(brew --prefix)/share/work-scripts/aliases.zsh"
+{{ end -}}
 zi light zdharma-continuum/null
