@@ -8,7 +8,7 @@ nmap <C-e> :e#<CR>
 noremap <silent><Leader>/ :nohls<CR>
 
 " Map ,cf to find conflict markers
-nmap <silent> <leader>cf <ESC>/\v^([<=>%]{7}( .*\|$)|\+\+\+\+\+\+\+$)<CR>
+nmap <silent> <leader>cf <ESC>/\v^[<=>]{7}( .*\|$)<CR>
 
 " ;; = escape key
 inoremap ;; <esc>
