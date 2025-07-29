@@ -8,8 +8,5 @@ alias kl='kubectl autons logs'
 alias kgp='k get pods -A | grep'
 {{- end }}
 
-{{ if .work -}}
-# work aliases
-alias asc='assume-service -c'
-alias asi='assume-service -i'
-{{ end -}}
+alias cc='claude --dangerously-skip-permissions'
+alias ccr='claude --dangerously-skip-permissions -r'
