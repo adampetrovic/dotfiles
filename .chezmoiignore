@@ -7,12 +7,6 @@ kinesis
 # these files will be ignored on work machine
 {{- end }}
 
-{{ if .server -}}
-# non-server files
-# these files will be ignored on server machines
-dot_Brewfile.tmpl
-{{- end }}
-
 {{ if .personal -}}
 # non-personal files
 # these files will be ignored on server machines
