@@ -132,6 +132,7 @@ zi wait lucid for \
 zi ice wait="1" lucid multisrc'~/.zsh/*.zsh'
 zi light zdharma-continuum/null
 {{ if .work -}}
-zi ice wait="1" lucid if'[[ -f $(brew --prefix)/share/work-scripts/aliases.zsh ]]' src'$(brew --prefix)/share/work-scripts/aliases.zsh'
+zi ice wait="1" lucid if'[[ -f $(brew --prefix)/share/work-scripts/aliases.zsh ]]' \
+    atload'source $(brew --prefix)/share/work-scripts/aliases.zsh'
 zi light zdharma-continuum/null
 {{ end -}}

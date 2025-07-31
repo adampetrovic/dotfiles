@@ -24,7 +24,6 @@ patterns = ["glob:'**/*.kt'"]
 
 [git]
 auto-local-bookmark = false
-push-bookmark-prefix = "apetrovic/push-"
 push-new-bookmarks = true
 
 [revsets]
@@ -42,7 +41,18 @@ log = "trunk() | (mutable() & mine()) ~ remote_bookmarks() | ancestors(immutable
 "merged_remotes()" = "remote_bookmarks() & ::main@origin & heads(remote_bookmarks() & mine())"
 
 [aliases]
-sync = ['git', 'fetch', '--all-remotes']
+sync = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  gum spin --title "Syncing remotes..." -- jj git fetch --all-remotes
+  ''',
+  ""
+]
 restack = [
   "util",
   "exec",
@@ -54,7 +64,7 @@ restack = [
   set -eu -o pipefail
   
   # Sync remotes first
-  jj git fetch --all-remotes
+  jj sync
   
   # Restack on trunk
   jj rebase --skip-emptied -d 'trunk()'
@@ -72,7 +82,7 @@ start = [
   set -eu -o pipefail
   
   # Sync remotes first
-  jj git fetch --all-remotes
+  jj sync
 
   # new commit off trunk
   jj new -r 'trunk()' -m "${1:-}"
@@ -96,7 +106,7 @@ track = [
   set -eu -o pipefail
 
   # Sync remotes first
-  jj git fetch --all-remotes
+  jj sync
 
   # Track the remote bookmark
   jj bookmark track "$1@origin"
@@ -120,7 +130,7 @@ remote-diff = [
   set -eu -o pipefail
 
   # Sync remotes first
-  jj git fetch --all-remotes
+  jj sync
   
   # Get the current bookmark name using jj from same working directory
   bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
@@ -156,7 +166,7 @@ reset-to-remote = [
   set -eu -o pipefail
 
   # Sync remotes first
-  jj git fetch --all-remotes
+  jj sync
   
   # Get the current bookmark name
   bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
@@ -205,7 +215,7 @@ split-changes = [
   set -eu -o pipefail
 
   # Sync remotes first
-  jj git fetch --all-remotes
+  jj sync
   
   # Get the current bookmark name
   bookmark=$(jj log --no-graph -r @ -T 'local_bookmarks.map(|b| b.name()).join(" ")' | tr -d ' ')
@@ -268,3 +278,4 @@ concat(
 
 [templates]
 draft_commit_description = "commit_description(self)"
+git_push_bookmark = '"apetrovic/push-" ++ change_id.short()'
