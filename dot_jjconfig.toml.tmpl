@@ -27,15 +27,17 @@ auto-local-bookmark = false
 push-new-bookmarks = true
 
 [revsets]
-log = "trunk() | (mutable() & mine()) ~ remote_bookmarks() | ancestors(immutable_heads()..heads(bookmarks()), 2)"
+log = "trunk() | (mutable() & mine() & visible_heads()) ~ remote_bookmarks() | ancestors(immutable_heads()..heads(bookmarks()), 2)"
 
 [revset-aliases]
-"mine()" = "author(exact:'{{ .full_name }}') | author(exact:'{{ .email }}')"
+"mine()" = "user()"
+"user()" = "user('{{ .email }}')"
+"user(x)" = "author(x)"
 "immutable_heads()" = "trunk() | tags()"
 "stack()" = "ancestors(mutable() & (..@ | @::), 2)"
 "streams()" = "heads(::@ & bookmarks())"
-"change()" = "::@ ~ ::main@origin"
-"branch_point()" = "roots(::@ ~ ::main@origin)-"
+"change()" = "::@ ~ ::trunk()"
+"branch_point()" = "roots(::@ ~ ::trunk())-"
 "remote_head()" = "remote_bookmarks() & ancestors(@) & heads(remote_bookmarks())"
 "local_changes()" = "@ ~ remote_head()"
 "merged_remotes()" = "remote_bookmarks() & ::main@origin & heads(remote_bookmarks() & mine())"
