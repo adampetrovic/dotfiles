@@ -96,6 +96,41 @@ tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 forget = ['bookmark', 'forget']
 a = ['abandon']
 
+# Move a single bookmark from the path to trunk() to the current changeset
+yoink = [
+  "util",
+  "exec",
+  "--",
+  "bash",
+  "-c",
+  '''
+  #!/usr/bin/env bash
+  set -eu -o pipefail
+  
+  # Find all bookmarks in the path from trunk to current commit
+  bookmarks=$(jj log --no-graph -r "(::@ ~ ::trunk()) & bookmarks()" -T 'local_bookmarks.map(|b| b.name()).join("\n")' | grep -v '^$' || true)
+  
+  # Count the number of bookmarks
+  bookmark_count=$(echo "$bookmarks" | grep -c . || echo "0")
+  
+  if [[ "$bookmark_count" -eq 0 ]]; then
+    echo "Error: No bookmarks found in the path from trunk() to @"
+    exit 1
+  elif [[ "$bookmark_count" -gt 1 ]]; then
+    echo "Error: Multiple bookmarks found in the path from trunk() to @:"
+    echo "$bookmarks"
+    echo "Please specify which bookmark to move manually"
+    exit 1
+  fi
+  
+  # We have exactly one bookmark, move it to @
+  bookmark_name=$(echo "$bookmarks" | head -1)
+  echo "Moving bookmark '$bookmark_name' to current changeset"
+  jj bookmark set "$bookmark_name" -r @
+  ''',
+  ""
+]
+
 # track a remote branch by fetching first
 track = [
   "util",
