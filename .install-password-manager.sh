@@ -10,7 +10,7 @@ Darwin)
     if ! command -v brew &>/dev/null; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
-    eval "$(/usr/local/bin/brew shellenv)"
+    eval "$(/opt/homebrew/bin/brew shellenv)"
     brew list 1password &>/dev/null || brew install 1password
     brew list 1password-cli &>/dev/null || brew install 1password-cli
     if [[ $(op account list | wc -l) -lt 1 ]]; then

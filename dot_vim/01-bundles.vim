@@ -13,8 +13,7 @@ if has('vim_starting')
         execute 'set runtimepath^=' . finddir('neobundle.vim', '.;')
     elseif &runtimepath !~ '/neobundle.vim'
         if !isdirectory(s:neobundle_dir.'/neobundle.vim')
-            execute printf('!git clone %s://github.com/Shougo/neobundle.vim.git',
-                        \ (exists('$http_proxy') ? 'https' : 'git'))
+            execute printf('!git clone https://github.com/Shougo/neobundle.vim.git')
                         \ s:neobundle_dir.'/neobundle.vim'
             let s:install_neo_bundles = 1
         endif

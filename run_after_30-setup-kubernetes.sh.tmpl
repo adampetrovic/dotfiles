@@ -9,12 +9,12 @@ fi
 
 # Step 3: Run talhelper to generate config
 if [ ! -f "$HOME/.talos/config" ]; then
-    cd $HOME/code/home-ops/kubernetes/bootstrap/talos
-    SOPS_AGE_KEY_FILE=$HOME/.config/sops/age/keys.txt talhelper genconfig --no-gitignore -o /tmp >/dev/null
+    cd $HOME/code/home-ops
+    task talos:generate
     # Step 4: Move talosconfig to ~/.talos/config and delete /tmp/*.yaml
     mkdir -p ~/.talos
-    mv /tmp/talosconfig $HOME/.talos/config
-    rm /tmp/*.yaml
+    mv talos/clusterconfig/talosconfig $HOME/.talos/config
+    rm talos/clusterconfig/talosconfig/*
 
     # Step 5: Test the command `talosctl time` runs and exits correctly
     if ! talosctl time >/dev/null 2>&1; then
