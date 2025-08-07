@@ -27,7 +27,8 @@ auto-local-bookmark = false
 push-new-bookmarks = true
 
 [revsets]
-log = "trunk() | (mutable() & mine() & visible_heads()) ~ remote_bookmarks() | ancestors(immutable_heads()..heads(bookmarks()), 2)"
+# show: trunk, current changset, any tree of changes where i have a mutable commit, or is a tracked branch
+log = "@ | ancestors(trunk()..((visible_heads() & mine()) | heads(bookmarks())), 2) | trunk()"
 
 [revset-aliases]
 "mine()" = "user()"
@@ -51,7 +52,7 @@ sync = [
   "-c",
   '''
   #!/usr/bin/env bash
-  gum spin --title "Syncing remotes..." -- jj git fetch --all-remotes
+  gum spin --show-error --title "Syncing remotes..." -- jj git fetch --all-remotes
   ''',
   ""
 ]
