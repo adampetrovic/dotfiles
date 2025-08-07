@@ -1,5 +1,5 @@
 {{- if (eq .chezmoi.os "darwin") -}}
 #!/usr/bin/env zsh
-# current config: {{ include "dot_config/mise/config.toml" | sha256sum }}
+# current config: {{ include "dot_config/mise/config.toml.tmpl" | sha256sum }}
 mise install
 {{ end }}

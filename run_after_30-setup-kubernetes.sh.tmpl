@@ -3,18 +3,17 @@
 
 # Step 1: Check if ~/code/home-ops doesn't exist. If it does, skip cloning.
 if [ ! -d "$HOME/code/home-ops" ]; then
-    # Step 2: Clone the repository to $HOME/code/home-ops
     git clone -q git@github.com:adampetrovic/home-ops.git "$HOME/code/home-ops"
 fi
 
 # Step 3: Run talhelper to generate config
 if [ ! -f "$HOME/.talos/config" ]; then
-    cd $HOME/code/home-ops
-    task talos:generate
+    cd $HOME/code/home-ops/talos
+    op run --env-file=".env" -- talhelper genconfig --debug -c talconfig.yaml -e talenv.yaml -s talsecret.yaml
     # Step 4: Move talosconfig to ~/.talos/config and delete /tmp/*.yaml
     mkdir -p ~/.talos
-    mv talos/clusterconfig/talosconfig $HOME/.talos/config
-    rm talos/clusterconfig/talosconfig/*
+    mv clusterconfig/talosconfig $HOME/.talos/config
+    rm clusterconfig/*
 
     # Step 5: Test the command `talosctl time` runs and exits correctly
     if ! talosctl time >/dev/null 2>&1; then
