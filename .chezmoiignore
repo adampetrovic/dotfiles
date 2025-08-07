@@ -1,5 +1,8 @@
 iterm
+istat
+alfred
 README.md
+CLAUDE.md
 kinesis
 
 {{ if .work -}}
