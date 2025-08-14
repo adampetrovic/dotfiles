@@ -50,5 +50,6 @@
       "Fetch"
     ],
     "deny": []
-  }
+  },
+  "model": "opus"
 }
