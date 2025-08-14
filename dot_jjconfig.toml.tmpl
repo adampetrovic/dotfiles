@@ -309,8 +309,9 @@ concat(
 "commit_description(commit)" = '''
 concat(
   commit.description(), "\n",
+  "JJ: change-id: ", change_id.short(), "\n",
   "JJ: This commit contains the following changes:\n",
-  indent("JJ:    ", diff.stat(72)),
+  indent("JJ: ", diff.summary()),
 )
 '''
 
