@@ -221,12 +221,11 @@ echo "Applying Dock, Desktop Dashboard & Hot Corners"
 /opt/homebrew/bin/dockutil --no-restart --remove all
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Google Chrome.app"
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Fantastical.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/WezTerm.app"
 {{ if .work -}}
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Slack.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/IntelliJ IDEA.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/PyCharm.app"
 {{ end -}}
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/WezTerm.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/IntelliJ IDEA.app"
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Logseq.app"
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Things3.app"
 {{ if .personal -}}

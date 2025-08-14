@@ -1,5 +1,0 @@
-* == no longer in use ==
-* This keymap file is no longer in use as I have modded my Kinesis Advantage2
-* With [kint controller](https://github.com/kinx-project/kint) and a Teensy 4.1
-* This uses QMK for keymaps. You can see my keymap here: 
-* https://github.com/adampetrovic/qmk_userspace/blob/main/keyboards/kinesis/kint41/keymaps/adampetrovic/keymap.c

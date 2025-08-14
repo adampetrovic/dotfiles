@@ -2,3 +2,4 @@
 
 # intellij module files
 *.iml
+.idea

@@ -1,9 +1,10 @@
 iterm
 istat
 alfred
+rectangle
+
 README.md
 CLAUDE.md
-kinesis
 
 {{ if .work -}}
 # work files
