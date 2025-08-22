@@ -14,8 +14,6 @@
 	</array>
 	<key>convertImagesToPNG</key>
 	<true/>
-	<key>fastAppend</key>
-	<true/>
 	<key>fastAppendPlaySound</key>
 	<false/>
 	<key>fastAppendSeparator</key>
