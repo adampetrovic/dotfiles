@@ -1,4 +1,3 @@
-{{- if (eq .chezmoi.os "darwin") -}}
 #!/bin/bash
 
 # current dock: {{ output "/opt/homebrew/bin/dockutil" "-L" | splitList "\n" }}
@@ -353,4 +352,3 @@ defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
 # Final Setup / Cleanup                                                       #
 ###############################################################################
 echo "Done. Note that some of these changes require a logout/restart to take effect."
-{{- end -}}
