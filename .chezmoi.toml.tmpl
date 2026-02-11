@@ -1,20 +1,13 @@
-{{/* boolean feature tags */}}
-{{- $work := false -}}
-{{- $personal := false -}}
-
-{{- if eq .chezmoi.username "apetrovic" -}}
-{{-	$work = true -}}
-{{- else -}}
-{{-	$personal = true -}}
-{{- end -}}
-
-{{ $email := promptStringOnce . "email" "What is your email address" -}}
+{{/* profile detection */}}
+{{- $profile := promptStringOnce . "profile" "Profile (personal/work)" -}}
+{{- $email := promptStringOnce . "email" "What is your email address" -}}
 
 [data]
     full_name = "Adam Petrovic"
-	work = {{ $work }}
-	personal = {{ $personal }}
-	email = {{ $email | quote }}
+    profile = {{ $profile | quote }}
+    work = {{ eq $profile "work" }}
+    personal = {{ eq $profile "personal" }}
+    email = {{ $email | quote }}
 
 [hooks.read-source-state.pre]
     command = ".local/share/chezmoi/.install-password-manager.sh"
