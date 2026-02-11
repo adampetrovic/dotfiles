@@ -26,6 +26,7 @@ config.window_close_confirmation = "NeverPrompt"
 
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
 
+{{- if .work }}
 -- JIRA issue pattern (e.g., ABCDE-12345)
 -- This will match project codes with uppercase letters followed by hyphen and numbers
 table.insert(config.hyperlink_rules, {
@@ -39,6 +40,7 @@ table.insert(config.hyperlink_rules, {
   regex = [[apetrovic/push-([a-zA-Z0-9-]+)]],
   format = 'https://bitbucket.org/atlassian/tdp-os/branch/apetrovic/push-$1',
 })
+{{- end }}
 
 config.window_padding = {
   left = '1cell',
