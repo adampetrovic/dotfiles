@@ -24,7 +24,9 @@ patterns = ["glob:'**/*.kt'"]
 
 [git]
 auto-local-bookmark = false
-push-new-bookmarks = true
+
+[remotes.origin]
+auto-track-bookmarks = "glob:*"
 
 [revsets]
 # show: trunk, current changset, any tree of changes where i have a mutable commit, or is a tracked branch
@@ -32,7 +34,7 @@ log = "@ | ancestors(trunk()..((visible_heads() & mine()) | heads(bookmarks())),
 
 [revset-aliases]
 "mine()" = "user()"
-"user()" = "user('{{ .email }}')"
+"user()" = "user(substring:'{{ .email }}')"
 "user(x)" = "author(x)"
 "immutable_heads()" = "trunk() | tags()"
 "stack()" = "ancestors(mutable() & (..@ | @::), 2)"
