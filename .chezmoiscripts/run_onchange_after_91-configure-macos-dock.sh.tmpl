@@ -1,0 +1,68 @@
+#!/bin/bash
+# current dock: {{ output "/opt/homebrew/bin/dockutil" "-L" | splitList "\n" }}
+
+set -eufo pipefail
+
+echo "Configuring macOS Dock & Hot Corners..."
+
+/opt/homebrew/bin/dockutil --no-restart --remove all
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Google Chrome.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Fantastical.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/WezTerm.app"
+{{ if .work -}}
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Slack.app"
+{{ end -}}
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/IntelliJ IDEA.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Logseq.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Things3.app"
+{{ if .personal -}}
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Telegram.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Spotify.app"
+{{ end -}}
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Reeder.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/System/Applications/System Settings.app"
+/opt/homebrew/bin/dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
+/opt/homebrew/bin/dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
+
+# Disable "click to reveal desktop" on Sonoma and above
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
+# Set the icon size of Dock items to 48 pixels
+defaults write com.apple.dock tilesize -int 48
+
+# Minimize windows into their application's icon
+defaults write com.apple.dock minimize-to-application -bool true
+
+# Show indicator lights for open applications in the Dock
+defaults write com.apple.dock show-process-indicators -bool true
+
+# Remove the auto-hiding Dock delay
+defaults write com.apple.dock autohide-delay -float 0
+
+# Automatically hide and show the Dock
+defaults write com.apple.dock autohide -bool true
+
+# Don't show recent applications in Dock
+defaults write com.apple.dock show-recents -bool false
+
+# Hot corners
+# Possible values:
+#  0: no-op        2: Mission Control  3: Show application windows
+#  4: Desktop      5: Start screen saver  6: Disable screen saver
+#  7: Dashboard   10: Put display to sleep  11: Launchpad
+# 12: Notification Center  13: Lock Screen
+# Modifiers: 0=None, 131072=Shift, 262144=Control, 524288=Option, 1048576=Command
+
+# Top left → Mission Control (Option)
+defaults write com.apple.dock wvous-tl-corner -int 2
+defaults write com.apple.dock wvous-tl-modifier -int 524288
+
+# Top right → Screensaver
+defaults write com.apple.dock wvous-tr-corner -int 5
+defaults write com.apple.dock wvous-tr-modifier -int 0
+
+# Bottom right → Sleep display
+defaults write com.apple.dock wvous-br-corner -int 10
+defaults write com.apple.dock wvous-br-modifier -int 0
+
+echo "Done configuring macOS Dock & Hot Corners."
