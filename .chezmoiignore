@@ -5,13 +5,3 @@ rectangle
 
 README.md
 CLAUDE.md
-
-{{ if .work -}}
-# work files
-# these files will be ignored on work machine
-{{- end }}
-
-{{ if .personal -}}
-# non-personal files
-# these files will be ignored on server machines
-{{- end }}
