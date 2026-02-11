@@ -1,5 +1,6 @@
 {{ if (eq .chezmoi.os "darwin" "linux") -}}
 #!/bin/bash
+# vimrc hash: {{ include "dot_vimrc" | sha256sum }}
 
 set -eufo pipefail
 
