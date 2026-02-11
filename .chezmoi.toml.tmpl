@@ -1,5 +1,4 @@
 {{/* boolean feature tags */}}
-{{- $server := false -}}
 {{- $work := false -}}
 {{- $personal := false -}}
 
@@ -7,12 +6,6 @@
 {{-	$work = true -}}
 {{- else -}}
 {{-	$personal = true -}}
-{{- end -}}
-
-{{- if eq .chezmoi.os "darwin" -}}
-{{- $server = false	-}}
-{{- else if eq .chezmoi.os "linux" -}}
-{{-	$server = true -}}
 {{- end -}}
 
 {{ $email := promptStringOnce . "email" "What is your email address" -}}
