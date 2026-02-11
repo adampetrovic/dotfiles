@@ -188,7 +188,111 @@ After editing conflict markers out of all files, the conflict is considered reso
 8. **`--no-pager`**: Use `--no-pager` when capturing output programmatically: `jj --no-pager log`.
 9. **`--color never`**: Use `--color never` when parsing output to avoid ANSI escape codes.
 
-## Typical Feature Workflow
+## User Configuration (~/.jjconfig.toml)
+
+The following customisations are active and **must be used in preference to generic jj commands** where applicable.
+
+### Identity & Signing
+
+- **User**: Adam Petrovic (`adam@petrovic.com.au`)
+- **Commit signing**: SSH-based via 1Password (`behaviour = "own"` — signs only the user's own commits automatically).
+
+### UI Settings
+
+- **Editor**: `vim`
+- **Default command**: `jj` with no subcommand runs `jj log`.
+- **Diff formatter**: `delta --dark` (external diff tool).
+- **Auto-pushed bookmark prefix**: `apetrovic/push-<short_change_id>` (used by `jj git push --change`).
+
+### Git Settings
+
+- `auto-local-bookmark = false` — fetching a remote bookmark does **not** create a local bookmark automatically.
+- `auto-track-bookmarks = true` — newly fetched remote bookmarks are tracked.
+
+### Fix Tools
+
+- **detekt** (Kotlin linter): `jj fix` runs `./gradlew detekt` on `**/*.kt` files.
+
+### Immutability
+
+- `immutable_heads()` = `trunk() | tags()` — trunk and tags are immutable; everything else is mutable.
+
+### Custom Revset Aliases
+
+These are available in any `-r` expression:
+
+| Alias | Definition | Use |
+|---|---|---|
+| `mine()` | `user("adam@petrovic.com.au")` | Current user's commits |
+| `user(x)` | `author(x)` | Commits by author substring |
+| `stack()` | `ancestors(mutable() & (..@ \| @::), 2)` | Current mutable stack (ancestors depth 2) |
+| `streams()` | `heads(::@ & bookmarks())` | Bookmark heads that are ancestors of `@` |
+| `change()` | `::@ ~ ::trunk()` | All commits on current change path from trunk |
+| `branch_point()` | `roots(::@ ~ ::trunk())-` | The commit where the current line diverged from trunk |
+| `remote_head()` | `remote_bookmarks() & ancestors(@) & heads(remote_bookmarks())` | The remote bookmark head in the ancestry of `@` |
+| `local_changes()` | `@ ~ remote_head()` | Working copy minus what's on the remote |
+| `merged_remotes()` | `remote_bookmarks() & ::main@origin & heads(remote_bookmarks() & mine())` | User's remote bookmarks merged into main |
+
+### Custom Log Revset
+
+The default `jj log` shows: `@ | ancestors(trunk()..((visible_heads() & mine()) | heads(bookmarks())), 2) | trunk()`.
+
+This means the log displays: the working copy, trunk, and 2 levels of ancestry from the user's visible heads and tracked bookmark heads above trunk.
+
+### Custom Aliases
+
+**Prefer these aliases over raw commands.** They encapsulate the user's workflows.
+
+| Alias | Command | Description |
+|---|---|---|
+| `jj sync` | `jj git fetch --all-remotes` | Fetch from all remotes (with spinner via `gum`). |
+| `jj restack` | sync + `jj rebase --skip-emptied -d trunk()` | Sync remotes, then rebase current branch onto trunk. |
+| `jj start "message"` | sync + `jj new -r trunk() -m "message"` | Start a new feature: sync, then create a new change off trunk. |
+| `jj merge-main` | `jj new -r trunk() @ -m "merge main"` | Create a merge commit combining trunk and current `@`. |
+| `jj tug` | `jj bookmark move --from 'heads(::@- & bookmarks())' --to @-` | Move the bookmark in `@-`'s ancestry forward to `@-`. Use after squashing/amending to keep the bookmark pointing at the right commit. |
+| `jj forget <bookmark>` | `jj bookmark forget` | Forget a bookmark (removes locally without propagating deletion to remote). |
+| `jj a` | `jj abandon` | Short alias for abandon. |
+| `jj yoink` | Finds the single bookmark in `trunk()..@` and moves it to `@`. | Move the only bookmark between trunk and working copy to the current change. Errors if 0 or >1 bookmarks found. |
+| `jj track <name>` | sync + `jj bookmark track <name>@origin` + `jj new -r <name>` | Fetch, track a remote bookmark, and start working on top of it. |
+| `jj remote-diff` | sync + `jj diff --from <bookmark>@origin --to @` | Show what local changes would be pushed compared to the remote bookmark. |
+| `jj reset-to-remote` | Rebases children onto remote, abandons `@`, resets bookmark to remote. | **Destructive.** Discard all local changes and reset to the remote bookmark state. Prompts for confirmation. |
+| `jj split-changes` | Splits unpushed local changes off the current bookmark into a new changeset. | Separates local-only changes from what's already on the remote. |
+
+### Typical Feature Workflow (Using Custom Aliases)
+
+```bash
+# Start a new feature from trunk (fetches first)
+jj start "Add new feature"
+
+# ... make edits (auto-tracked) ...
+
+# Review what you've done
+jj diff
+jj log
+
+# Create a bookmark and push
+jj bookmark create my-feature -r @
+jj git push -b my-feature
+
+# After more edits, move the bookmark forward
+jj tug
+jj git push -b my-feature
+
+# Or if the bookmark is behind, yoink it to current change
+jj yoink
+jj git push -b my-feature
+
+# Rebase onto latest trunk
+jj restack
+
+# See what would be pushed vs remote
+jj remote-diff
+
+# If you need to discard local changes and match the remote
+jj reset-to-remote
+```
+
+### Generic Feature Workflow (Without Aliases)
 
 ```bash
 # Start from trunk
@@ -219,3 +323,5 @@ jj git push -b my-feature
 For detailed docs, see: https://jj-vcs.dev/latest/
 
 For command help: `jj help <command>` or `jj help -k <keyword>` where keyword is one of: bookmarks, config, filesets, glossary, revsets, templates, tutorial.
+
+Full user config: `~/.jjconfig.toml`
