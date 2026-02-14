@@ -12,7 +12,7 @@ export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/
 export ASDF_FORCE_PREPEND=no
 export K9S_CONFIG_DIR=~/.config/k9s
 eval "$(/opt/homebrew/bin/brew shellenv)"
-export PATH=$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
+export PATH=$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
 
 # Load theme first
 zinit light NICHOLAS85/z-a-eval
@@ -123,7 +123,7 @@ zi wait lucid for \
 # mise
 zi wait lucid for \
     has"mise" \
-    atload'eval "$(mise activate zsh)"' \
+    atload'eval "$(mise activate zsh)"; eval "$(mise completion zsh)"' \
     zdharma-continuum/null
 
 # Custom configs
