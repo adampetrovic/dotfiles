@@ -45,3 +45,33 @@ Most commands support `--json` for structured output.  You can use `--jq` to fil
 ```bash
 gh issue list --repo owner/repo --json number,title --jq '.[] | "\(.number): \(.title)"'
 ```
+
+## Downloading Files & Folders
+
+Use the `gh download` extension (`yuler/gh-download`) to download individual files or folders from a GitHub repo without cloning.
+
+Download specific files or folders from a repo:
+```bash
+gh download owner/repo path/to/file.txt path/to/folder
+```
+
+Download from a specific branch or tag:
+```bash
+gh download owner/repo path/to/file.txt --branch main
+```
+
+Download using a full GitHub URL:
+```bash
+gh download https://github.com/owner/repo/tree/main/src
+```
+
+Save to a custom location:
+```bash
+gh download owner/repo path/to/file.txt --outdir ./local-dir
+gh download owner/repo path/to/file.txt --outfile ./local-file.txt
+```
+
+Dry run to preview what would be downloaded:
+```bash
+gh download owner/repo src --dry-run
+```
