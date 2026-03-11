@@ -185,7 +185,9 @@ export default function (pi: ExtensionAPI) {
 			const tagsLine = writeup.tags.join(", ");
 			const now = new Date();
 			const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-			const pageContent = `tags:: ${tagsLine}\ndate:: ${dateStr}\n\n${writeup.body}\n`;
+			const sessionFile = ctx.sessionManager.getSessionFile();
+			const sessionLine = sessionFile ? `\nsession:: \`pi --session ${sessionFile}\`` : "";
+			const pageContent = `tags:: ${tagsLine}\ndate:: ${dateStr}${sessionLine}\n\n${writeup.body}\n`;
 
 			// 6. Write page file
 			const pageFile = path.join(PAGES_DIR, pageFilename(title));
@@ -210,6 +212,9 @@ export default function (pi: ExtensionAPI) {
 			} else {
 				fs.writeFileSync(journalFile, journalLine + "\n", "utf-8");
 			}
+
+			// 8. Name the session for easy /resume discovery
+			pi.setSessionName(title);
 
 			ctx.ui.notify(`✅ Created page "${title}" and added journal entry`, "success");
 		},
