@@ -186,12 +186,7 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			// 4. Let user confirm/edit title
-			const title = await ctx.ui.input("Page Title", writeup.title);
-			if (!title) {
-				ctx.ui.notify("Cancelled", "info");
-				return;
-			}
+			const title = writeup.title;
 
 			// 5. Build page content
 			const tagsLine = writeup.tags.join(", ");
