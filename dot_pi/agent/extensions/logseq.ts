@@ -83,57 +83,69 @@ function pageFilename(title: string): string {
 	return title.replace(/\//g, "___").replace(/:/g, "%3A").replace(/\?/g, "%3F") + ".md";
 }
 
+function completeText(
+	model: NonNullable<ReturnType<typeof getModel>>,
+	apiKey: string,
+	prompt: string,
+): Promise<string> {
+	return complete(
+		model,
+		{ messages: [{ role: "user", content: [{ type: "text", text: prompt }], timestamp: Date.now() }] },
+		{ apiKey, reasoningEffort: "high" },
+	).then((r) =>
+		r.content
+			.filter((c): c is { type: "text"; text: string } => c.type === "text")
+			.map((c) => c.text)
+			.join("\n"),
+	);
+}
+
+function extractJson(text: string): Record<string, unknown> {
+	const fenced = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+	return JSON.parse((fenced ? fenced[1]! : text).trim());
+}
+
 async function generateWriteup(
 	conversationText: string,
 	apiKey: string,
 	model: ReturnType<typeof getModel>,
 ): Promise<{ title: string; tags: string[]; body: string; journalSummary: string }> {
-	const prompt = `You are a technical writer. Given the following conversation between a user and an AI assistant, produce a structured Logseq writeup.
-
-Return ONLY a JSON object with these fields:
-- "title": A concise, descriptive page title (no special characters besides hyphens and spaces)
-- "tags": An array of relevant lowercase tags (e.g. ["home-assistant", "debugging", "shelly"])
-- "body": The full writeup in Logseq-flavored markdown using bullet blocks (every line starts with "- " or a tab-indented "- " for nesting). Include sections like Summary, Investigation, Findings, Root Cause, Resolution as appropriate. Use code blocks, tables, and structured content where helpful.
-- "journalSummary": A single concise line summarizing what was done, suitable for a daily journal entry (do NOT include the page link — that will be added automatically)
-
-Important Logseq formatting rules:
-- Every content line must start with "- " (top-level) or tab + "- " (nested)
-- Section headings use "- # Heading" or "- ## Heading"
-- Nested content under a heading uses one additional tab level
-- Code blocks and tables go inside bullet blocks
+	// Step 1: Get metadata (small JSON — no multi-line strings)
+	const metaPrompt = `You are a technical writer. Given the conversation below, return ONLY a JSON object with:
+- "title": A concise descriptive page title (no special characters besides hyphens and spaces)
+- "tags": An array of relevant lowercase tags (e.g. ["home-assistant", "debugging"])
+- "journalSummary": A single concise line summarizing what was done (do NOT include any page link)
 
 <conversation>
 ${conversationText}
 </conversation>`;
 
-	const response = await complete(
-		model!,
-		{
-			messages: [
-				{
-					role: "user",
-					content: [{ type: "text", text: prompt }],
-					timestamp: Date.now(),
-				},
-			],
-		},
-		{ apiKey, reasoningEffort: "high" },
-	);
+	const metaText = await completeText(model!, apiKey, metaPrompt);
+	const meta = extractJson(metaText);
 
-	const text = response.content
-		.filter((c): c is { type: "text"; text: string } => c.type === "text")
-		.map((c) => c.text)
-		.join("\n");
+	// Step 2: Get body (freeform markdown — no JSON escaping issues)
+	const bodyPrompt = `You are a technical writer. Given the conversation below, write a structured Logseq page.
 
-	// Extract JSON from the response (handle markdown code fences)
-	const jsonMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/) || [null, text];
-	const parsed = JSON.parse(jsonMatch[1]!.trim());
+Output ONLY the Logseq-flavoured markdown body — no frontmatter, no code fences around the whole thing.
+
+Logseq formatting rules:
+- Every content line must start with "- " (top-level) or tab + "- " (nested)
+- Section headings use "- # Heading" or "- ## Heading"
+- Nested content under a heading uses one additional tab level
+- Code blocks and tables go inside bullet blocks
+- Include sections like Summary, Investigation, Findings, Root Cause, Resolution as appropriate
+
+<conversation>
+${conversationText}
+</conversation>`;
+
+	const body = await completeText(model!, apiKey, bodyPrompt);
 
 	return {
-		title: parsed.title,
-		tags: parsed.tags || [],
-		body: parsed.body,
-		journalSummary: parsed.journalSummary,
+		title: meta.title as string,
+		tags: (meta.tags as string[]) || [],
+		body: body.trim(),
+		journalSummary: meta.journalSummary as string,
 	};
 }
 
