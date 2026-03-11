@@ -149,7 +149,31 @@ ${conversationText}
 	};
 }
 
+const LOGSEQ_CUSTOM_TYPE = "logseq-writeup";
+
+interface LogseqState {
+	title: string;
+	journalFile: string;
+}
+
 export default function (pi: ExtensionAPI) {
+	// Restore state from session on load
+	let logseqState: LogseqState | null = null;
+
+	pi.on("session_start", async (_event, ctx) => {
+		logseqState = null;
+		for (const entry of ctx.sessionManager.getBranch()) {
+			if (
+				entry.type === "custom" &&
+				"customType" in entry &&
+				entry.customType === LOGSEQ_CUSTOM_TYPE &&
+				"data" in entry
+			) {
+				logseqState = entry.data as LogseqState;
+			}
+		}
+	});
+
 	pi.registerCommand("logseq", {
 		description: "Write up the current session to Logseq with a journal entry",
 		handler: async (args, ctx: ExtensionCommandContext) => {
@@ -175,7 +199,8 @@ export default function (pi: ExtensionAPI) {
 			}
 
 			// 3. Generate writeup
-			ctx.ui.notify("Generating writeup...", "info");
+			const isUpdate = logseqState !== null;
+			ctx.ui.notify(isUpdate ? "Updating writeup..." : "Generating writeup...", "info");
 
 			let writeup: Awaited<ReturnType<typeof generateWriteup>>;
 			try {
@@ -186,7 +211,8 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 
-			const title = writeup.title;
+			// 4. Use existing title on update, new title on first run
+			const title = logseqState?.title ?? writeup.title;
 
 			// 5. Build page content
 			const tagsLine = writeup.tags.join(", ");
@@ -196,34 +222,47 @@ export default function (pi: ExtensionAPI) {
 			const sessionLine = sessionFile ? `\nsession:: \`pi --session ${sessionFile}\`` : "";
 			const pageContent = `tags:: ${tagsLine}\ndate:: ${dateStr}${sessionLine}\n\n${writeup.body}\n`;
 
-			// 6. Write page file
+			// 6. Write page file (overwrite on update)
 			const pageFile = path.join(PAGES_DIR, pageFilename(title));
-			if (fs.existsSync(pageFile)) {
-				const overwrite = await ctx.ui.confirm("Page exists", `${title} already exists. Overwrite?`);
-				if (!overwrite) {
-					ctx.ui.notify("Cancelled", "info");
-					return;
-				}
-			}
 			fs.mkdirSync(PAGES_DIR, { recursive: true });
 			fs.writeFileSync(pageFile, pageContent, "utf-8");
 
-			// 7. Append journal entry
-			const journalFile = path.join(JOURNALS_DIR, todayJournalFile());
+			// 7. Write or update journal entry
+			const journalFile = logseqState?.journalFile ?? path.join(JOURNALS_DIR, todayJournalFile());
 			fs.mkdirSync(JOURNALS_DIR, { recursive: true });
 
 			const journalLine = `- ${writeup.journalSummary} [[${title}]]`;
+			const pageLink = `[[${title}]]`;
+
 			if (fs.existsSync(journalFile)) {
 				const existing = fs.readFileSync(journalFile, "utf-8");
-				fs.writeFileSync(journalFile, existing.trimEnd() + "\n" + journalLine + "\n", "utf-8");
+				const lines = existing.split("\n");
+				const idx = lines.findIndex((l) => l.includes(pageLink));
+				if (idx !== -1) {
+					// Replace existing journal line for this page
+					lines[idx] = journalLine;
+					fs.writeFileSync(journalFile, lines.join("\n"), "utf-8");
+				} else {
+					// Append new entry
+					fs.writeFileSync(journalFile, existing.trimEnd() + "\n" + journalLine + "\n", "utf-8");
+				}
 			} else {
 				fs.writeFileSync(journalFile, journalLine + "\n", "utf-8");
 			}
 
-			// 8. Name the session for easy /resume discovery
+			// 8. Persist state in session for future updates
+			logseqState = { title, journalFile };
+			pi.appendEntry(LOGSEQ_CUSTOM_TYPE, logseqState);
+
+			// 9. Name the session for easy /resume discovery
 			pi.setSessionName(title);
 
-			ctx.ui.notify(`✅ Created page "${title}" and added journal entry`, "success");
+			ctx.ui.notify(
+				isUpdate
+					? `✅ Updated page "${title}" and journal entry`
+					: `✅ Created page "${title}" and added journal entry`,
+				"success",
+			);
 		},
 	});
 }
