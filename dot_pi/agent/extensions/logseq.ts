@@ -160,19 +160,28 @@ export default function (pi: ExtensionAPI) {
 	// Restore state from session on load
 	let logseqState: LogseqState | null = null;
 
-	pi.on("session_start", async (_event, ctx) => {
+	function restoreState(ctx: { sessionManager: { getBranch(): SessionEntry[] } }) {
 		logseqState = null;
 		for (const entry of ctx.sessionManager.getBranch()) {
 			if (
 				entry.type === "custom" &&
 				"customType" in entry &&
-				entry.customType === LOGSEQ_CUSTOM_TYPE &&
+				(entry as any).customType === LOGSEQ_CUSTOM_TYPE &&
 				"data" in entry
 			) {
-				logseqState = entry.data as LogseqState;
+				logseqState = (entry as any).data as LogseqState;
 			}
 		}
-	});
+	}
+
+	// Reset state on initial load
+	pi.on("session_start", async (_event, ctx) => restoreState(ctx));
+
+	// Reset state when switching sessions (/new, /resume)
+	pi.on("session_switch", async (_event, ctx) => restoreState(ctx));
+
+	// Reset state when forking (/fork)
+	pi.on("session_fork", async (_event, ctx) => restoreState(ctx));
 
 	pi.registerCommand("logseq", {
 		description: "Write up the current session to Logseq with a journal entry",
