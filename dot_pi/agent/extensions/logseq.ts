@@ -112,7 +112,7 @@ async function generateWriteup(
 ): Promise<{ title: string; tags: string[]; body: string; journalSummary: string }> {
 	// Step 1: Get metadata (small JSON — no multi-line strings)
 	const metaPrompt = `You are a technical writer. Given the conversation below, return ONLY a JSON object with:
-- "title": A concise descriptive page title (no special characters besides hyphens and spaces)
+- "title": A short page title — 2-5 words max, like a project name not a sentence (e.g. "Coffee Switch OTA Failure", "Pool Pump Schedule", "Ecovacs WiFi Issue")
 - "tags": An array of relevant lowercase tags (e.g. ["home-assistant", "debugging"])
 - "journalSummary": A single concise line summarizing what was done (do NOT include any page link)
 
@@ -221,7 +221,10 @@ export default function (pi: ExtensionAPI) {
 			}
 
 			// 4. Use existing title on update, new title on first run
-			const title = logseqState?.title ?? writeup.title;
+			//    All pi-agent pages live under the "Pi Agent/" namespace
+			const PI_AGENT_NS = "Pi Agent/";
+			const rawTitle = logseqState?.title ?? writeup.title;
+			const title = rawTitle.startsWith(PI_AGENT_NS) ? rawTitle : PI_AGENT_NS + rawTitle;
 
 			// 5. Build page content
 			const tagsLine = writeup.tags.join(", ");
