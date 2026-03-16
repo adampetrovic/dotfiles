@@ -2,6 +2,12 @@
 {{- $profile := promptStringOnce . "profile" "Profile (personal/work)" -}}
 {{- $email := promptStringOnce . "email" "What is your email address" -}}
 
+encryption = "age"
+
+[age]
+    identity = "~/.config/sops/age/keys.txt"
+    recipient = "age1pvlc4c05yg9g0pst6f6uvthh7942vt5tx79ycva92y8matj2ne5qvz4md5"
+
 [data]
     full_name = "Adam Petrovic"
     profile = {{ $profile | quote }}
