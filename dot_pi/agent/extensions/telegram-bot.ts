@@ -680,14 +680,17 @@ Your response will be forwarded to Telegram. Format ALL responses using Telegram
 		await new Promise((r) => setTimeout(r, 500));
 		await stopActivityFeed();
 
-		// Extract all assistant text from the response
+		// Extract text from only the LAST assistant message (the final summary),
+		// skipping intermediate narration between tool calls.
 		const textParts: string[] = [];
-		for (const msg of event.messages) {
-			if (msg.role === "assistant" && Array.isArray(msg.content)) {
-				for (const block of msg.content) {
-					if (block.type === "text" && block.text?.trim()) {
-						textParts.push(block.text);
-					}
+		const lastAssistantMsg = [...event.messages].reverse().find(
+			(msg) => msg.role === "assistant" && Array.isArray(msg.content) &&
+				msg.content.some((b: any) => b.type === "text" && b.text?.trim())
+		);
+		if (lastAssistantMsg && Array.isArray(lastAssistantMsg.content)) {
+			for (const block of lastAssistantMsg.content) {
+				if (block.type === "text" && block.text?.trim()) {
+					textParts.push(block.text);
 				}
 			}
 		}
