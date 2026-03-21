@@ -63,7 +63,7 @@ export default function (pi: ExtensionAPI) {
 	let lastEditTime = 0;                           // rate limit edits
 	let pendingEdit = false;                        // coalesce rapid updates
 	let editTimer: ReturnType<typeof setTimeout> | null = null;
-	const MIN_EDIT_INTERVAL_MS = 2000;              // min 2s between edits
+	const MIN_EDIT_INTERVAL_MS = 4000;              // min 4s between edits (Telegram limits ~20 edits/min/chat)
 
 	// ── Telegram API ──────────────────────────────────────────────────
 
@@ -386,6 +386,9 @@ export default function (pi: ExtensionAPI) {
 	}
 
 	function flushActivityEdit(): void {
+		// Skip edits entirely when rate-limited
+		if (rateLimitedUntil > 0 && Date.now() < rateLimitedUntil) return;
+
 		lastEditTime = Date.now();
 		const text = buildActivityText();
 
@@ -394,7 +397,12 @@ export default function (pi: ExtensionAPI) {
 				chat_id: chatId,
 				message_id: msgId,
 				text,
-			}).catch(() => {});
+			}).catch((e: any) => {
+				// If this edit itself triggers rate limiting, stop future edits until cleared
+				if (e?.message?.includes("429") || e?.message?.toLowerCase()?.includes("too many")) {
+					console.error(`[telegram-bot] Activity edit rate-limited, pausing edits`);
+				}
+			});
 		}
 	}
 
