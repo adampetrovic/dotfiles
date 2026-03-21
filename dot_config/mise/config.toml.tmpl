@@ -9,3 +9,7 @@ java = 'corretto-17.0.15.6.1'
 
 [settings]
 idiomatic_version_file_enable_tools = ["java"]
+
+[env]
+TELEGRAM_BOT_TOKEN = {{ onepasswordRead "op://Private/Telegram Bot - Pi/token" | quote }}
+TELEGRAM_CHAT_ID = {{ onepasswordRead "op://Private/Telegram Bot - Pi/chat_id" | quote }}
