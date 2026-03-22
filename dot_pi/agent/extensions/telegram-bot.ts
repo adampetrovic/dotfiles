@@ -10,6 +10,7 @@
  *   - Bidirectional: both terminal and Telegram can control Pi
  *   - /steer and /followup prefixes to control behavior while agent is busy
  *   - Long message auto-splitting with rate-limit-aware retry
+ *   - Image support (photos and image documents forwarded to Claude)
  *   - Voice note transcription via whisper.cpp (Apple Silicon optimized)
  *   - Graceful connect/disconnect
  *
@@ -287,19 +288,16 @@ export default function (pi: ExtensionAPI) {
 		switch (toolName) {
 			case "Read":
 			case "read":
-				return `📖 Reading \`${truncPath(args?.path)}\``;
+				return `📖 Reading ${friendlyPath(args?.path)}`;
 			case "Bash":
-			case "bash": {
-				const cmd = args?.command || "";
-				const short = cmd.length > 60 ? cmd.slice(0, 57) + "..." : cmd;
-				return `⚙️ Running \`${short}\``;
-			}
+			case "bash":
+				return `⚙️ ${describeBashCommand(args?.command || "")}`;
 			case "Edit":
 			case "edit":
-				return `✏️ Editing \`${truncPath(args?.path)}\``;
+				return `✏️ Editing ${friendlyPath(args?.path)}`;
 			case "Write":
 			case "write":
-				return `📝 Writing \`${truncPath(args?.path)}\``;
+				return `📝 Writing ${friendlyPath(args?.path)}`;
 			case "todo":
 				return `📋 Todo: ${args?.action || "managing"}`;
 			default:
@@ -307,12 +305,84 @@ export default function (pi: ExtensionAPI) {
 		}
 	}
 
-	function truncPath(p: string | undefined): string {
-		if (!p) return "?";
-		// Show just filename or last 2 path components
+	function friendlyPath(p: string | undefined): string {
+		if (!p) return "file";
 		const parts = p.split("/").filter(Boolean);
-		if (parts.length <= 2) return p;
-		return "…/" + parts.slice(-2).join("/");
+		const filename = parts[parts.length - 1] || p;
+		// Return just the filename for readability
+		return `\`${filename}\``;
+	}
+
+	function describeBashCommand(cmd: string): string {
+		// Strip common prefixes like cd, eval mise, etc.
+		const cleaned = cmd
+			.replace(/^cd\s+[^\s;&&]+\s*[;&|]+\s*/g, "")
+			.replace(/^eval\s+"\$\(mise\s+env[^)]*\)"\s*[;&|]+\s*/g, "")
+			.replace(/^\s*export\s+\S+\s*[;&|]+\s*/g, "")
+			.trim();
+
+		// Match common patterns and describe them
+		const patterns: [RegExp, string | ((m: RegExpMatchArray) => string)][] = [
+			[/^kubectl\s+get\s+nodes/, "Checking cluster nodes"],
+			[/^kubectl\s+get\s+pods/, "Checking pods"],
+			[/^kubectl\s+get\s+(deploy|deployment)/, "Checking deployments"],
+			[/^kubectl\s+get\s+(\S+)/, (m) => `Checking ${m[1]}`],
+			[/^kubectl\s+scale\s+.*--replicas=(\d+)/, (m) => m[1] === "0" ? "Scaling down" : "Scaling up"],
+			[/^kubectl\s+exec\s+.*cat\s+(\S+)/, (m) => `Reading ${friendlyPath(m[1])} on server`],
+			[/^kubectl\s+exec\s+.*git\s+.*commit/, "Committing on server"],
+			[/^kubectl\s+exec\s+.*git\s+.*push/, "Pushing to git"],
+			[/^kubectl\s+exec\s+.*git\s+.*status/, "Checking git status on server"],
+			[/^kubectl\s+cp\s+/, "Copying file to server"],
+			[/^kubectl\s+port-forward/, "Port forwarding"],
+			[/^kubectl\s+delete\s+pod/, "Cleaning up temp pod"],
+			[/^kubectl\s+wait/, "Waiting for pod readiness"],
+			[/^kubectl\s+apply/, "Applying Kubernetes manifest"],
+			[/^flux\s+get\s+kustomizations/, "Checking Flux kustomizations"],
+			[/^flux\s+get\s+helmreleases/, "Checking Helm releases"],
+			[/^grep\s+-r/, "Searching files"],
+			[/^find\s+/, "Finding files"],
+			[/^ls\s+/, "Listing directory"],
+			[/^cat\s+/, "Reading file"],
+			[/^python3?\s+.*ws\.py/, "Querying HA websocket API"],
+			[/^python3?\s+.*lovelace\.py/, "Updating dashboard"],
+			[/^\$HA\s+call\s+(\S+)\s+(\S+)/, (m) => `Calling HA ${m[1]}.${m[2]}`],
+			[/^\$HA\s+(states|state)\s+/, "Checking HA entity states"],
+			[/^\$HA\s+template/, "Running HA template"],
+			[/^\$HA\s+check-config/, "Validating HA config"],
+			[/^HA=.*?\$HA\s+call\s+(\S+)\s+(\S+)/, (m) => `Calling HA ${m[1]}.${m[2]}`],
+			[/^HA=.*?\$HA\s+(states|state)/, "Checking HA entity states"],
+			[/^HA=.*?\$HA\s+template/, "Running HA template"],
+			[/^HA=.*?\$HA\s+check-config/, "Validating HA config"],
+			[/ha-deploy/, "Deploying to Home Assistant"],
+			[/ha-dash/, "Updating HA dashboard"],
+			[/^git\s+status/, "Checking git status"],
+			[/^git\s+diff/, "Checking git diff"],
+			[/^git\s+log/, "Checking git log"],
+			[/^git\s+commit/, "Committing changes"],
+			[/^git\s+push/, "Pushing changes"],
+			[/^git\s+pull/, "Pulling changes"],
+			[/^jj\s+/, "Running jj command"],
+			[/^docker\s+/, "Running Docker command"],
+			[/^go\s+build/, "Building Go project"],
+			[/^go\s+test/, "Running Go tests"],
+			[/^npm\s+/, "Running npm"],
+			[/^yarn\s+/, "Running yarn"],
+			[/^pnpm\s+/, "Running pnpm"],
+			[/mosquitto/, "MQTT operation"],
+			[/^kill\s+/, "Cleaning up process"],
+			[/^sleep\s+/, "Waiting"],
+		];
+
+		for (const [pattern, result] of patterns) {
+			const match = cleaned.match(pattern);
+			if (match) {
+				return typeof result === "function" ? result(match) : result;
+			}
+		}
+
+		// Fallback: show first meaningful command, truncated
+		const short = cleaned.length > 50 ? cleaned.slice(0, 47) + "..." : cleaned;
+		return `Running \`${short}\``;
 	}
 
 	function buildActivityText(): string {
@@ -445,6 +515,12 @@ export default function (pi: ExtensionAPI) {
 					const msg = update.message;
 					if (msg?.voice) {
 						handleVoiceMessage(msg.chat.id, msg.voice.file_id, msg.caption);
+					} else if (msg?.photo) {
+						// photo is array of sizes — use the largest
+						const photo = msg.photo[msg.photo.length - 1];
+						handlePhotoMessage(msg.chat.id, photo.file_id, msg.caption);
+					} else if (msg?.document && msg.document.mime_type?.startsWith("image/")) {
+						handlePhotoMessage(msg.chat.id, msg.document.file_id, msg.caption);
 					} else if (msg?.text) {
 						handleTelegramMessage(msg.chat.id, msg.text);
 					}
@@ -457,6 +533,68 @@ export default function (pi: ExtensionAPI) {
 				}
 				await new Promise((r) => setTimeout(r, 5000));
 			}
+		}
+	}
+
+	function downloadFileToBuffer(url: string): Promise<Buffer> {
+		return new Promise((resolve, reject) => {
+			https.get(url, { family: 4 }, (res) => {
+				if (res.statusCode === 301 || res.statusCode === 302) {
+					downloadFileToBuffer(res.headers.location!).then(resolve, reject);
+					return;
+				}
+				const chunks: Buffer[] = [];
+				res.on("data", (chunk) => chunks.push(chunk));
+				res.on("end", () => resolve(Buffer.concat(chunks)));
+			}).on("error", reject);
+		});
+	}
+
+	function mimeFromPath(filePath: string): "image/jpeg" | "image/png" | "image/gif" | "image/webp" {
+		const ext = filePath.split(".").pop()?.toLowerCase();
+		if (ext === "png") return "image/png";
+		if (ext === "gif") return "image/gif";
+		if (ext === "webp") return "image/webp";
+		return "image/jpeg";
+	}
+
+	async function handlePhotoMessage(chatId: number, fileId: string, caption?: string): Promise<void> {
+		if (!isConnected) return;
+		if (allowedChatId && chatId !== allowedChatId) return;
+
+		activeChatIds.add(chatId);
+		messageCount.received++;
+
+		tgApi("sendChatAction", { chat_id: chatId, action: "typing" }).catch(() => {});
+
+		try {
+			const fileInfo = await tgApi("getFile", { file_id: fileId });
+			const fileUrl = `https://api.telegram.org/file/bot${token}/${fileInfo.file_path}`;
+			const buffer = await downloadFileToBuffer(fileUrl);
+			const base64 = buffer.toString("base64");
+			const mediaType = mimeFromPath(fileInfo.file_path);
+
+			const content: any[] = [
+				{ type: "image", source: { type: "base64", media_type: mediaType, data: base64 } },
+			];
+			if (caption?.trim()) {
+				content.unshift({ type: "text", text: caption.trim() });
+			}
+
+			let deliverAs: "steer" | "followUp" | undefined;
+			if (agentBusy) {
+				deliverAs = "followUp";
+			}
+
+			const opts = deliverAs ? { deliverAs } : undefined;
+			pi.sendUserMessage(content, opts);
+
+			if (deliverAs && agentBusy) {
+				sendFinalMessage(chatId, "📋 Queued as follow-up").catch(() => {});
+			}
+		} catch (e: any) {
+			const errMsg = e?.message || String(e);
+			sendFinalMessage(chatId, `⚠️ Failed to process image: ${errMsg}`).catch(() => {});
 		}
 	}
 
