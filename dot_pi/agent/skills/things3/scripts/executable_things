@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SKILL_NAME="things3-manager"
+SKILL_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILL_DATA_DIR="$SKILL_ROOT/.skills-data"
+
+WRAPPER="$SKILL_DATA_DIR/bin/things"
+VENV_PY="$SKILL_DATA_DIR/venv/bin/python"
+
+needs_setup=0
+if [[ ! -x "$WRAPPER" ]]; then
+  needs_setup=1
+elif [[ ! -x "$VENV_PY" ]]; then
+  needs_setup=1
+elif ! "$VENV_PY" -c "import things" >/dev/null 2>&1; then
+  needs_setup=1
+fi
+
+if [[ "$needs_setup" == "1" ]]; then
+  bash "$SKILL_ROOT/scripts/setup.sh"
+fi
+
+exec "$WRAPPER" "$@"
+
