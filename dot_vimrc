@@ -1,0 +1,3 @@
+for s:script_name in split(globpath('$HOME/.vim/', '*.vim'))
+    exec ":source " . s:script_name
+endfor

@@ -1,0 +1,18 @@
+alias l='ls'
+alias g='git'
+alias ls="gls --color"
+alias dns="sudo killall -hUP mDNSResponder"
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias kl='kubectl autons logs'
+alias kgp='k get pods -A | grep'
+alias kk='k klock'
+alias vimc='chezmoi edit --watch'
+
+alias cc='claude --dangerously-skip-permissions'
+alias ccr='claude --dangerously-skip-permissions -r'
+alias ccc='claude --dangerously-skip-permissions -c'
+alias ccp='claude --dangerously-skip-permissions --permission-mode plan'
+
+alias wsu='brew upgrade --fetch-head work-scripts'
+
+alias rsync-nas='rsync --rsync-path="/opt/bin/rsync" -e "ssh -p 2222"'

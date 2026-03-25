@@ -1,0 +1,141 @@
+# init zinit (managed by chezmoi externals)
+ZINIT_HOME="${HOME}/.local/share/zinit/zinit.git"
+source "${ZINIT_HOME}/zinit.zsh"
+
+autoload -Uz _zinit
+(( ${+_comps} )) && _comps[zinit]=_zinit
+
+# Critical environment variables (needed early)
+export EDITOR=vim
+export HOMEBREW_NO_ENV_HINTS=true
+export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+export ASDF_FORCE_PREPEND=no
+export K9S_CONFIG_DIR=~/.config/k9s
+eval "$(/opt/homebrew/bin/brew shellenv)"
+export PATH=$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
+
+# Load theme first
+zinit light NICHOLAS85/z-a-eval
+
+zi ice pick"spaceship.zsh" as"theme" depth"1"
+zi light spaceship-prompt/spaceship-prompt
+
+# Theme configuration
+SPACESHIP_PROMPT_ORDER=(
+    user
+    dir
+    git
+    venv
+    exec_time
+    line_sep
+    jobs
+    exit_code
+    char
+)
+SPACESHIP_RPROMPT_ORDER=(time)
+SPACESHIP_PROMPT_ADD_NEWLINE=false
+SPACESHIP_TIME_SHOW=true
+SPACESHIP_EXIT_CODE_SHOW=true
+SPACESHIP_EXIT_CODE_COLOR=red
+SPACESHIP_GIT_BRANCH_SHOW=true
+SPACESHIP_GIT_BRANCH_ASYNC=true
+SPACESHIP_GIT_BRANCH_COLOR="magenta"
+SPACESHIP_GIT_STATUS_SHOW=false
+
+# Custom git branch function for jj support
+spaceship_git_branch () {
+    if command -v jj >/dev/null 2>&1 && jj root >/dev/null 2>&1; then
+        jj_branch=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'if(bookmarks, bookmarks.join(", "), "")')
+        jj_changes=$(jj log -n 1 --ignore-working-copy --no-graph --color always -r @ -T 'surround("(", ")", change_id.shortest(6) ++ " " ++ commit_id.shortest(6))')
+        spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$jj_branch $jj_changes"
+    else
+        [[ $SPACESHIP_GIT_BRANCH_SHOW == false ]] && return
+        vcs_info
+        local git_current_branch="$vcs_info_msg_0_"
+        [[ -z "$git_current_branch" ]] && return
+        [[ "$git_current_branch" == branchless/* ]] && git_current_branch="(detached)"
+        git_current_branch="${git_current_branch#heads/}"
+        git_current_branch="${git_current_branch/.../}"
+        spaceship::section --color "$SPACESHIP_GIT_BRANCH_COLOR" "$SPACESHIP_GIT_BRANCH_PREFIX$git_current_branch$SPACESHIP_GIT_BRANCH_SUFFIX"
+    fi
+}
+
+# URL magic
+autoload -U url-quote-magic bracketed-paste-magic
+zle -N self-insert url-quote-magic
+zle -N bracketed-paste bracketed-paste-magic
+
+# compinit / completions
+autoload -Uz compinit
+[[ ! -d ~/.local/share/zinit/completions ]] && mkdir -p ~/.local/share/zinit/completions
+compinit -u -C
+
+# Main plugin block
+zi ice wait lucid atload'zstyle ":completion:*" fast-theme -q clean' atinit'zpcompinit; zpcdreplay'
+zi wait lucid for \
+    zdharma-continuum/fast-syntax-highlighting \
+    atload"fast-theme -q clean" \
+    blockf \
+    zsh-users/zsh-completions \
+    atload'!_zsh_autosuggest_start' \
+    zsh-users/zsh-autosuggestions \
+
+# zinit completion
+zi ice has"jj" as"completion" id-as"jj-completion" \
+    atclone"mkdir -p ~/.local/share/zinit/completions" \
+    atload'source <(jj util completion zsh); source <(COMPLETE=zsh jj)'
+zi light zdharma-continuum/null
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
+
+# Colors
+zinit ice atclone"/opt/homebrew/bin/gdircolors -b LS_COLORS > clrs.zsh" \
+    atpull'%atclone' pick"clrs.zsh" nocompile'!' \
+    atload'zstyle ":completion:*" list-colors "${(s.:.)LS_COLORS}"'
+zinit light trapd00r/LS_COLORS
+
+# Tools and utilities
+zinit wait lucid for \
+    andrewferrier/fzf-z \
+
+# OMZ snippets
+zi wait"0" lucid for \
+    OMZL::clipboard.zsh \
+    OMZP::brew/brew.plugin.zsh \
+    OMZP::git-extras/git-extras.plugin.zsh \
+    OMZP::kubectl/kubectl.plugin.zsh \
+    OMZP::sudo/sudo.plugin.zsh \
+    PZTM::osx
+
+# Environment setup
+zi wait lucid for \
+    has"zoxide" \
+    atload'eval "$(zoxide init --cmd cd zsh)"' \
+    zdharma-continuum/null
+
+# atuin
+zi wait lucid for \
+    has"atuin" \
+    atload'eval "$(atuin init zsh --disable-up-arrow)"' \
+    zdharma-continuum/null
+
+# mise
+zi wait lucid for \
+    has"mise" \
+    atload'eval "$(mise activate zsh)"; eval "$(mise completion zsh)"' \
+    zdharma-continuum/null
+
+# Custom configs
+zi ice wait="1" lucid multisrc'~/.zsh/*.zsh'
+zi light zdharma-continuum/null
+{{ if .work -}}
+zi ice wait="1" lucid if'[[ -f $(brew --prefix)/share/work-scripts/aliases.zsh ]]' \
+    atload'source $(brew --prefix)/share/work-scripts/aliases.zsh'
+zi light zdharma-continuum/null
+
+zi wait lucid for \
+    has"atlas" \
+    atload'export KUBECONFIG=$(atlas kitt context:create --pid=$$)' \
+    zdharma-continuum/null
+{{ end -}}

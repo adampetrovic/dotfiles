@@ -1,0 +1,162 @@
+{{/* base level packages for all environments */}}
+{{- $taps := list
+    "buo/cask-upgrade"
+    "FelixKratz/formulae"  
+    "weaveworks/tap"
+    "siderolabs/tap" -}}
+
+{{- $customTaps := dict -}}
+
+{{- $brews := list
+    "atuin"
+    "bat"
+    "bind"
+    "chezmoi"
+    "coreutils"
+    "difftastic"
+    "dockutil"
+    "doggo"
+    "entr"
+    "fzf"
+    "git"
+    "git-delta"
+    "git-extras"
+    "gnu-sed"
+    "grep"
+    "gron"
+    "gum"
+    "httpstat"
+    "httpie"
+    "jj"
+    "jq"
+    "krew"
+	"kubectl"
+    "mas"
+    "mise"
+    "pipenv"
+    "ripgrep"
+    "rsync"
+    "skopeo"
+    "sops"
+    "talosctl"
+    "talhelper"
+    "vim"
+    "watch"
+    "wget"
+    "yq"
+    "zoxide"
+    "zsh" -}}
+
+{{- $casks := list
+    "1password"
+    "1password-cli"
+    "alfred"
+    "bartender"
+    "claude-code"
+    "cleanshot"
+    "docker-desktop"
+    "fantastical"
+    "font-hack-nerd-font"
+    "font-fira-code"
+    "font-jetbrains-mono"
+    "goland"
+    "google-chrome"
+    "intellij-idea"
+    "istat-menus"
+    "keyboardcleantool"
+    "keymapp"
+	"logseq"
+    "mitmproxy"
+    "obsidian"
+    "pycharm"
+    "rectangle-pro"
+    "rustrover"
+    "spotify"
+    "teensy"
+    "webstorm" 
+    "wezterm" -}}
+
+{{- $mas := dict -}}
+
+{{- $brewsWithArgs := dict -}}
+
+{{/* personal-specific packages */}}
+{{- if .personal -}}
+{{- $taps = concat $taps (list) -}}
+
+{{-  $brews = concat $brews (list) -}}
+
+{{  $brewsWithArgs = merge $brewsWithArgs (dict) -}}
+
+{{-  $casks = concat $casks (list
+    "bambu-studio"
+    "calibre"
+    "claude"
+    "keepingyouawake"
+    "kindle-previewer"
+    "telegram"
+    "voiceink") -}}
+
+{{-  $mas = merge $mas (dict
+    "EventScripts" "525319418"
+    "Parcel" "639968404"
+    "Reeder Classic." "1529448980"
+    "Things3" "904280696" 
+    "Wireguard" "1451685025") -}}
+{{- end -}}
+
+
+{{/* work-specific packages */}}
+{{- if .work -}}
+{{- $taps = concat $taps (list
+    "atlassian/homebrew-acli") -}}
+
+{{  $customTaps = merge $customTaps (dict
+    "atlassian/lanyard" "git@bitbucket.org:atlassian/lanyard-tap.git"
+    "atlassian/micros" "ssh://git@stash.atlassian.com:7997/micros/homebrew-tap.git") -}}
+
+{{  $brews = concat $brews (list
+    "acli"
+    "awscli"
+    "gcloud-cli"
+    "jira-cli"
+    "tfenv") -}}
+
+{{  $brewsWithArgs = merge $brewsWithArgs (dict
+    "adampetrovic/tap/work-scripts" (list "HEAD")) -}}
+
+{{  $casks = concat $casks (list
+    "amazon-workspaces"
+    "cloudflare-warp"
+    "cursor"
+    "docker"
+    "drawio"
+    "lanyard"
+    "logitech-g-hub"
+    "loom"
+    "postman"
+    "slack@beta"
+    "yubico-yubikey-manager"
+    "zoom") -}}
+
+{{  $mas = merge $mas (dict) -}}
+{{- end -}}
+
+{{ range ($taps | sortAlpha | uniq) -}}
+tap "{{ . }}"
+{{ end }}
+{{ range $name, $url := $customTaps -}}
+tap "{{ $name }}", "{{ $url }}"
+{{ end -}}
+{{ range ($brews | sortAlpha | uniq) -}}
+brew "{{ . }}"
+{{ end }}
+{{ range $name, $args := $brewsWithArgs -}}
+brew "{{ $name }}", args: {{ $args | toJson }}
+{{ end }}
+{{ range ($casks | sortAlpha | uniq) -}}
+cask "{{ . }}"
+{{ end }}
+{{ range $app, $id := $mas -}}
+mas "{{ $app }}", id: {{ $id }}
+{{ end }}

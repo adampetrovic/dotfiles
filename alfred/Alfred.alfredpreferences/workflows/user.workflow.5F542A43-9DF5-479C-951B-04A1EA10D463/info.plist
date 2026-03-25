@@ -1,0 +1,1420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>bundleid</key>
+	<string>com.github.vanstrouble.alfred.caffeinedose</string>
+	<key>connections</key>
+	<dict>
+		<key>05071E07-4DBE-4C95-BFD5-FCD77617D6CE</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A7E04954-4F21-4963-B285-8C3A0ED1B1D1</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>231D6932-9005-4AB8-A7DB-107A74DBC175</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>427E0D2E-86E2-42BE-88EF-A515B9081A07</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>E5DD6A1C-CD20-435B-A701-C830DCCDE768</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>58A9AFD8-3811-48A0-A3D7-D293C2E98AF0</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5B01CD05-6B04-4F93-80C4-D689A3BBA9DB</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>D21CE85D-EB47-4EC5-9A4B-95BA6BBA9B68</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Allow display sleep</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>5B01CD05-6B04-4F93-80C4-D689A3BBA9DB</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>97FB63B4-1A45-494B-AE1E-AF983C5654FF</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>921AA255-FBD8-42EC-AA9A-4AB62F80DF09</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>231D6932-9005-4AB8-A7DB-107A74DBC175</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>97FB63B4-1A45-494B-AE1E-AF983C5654FF</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B02CEF3F-AE77-4E88-B461-40850ADB2ABB</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A72FB2C7-3E3A-4718-9252-81B9F781C030</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>05071E07-4DBE-4C95-BFD5-FCD77617D6CE</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Allow display sleep</string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>A7E04954-4F21-4963-B285-8C3A0ED1B1D1</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>B02CEF3F-AE77-4E88-B461-40850ADB2ABB</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>D21CE85D-EB47-4EC5-9A4B-95BA6BBA9B68</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>5B01CD05-6B04-4F93-80C4-D689A3BBA9DB</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+		<key>E5DD6A1C-CD20-435B-A701-C830DCCDE768</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+				<key>vitoclose</key>
+				<false/>
+			</dict>
+		</array>
+	</dict>
+	<key>createdby</key>
+	<string>vanstrouble</string>
+	<key>description</key>
+	<string>Simple, native, and accessible</string>
+	<key>disabled</key>
+	<false/>
+	<key>name</key>
+	<string>Caffeine Dose</string>
+	<key>objects</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>{var:toogle_keyword}</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Please wait…</string>
+				<key>script</key>
+				<string>#!/bin/zsh --no-rcs
+
+# Verificar si caffeinate está ejecutándose usando la misma técnica que coffee_run.zsh
+if pgrep -x "caffeinate" &gt;/dev/null 2&gt;&amp;1; then
+    echo '{"items":[{"title":"Turn Off","subtitle":"Allow computer to sleep","arg":"off","icon":{"path":"icon.png"}}]}'
+else
+    echo '{"items":[{"title":"Turn On","subtitle":"Prevent sleep indefinitely","arg":"on","icon":{"path":"icon.png"}}]}'
+fi
+</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>skipuniversalaction</key>
+				<true/>
+				<key>subtext</key>
+				<string>Prevent your computer from going to sleep</string>
+				<key>title</key>
+				<string>{const:alfred_workflow_name}</string>
+				<key>type</key>
+				<integer>11</integer>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>A72FB2C7-3E3A-4718-9252-81B9F781C030</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<true/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>#!/bin/bash
+
+# Use hotkey_value if provided, otherwise use first argument
+INPUT="${hotkey_value:-$1}"
+
+# Default value for display_sleep_allow if not set
+display_sleep_allow=${display_sleep_allow:-false}
+
+if [[ "$INPUT" == "off" ]]; then
+    # Kill all caffeinate processes
+    pkill -x "caffeinate" 2&gt;/dev/null
+    echo "Caffeinate deactivated."
+elif [[ "$INPUT" == "on" ]]; then
+    # Matar cualquier instancia previa para garantizar una ejecución limpia
+    pkill -x "caffeinate" 2&gt;/dev/null
+
+    # Start caffeinate with appropriate flags using nohup
+    if [[ "$display_sleep_allow" == "true" ]]; then
+        # Allow display to sleep (-i prevents idle sleep only)
+        nohup caffeinate -i &gt;/dev/null 2&gt;&amp;1 &amp;
+        echo "Caffeinate activated (display can sleep)."
+    else
+        # Prevent both idle sleep and display sleep
+        nohup caffeinate -d -i &gt;/dev/null 2&gt;&amp;1 &amp;
+        echo "Caffeinate activated."
+    fi
+else
+    echo "Error: Invalid input. Use 'on' or 'off'."
+    exit 1
+fi</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>11</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>A7E04954-4F21-4963-B285-8C3A0ED1B1D1</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict/>
+			<key>type</key>
+			<string>alfred.workflow.utility.junction</string>
+			<key>uid</key>
+			<string>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argument</key>
+				<string>{query}</string>
+				<key>passthroughargument</key>
+				<false/>
+				<key>variables</key>
+				<dict>
+					<key>display_sleep_allow</key>
+					<string>true</string>
+				</dict>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.argument</string>
+			<key>uid</key>
+			<string>05071E07-4DBE-4C95-BFD5-FCD77617D6CE</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>921AA255-FBD8-42EC-AA9A-4AB62F80DF09</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argument</key>
+				<string></string>
+				<key>passthroughargument</key>
+				<true/>
+				<key>variables</key>
+				<dict>
+					<key>hotkey_value</key>
+					<string>on</string>
+				</dict>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.argument</string>
+			<key>uid</key>
+			<string>231D6932-9005-4AB8-A7DB-107A74DBC175</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>lastpathcomponent</key>
+				<false/>
+				<key>onlyshowifquerypopulated</key>
+				<false/>
+				<key>removeextension</key>
+				<false/>
+				<key>text</key>
+				<string>{query}</string>
+				<key>title</key>
+				<string>{const:alfred_workflow_name}</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.output.notification</string>
+			<key>uid</key>
+			<string>B02CEF3F-AE77-4E88-B461-40850ADB2ABB</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>action</key>
+				<integer>0</integer>
+				<key>argument</key>
+				<integer>0</integer>
+				<key>focusedappvariable</key>
+				<false/>
+				<key>focusedappvariablename</key>
+				<string></string>
+				<key>leftcursor</key>
+				<false/>
+				<key>modsmode</key>
+				<integer>0</integer>
+				<key>relatedAppsMode</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.hotkey</string>
+			<key>uid</key>
+			<string>427E0D2E-86E2-42BE-88EF-A515B9081A07</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argument</key>
+				<string></string>
+				<key>passthroughargument</key>
+				<true/>
+				<key>variables</key>
+				<dict>
+					<key>hotkey_value</key>
+					<string>off</string>
+				</dict>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.argument</string>
+			<key>uid</key>
+			<string>E5DD6A1C-CD20-435B-A701-C830DCCDE768</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>alfredfiltersresults</key>
+				<false/>
+				<key>alfredfiltersresultsmatchmode</key>
+				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<true/>
+				<key>argumenttrimmode</key>
+				<integer>0</integer>
+				<key>argumenttype</key>
+				<integer>0</integer>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>keyword</key>
+				<string>cfs</string>
+				<key>queuedelaycustom</key>
+				<integer>3</integer>
+				<key>queuedelayimmediatelyinitially</key>
+				<true/>
+				<key>queuedelaymode</key>
+				<integer>0</integer>
+				<key>queuemode</key>
+				<integer>1</integer>
+				<key>runningsubtext</key>
+				<string>Please wait…</string>
+				<key>script</key>
+				<string>#!/bin/zsh --no-rcs
+
+# Function to calculate the end time based on the given minutes
+calculate_end_time() {
+    local minutes=$1
+
+    # Check Alfred variable for time format preference
+    # 'a' is 12-hour format, 'b' is 24-hour format
+    if [[ "${alfred_time_format:-a}" == "a" ]]; then
+        # 12-hour format with AM/PM including seconds
+        date -v+"$minutes"M +"%l:%M:%S %p" | sed 's/^ //'
+    else
+        # 24-hour format including seconds
+        date -v+"$minutes"M +"%H:%M:%S"
+    fi
+}
+
+# Function to get the nearest future time based on input hour and minute
+get_nearest_future_time() {
+    local hour=$1
+    local minute=$2
+    local current_hour=$3
+    local current_minute=$4
+
+    # Calculate current time in minutes since midnight (once instead of twice)
+    local current_total=$(( current_hour * 60 + current_minute ))
+
+    # Special handling for hour 12 and conversion to AM/PM using shorter syntax
+    local am_hour=$hour
+    local pm_hour=$hour
+    [[ $hour -eq 12 ]] &amp;&amp; am_hour=0  # 12 AM is actually 0 in 24-hour format
+    [[ $hour -lt 12 ]] &amp;&amp; pm_hour=$(( hour + 12 ))
+
+    # Calculate minutes for AM and PM interpretations
+    local am_total=$(( am_hour * 60 + minute ))
+    local pm_total=$(( pm_hour * 60 + minute ))
+
+    # Calculate differences once
+    local am_diff=$(( am_total - current_total ))
+    local pm_diff=$(( pm_total - current_total ))
+
+    # Use the same logic but with pre-calculated differences
+    if [[ $am_diff -lt 0 &amp;&amp; $pm_diff -gt 0 ]]; then
+        echo $pm_diff
+    elif [[ $am_diff -gt 0 ]]; then
+        echo $am_diff
+    else
+        echo $(( am_diff + 1440 ))
+    fi
+}
+
+# Consolidate format_hour and format_minute into one function
+format_number_with_leading_zero() {
+    local num=${1#0}
+    [[ -z "$num" ]] &amp;&amp; num=0
+    [[ "$num" -lt 10 ]] &amp;&amp; echo "0$num" || echo "$num"
+}
+
+# Helper function to convert AM/PM hour to 24-hour format
+convert_to_24h_format() {
+    local hour=$1
+    local ampm=$2
+
+    # Trim leading zeros
+    hour=${hour#0}
+    [[ -z "$hour" ]] &amp;&amp; hour=0
+
+    if [[ "$ampm" =~ [pP] &amp;&amp; "$hour" -lt 12 ]]; then
+        echo $(( hour + 12 ))
+    elif [[ "$ampm" =~ [aA] &amp;&amp; "$hour" -eq 12 ]]; then
+        echo 0
+    else
+        echo $hour
+    fi
+}
+
+# Helper function to calculate future time from minutes
+calculate_future_time() {
+    local total_minutes=$1
+    local current_hour=$2
+    local current_minute=$3
+
+    local future_hour=$(( (total_minutes + current_hour * 60 + current_minute) / 60 % 24 ))
+    local future_minute=$(( (total_minutes + current_hour * 60 + current_minute) % 60 ))
+
+    # Format with leading zeros (after removing any existing leading zeros)
+    future_hour=$(format_number_with_leading_zero "$future_hour")
+    future_minute=$(format_number_with_leading_zero "$future_minute")
+
+    echo "TIME:$future_hour:$future_minute"
+}
+
+
+# Function to format the duration in hours and minutes
+format_duration() {
+    local total_minutes=$1
+    local hours=$(( total_minutes / 60 ))
+    local minutes=$(( total_minutes % 60 ))
+
+    if [[ "$hours" -gt 0 &amp;&amp; "$minutes" -gt 0 ]]; then
+        echo "$hours hour(s) $minutes minute(s)"
+    elif [[ "$hours" -gt 0 ]]; then
+        echo "$hours hour(s)"
+    else
+        echo "$minutes minute(s)"
+    fi
+}
+
+# Format time with proper leading zeros
+format_time() {
+    local hours=$1
+    local minutes=$2
+    local seconds=$3
+
+    local formatted="${hours}h:"
+    [[ $minutes -lt 10 ]] &amp;&amp; formatted="${formatted}0${minutes}m:" || formatted="${formatted}${minutes}m:"
+    [[ $seconds -lt 10 ]] &amp;&amp; formatted="${formatted}0${seconds}s" || formatted="${formatted}${seconds}s"
+
+    echo "$formatted"
+}
+
+# Get display sleep status based on caffeinate arguments
+get_display_sleep_status() {
+    local caffeinate_args=$1
+    [[ "$caffeinate_args" == *"-d"* ]] &amp;&amp; echo "Display sleep prevention active" || echo "Display can sleep (idle prevention only)"
+}
+
+# Universal format message function
+format_session_message() {
+    local type=$1
+    local time_value=$2
+    local display_info=$3
+    local extra=$4
+
+    case "$type" in
+        "target")
+            echo "Active until $time_value - $display_info"
+            ;;
+        "timed")
+            local h=$((time_value / 3600))
+            local m=$(((time_value % 3600) / 60))
+            local s=$((time_value % 60))
+            local time_fmt=$(format_time "$h" "$m" "$s")
+            echo "Remaining: $time_fmt - Will end at $extra - $display_info"
+            ;;
+        "indefinite")
+            local h=$((time_value / 3600))
+            local m=$(((time_value % 3600) / 60))
+            local s=$((time_value % 60))
+            local time_fmt=$(format_time "$h" "$m" "$s")
+            echo "Running for $time_fmt - $display_info"
+            ;;
+    esac
+}
+
+# Generate JSON output with conditional rerun
+generate_alfred_json() {
+    local title=$1
+    local subtitle=$2
+    local arg=$3
+    local needs_rerun=$4
+
+    local rerun_part=""
+    [[ "$needs_rerun" == "true" ]] &amp;&amp; rerun_part='"rerun":1,'
+
+    echo '{'${rerun_part}'"items":[{"title":"'"$title"'","subtitle":"'"$subtitle"'","arg":"'"$arg"'","icon":{"path":"icon.png"}}]}'
+}
+
+# Helper function to determine if a session needs rerun
+needs_rerun() {
+    local session_type=$1
+    local total_seconds=$2
+
+    # For target time sessions or very long sessions (&gt;2h), we don't need frequent updates
+    if [[ "$session_type" == "timed" &amp;&amp; $total_seconds -gt 7200 ]]; then
+        echo "false"
+    elif [[ "$session_type" == "target_time" ]]; then
+        echo "false"
+    elif [[ "$session_type" == "indefinite" ]]; then
+        # Indefinite sessions show elapsed time, so we want updates
+        echo "true"
+    elif [[ "$session_type" == "timed" ]]; then
+        # Regular timed sessions show remaining time, so we want updates
+        echo "true"
+    else
+        # Default to not needing rerun
+        echo "false"
+    fi
+}
+
+# Function to check caffeinate status and return JSON output
+check_status() {
+    # Check if caffeinate is running - early return if not
+    local caffeinate_pid=$(pgrep -x "caffeinate")
+    [[ -z "$caffeinate_pid" ]] &amp;&amp; generate_alfred_json "No Caffeinate Session Active" \
+        "Run a command to start caffeinate" "status" "false" &amp;&amp; return
+
+    # Get process info
+    local caffeinate_info=$(ps -o lstart=,command= -p "$caffeinate_pid")
+    local caffeinate_start=${caffeinate_info%% caffeinate*}
+    local caffeinate_args=${caffeinate_info#*caffeinate }
+
+    # Calculate timestamps once
+    local start_seconds=$(date -j -f "%a %b %d %T %Y" "$caffeinate_start" "+%s" 2&gt;/dev/null)
+    local current_seconds=$(date "+%s")
+    local duration_seconds=$(( current_seconds - start_seconds ))
+
+    # Get display sleep status
+    local display_sleep_info=$(get_display_sleep_status "$caffeinate_args")
+
+    # Determine session type and format message in one step
+    local session_type="indefinite"
+    local subtitle=""
+    local total_seconds=0
+
+    # Extract timed session information if present
+    if [[ "$caffeinate_args" =~ -t[[:space:]]+([0-9]+) ]]; then
+        total_seconds=${match[1]}
+        local remaining_seconds=$(( total_seconds - duration_seconds ))
+        [[ $remaining_seconds -lt 0 ]] &amp;&amp; remaining_seconds=0
+
+        # Calculate end time once
+        local end_time=$(date -r $(( start_seconds + total_seconds )) "+%l:%M %p" | sed 's/^ //')
+
+        # Determine session type based on duration
+        if [[ $total_seconds -gt 7200 ]]; then
+            session_type="target_time"
+            subtitle=$(format_session_message "target" "$end_time" "$display_sleep_info")
+        else
+            session_type="timed"
+            subtitle=$(format_session_message "timed" "$remaining_seconds" "$display_sleep_info" "$end_time")
+        fi
+    else
+        # Indefinite session
+        subtitle=$(format_session_message "indefinite" "$duration_seconds" "$display_sleep_info")
+    fi
+
+    # Escape JSON special characters and generate final output
+    subtitle=${subtitle//\"/\\\"}
+    generate_alfred_json "Caffeinate Session Active" "$subtitle" "status" \
+        $(needs_rerun "$session_type" "$total_seconds")
+}
+
+# Function to parse the input and calculate the total minutes
+parse_input() {
+    local input=(${(@s/ /)1})  # Split the input into parts
+    local current_hour=$(date +"%H")
+    local current_minute=$(date +"%M")
+
+    # Early return for invalid input when empty
+    [[ -z "${input[1]}" ]] &amp;&amp; echo "0" &amp;&amp; return
+
+    # Check for status command
+    [[ "${input[1]}" == "s" ]] &amp;&amp; echo "status" &amp;&amp; return
+
+    # Handle single input cases with early returns
+    if [[ "${#input[@]}" -eq 1 ]]; then
+        # Special value for indefinite mode
+        [[ "${input[1]}" == "i" ]] &amp;&amp; echo "indefinite" &amp;&amp; return
+
+        # Format: 2h (hours)
+        if [[ "${input[1]}" =~ ^[0-9]+h$ ]]; then
+            echo $(( ${input[1]%h} * 60 ))
+            return
+        fi
+
+        # Direct number input (minutes)
+        if [[ "${input[1]}" =~ ^[0-9]+$ ]]; then
+            echo "${input[1]}"
+            return
+        fi
+
+        # Format: 8 or 8: (hour only)
+        if [[ "${input[1]}" =~ ^([0-9]{1,2}):?$ ]]; then
+            local hour=${match[1]}
+            local minute=0
+
+            # Parameter expansion is more efficient than sed
+            hour=${hour#0}
+
+            # Check if the input has a colon at the end
+            if [[ "${input[1]}" =~ :$ ]]; then
+                # If it has a colon, calculate specific time
+                local total_minutes=$(get_nearest_future_time "$hour" "$minute" "$current_hour" "$current_minute")
+
+                # Use helper function to calculate future time
+                local future_time=$(calculate_future_time "$total_minutes" "$current_hour" "$current_minute")
+                # For hour-only format with colon, we want to force minutes to 00
+                echo "${future_time%:*}:00"
+            else
+                # No colon, return minutes
+                local total_minutes=$(get_nearest_future_time "$hour" "$minute" "$current_hour" "$current_minute")
+                echo "$total_minutes"
+            fi
+            return
+        fi
+
+        # Format: 8a, 8am, 8p, 8pm
+        if [[ "${input[1]}" =~ ^([0-9]{1,2})([aApP])?(m)?$ ]]; then
+            local hour=${match[1]}
+            local ampm=${match[2]:-""}
+            local minute=0
+
+            # With AM/PM indicator
+            if [[ -n "$ampm" ]]; then
+                # Convert to 24-hour format using helper function
+                hour=$(convert_to_24h_format "$hour" "$ampm")
+
+                # Format hour with leading zero
+                hour=$(format_number_with_leading_zero "$hour")
+                echo "TIME:$hour:00"
+            else
+                # Without AM/PM, use nearest future time
+                hour=${hour#0}
+                echo $(get_nearest_future_time "$hour" "$minute" "$current_hour" "$current_minute")
+            fi
+            return
+        fi
+
+        # Format: 8:30, 8:30a, 8:30am, 8:30p, 8:30pm
+        if [[ "${input[1]}" =~ ^([0-9]{1,2}):([0-9]{1,2})([aApP])?([mM])?$ ]]; then
+            local hour=${match[1]}
+            local minute=${match[2]}
+            local ampm=${match[3]:-""}
+
+            # With AM/PM indicator
+            if [[ -n "$ampm" ]]; then
+                # Convert to 24-hour format using helper function
+                hour=$(convert_to_24h_format "$hour" "$ampm")
+
+                # Format output with leading zeros
+                hour=$(format_number_with_leading_zero "$hour")
+                minute=$(format_number_with_leading_zero "$minute")
+                echo "TIME:$hour:$minute"
+            else
+                # Without explicit AM/PM, calculate future time
+                hour=${hour#0}
+                local total_minutes=$(get_nearest_future_time "$hour" "$minute" "$current_hour" "$current_minute")
+
+                # Use helper function to calculate and format future time
+                echo $(calculate_future_time "$total_minutes" "$current_hour" "$current_minute")
+            fi
+            return
+        fi
+
+        # If we get here, it's an invalid single input
+        echo "0"
+        return
+    fi
+
+    # Handle two-part input (hours and minutes)
+    if [[ "${#input[@]}" -eq 2 ]]; then
+        if [[ "${input[1]}" =~ ^[0-9]+$ &amp;&amp; "${input[2]}" =~ ^[0-9]+$ ]]; then
+            echo $(( input[1] * 60 + input[2] ))
+            return
+        fi
+
+        # Invalid two-part input
+        echo "0"
+        return
+    fi
+
+    # Default case: invalid input
+    echo "0"
+}
+
+# Function to generate Alfred JSON output
+generate_output() {
+    local input_result=$1
+
+    # Check for invalid input first (fastest check)
+    if [[ "$input_result" == "0" ]]; then
+        echo '{"items":[{"title":"Invalid input","subtitle":"Please provide a valid time format","arg":"0","icon":{"path":"icon.png"}}]}'
+        return
+    fi
+
+    # Check for indefinite mode (no rerun needed)
+    if [[ "$input_result" == "indefinite" ]]; then
+        echo '{"items":[{"title":"Active indefinitely","subtitle":"Keep your Mac awake until manually disabled","arg":"indefinite","icon":{"path":"icon.png"}}]}'
+        return
+    fi
+
+    # Check for status command
+    if [[ "$input_result" == "status" ]]; then
+        check_status
+        return
+    fi
+
+    # Check for target time format
+    if [[ "$input_result" == TIME:* ]]; then
+        local target_time=${input_result#TIME:}
+        local hour=${target_time%:*}
+        local minute=${target_time#*:}
+
+        # To display the time in a user-friendly format
+        local display_time=$(date -j -f "%H:%M" "$target_time" "+%l:%M %p" 2&gt;/dev/null | sed 's/^ //')
+        [[ $? -ne 0 ]] &amp;&amp; display_time="$target_time"
+
+        echo '{"items":[{"title":"Active until '"$display_time"'","subtitle":"Keep awake until specified time","arg":"'"$input_result"'","icon":{"path":"icon.png"}}]}'
+        return
+    fi
+
+    # Finally, handle duration in minutes (most common case)
+    local end_time=$(calculate_end_time "$input_result")
+    local formatted_duration=$(format_duration "$input_result")
+    echo '{"rerun":1,"items":[{"title":"Active for '"$formatted_duration"'","subtitle":"Keep awake until around '"$end_time"'","arg":"'"$input_result"'","icon":{"path":"icon.png"}}]}'
+}
+
+# Main function
+main() {
+    local total_minutes=$(parse_input "$1")
+    generate_output "$total_minutes"
+}
+
+# Execute the main function with the input
+main "$1"
+</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>subtext</key>
+				<string>Define the time</string>
+				<key>title</key>
+				<string>Active for {query}</string>
+				<key>type</key>
+				<integer>11</integer>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.scriptfilter</string>
+			<key>uid</key>
+			<string>58A9AFD8-3811-48A0-A3D7-D293C2E98AF0</string>
+			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<true/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>#!/bin/bash
+
+# Function to calculate the end time based on the given minutes
+calculate_end_time() {
+    local minutes=$1
+
+    # Check Alfred variable for time format preference
+    if [[ "${alfred_time_format:-a}" == "a" ]]; then
+        # 12-hour format with AM/PM
+        date -v+"$minutes"M +"%l:%M %p" | sed 's/^ //'
+    else
+        # 24-hour format
+        date -v+"$minutes"M +"%H:%M"
+    fi
+}
+
+# Function to extract hour and minute from TIME:HH:MM format
+parse_time_format() {
+    local time_str=$1
+
+    # Remove the TIME: prefix
+    time_str=${time_str#TIME:}
+
+    # Extract hour and minute directly
+    local hour=${time_str%%:*}
+    local minute=${time_str#*:}
+
+    # Validate input - purely numeric and in range
+    if [[ ! "$hour" =~ ^[0-9]+$ || ! "$minute" =~ ^[0-9]+$ || "$hour" -gt 23 || "$minute" -gt 59 ]]; then
+        echo "Error: Invalid time format: $time_str" &gt;&amp;2
+        exit 1
+    fi
+
+    # Return as space-separated values
+    echo "$hour $minute"
+}
+
+# Function to calculate minutes until target time
+calculate_minutes_until_target() {
+    local hour=$1
+    local minute=$2
+
+    # Get current time
+    local current_hour=$(date +"%H")
+    local current_minute=$(date +"%M")
+
+    # Calculate total minutes
+    local target_minutes=$(( hour * 60 + minute ))
+    local current_minutes=$(( current_hour * 60 + current_minute ))
+    local duration_minutes=$(( target_minutes - current_minutes ))
+
+    # If target time is earlier than current time, add 24 hours
+    [[ $duration_minutes -le 0 ]] &amp;&amp; duration_minutes=$(( duration_minutes + 1440 ))
+
+    echo "$duration_minutes"
+}
+
+# Function to format time for display
+format_display_time() {
+    local hour=$1
+    local minute=$2
+    local time_format=${3:-a}
+
+    local display_time
+
+    if [[ "$time_format" == "a" ]]; then
+        # 12-hour format
+        if [[ "$hour" -gt 12 ]]; then
+            display_time="$((hour-12)):${minute} PM"
+        elif [[ "$hour" -eq 12 ]]; then
+            display_time="12:${minute} PM"
+        elif [[ "$hour" -eq 0 ]]; then
+            display_time="12:${minute} AM"
+        else
+            display_time="${hour}:${minute} AM"
+        fi
+
+        # Ensure minutes have leading zero if needed
+        [[ ${#minute} -eq 1 ]] &amp;&amp; display_time="${display_time/\:$minute/\:0$minute}"
+    else
+        # 24-hour format
+        [[ ${#hour} -eq 1 ]] &amp;&amp; hour="0$hour"
+        [[ ${#minute} -eq 1 ]] &amp;&amp; minute="0$minute"
+        display_time="${hour}:${minute}"
+    fi
+
+    echo "$display_time"
+}
+
+# Function to print output message based on display sleep setting
+output_message() {
+    local message=$1
+    local approximate=$2
+    local allow_display_sleep=$3
+
+    local prefix="Keeping awake"
+    local suffix
+
+    if [[ "$allow_display_sleep" == "true" ]]; then
+        suffix=". (Display can sleep)"
+    else
+        suffix="."
+    fi
+
+    if [[ -n "$approximate" &amp;&amp; "$approximate" == "true" ]]; then
+        echo "${prefix} until around ${message}${suffix}"
+    else
+        echo "${prefix} until ${message}${suffix}"
+    fi
+}
+
+# Function to print indefinite output message based on display sleep setting
+output_indefinite_message() {
+    local allow_display_sleep=$1
+
+    if [[ "$allow_display_sleep" == "true" ]]; then
+        echo "Keeping awake indefinitely. (Display can sleep)"
+    else
+        echo "Keeping awake indefinitely."
+    fi
+}
+
+# Function to ensure no other caffeinate processes are running
+kill_existing_caffeinate() {
+    pkill -x "caffeinate" 2&gt;/dev/null
+}
+
+# Function to start a caffeinate session with specific duration
+start_caffeinate_session() {
+    local total_minutes=$1
+    local allow_display_sleep=$2
+
+    # Ensure the minutes are a valid number and greater than 0
+    if [[ ! "$total_minutes" =~ ^[0-9]+$ || "$total_minutes" -eq 0 ]]; then
+        echo "Error: Invalid duration: $total_minutes minutes" &gt;&amp;2
+        exit 1
+    fi
+
+    # Convert minutes to seconds for caffeinate
+    local total_seconds=$(( total_minutes * 60 ))
+
+    # Kill any existing caffeinate processes
+    kill_existing_caffeinate
+
+    # Start caffeinate with appropriate flags
+    if [[ "$allow_display_sleep" == "true" ]]; then
+        # Allow display to sleep (-i prevents idle sleep only)
+        nohup caffeinate -i -t "$total_seconds" &gt;/dev/null 2&gt;&amp;1 &amp;
+    else
+        # Prevent both idle sleep and display sleep
+        nohup caffeinate -d -i -t "$total_seconds" &gt;/dev/null 2&gt;&amp;1 &amp;
+    fi
+}
+
+# Function to start an indefinite caffeinate session
+start_indefinite_session() {
+    local allow_display_sleep=$1
+
+    # Kill any existing caffeinate processes
+    kill_existing_caffeinate
+
+    # Start caffeinate with appropriate flags for indefinite duration
+    if [[ "$allow_display_sleep" == "true" ]]; then
+        # Allow display to sleep (-i prevents idle sleep only)
+        nohup caffeinate -i &gt;/dev/null 2&gt;&amp;1 &amp;
+    else
+        # Prevent both idle sleep and display sleep
+        nohup caffeinate -d -i &gt;/dev/null 2&gt;&amp;1 &amp;
+    fi
+
+    output_indefinite_message "$allow_display_sleep"
+}
+
+# Function to handle target time input
+handle_target_time() {
+    local target_time=$1
+    local allow_display_sleep=$2
+
+    # Extract hour and minute
+    read -r hour minute &lt;&lt;&lt; "$(parse_time_format "$target_time")"
+
+    # Calculate minutes until target time
+    local duration_minutes=$(calculate_minutes_until_target "$hour" "$minute")
+
+    # Start the caffeinate session
+    start_caffeinate_session "$duration_minutes" "$allow_display_sleep"
+
+    # Format time for display
+    local display_time=$(format_display_time "$hour" "$minute" "${alfred_time_format:-a}")
+
+    # Output result message
+    output_message "$display_time" "false" "$allow_display_sleep"
+}
+
+# Function to handle minute duration input
+handle_duration() {
+    local minutes=$1
+    local allow_display_sleep=$2
+
+    # Calculate end time for display
+    local end_time=$(calculate_end_time "$minutes")
+
+    # Start the caffeinate session
+    start_caffeinate_session "$minutes" "$allow_display_sleep"
+
+    # Output result message using the common function
+    output_message "$end_time" "true" "$allow_display_sleep"
+}
+
+# Main function
+main() {
+    # Default value for display_sleep_allow if not set
+    display_sleep_allow=${display_sleep_allow:-false}
+
+    # Handle different input types from the Filter Script
+    if [[ "$INPUT" == "0" ]]; then
+        echo "Error: Invalid input. Please provide a valid duration."
+        exit 1
+    elif [[ "$INPUT" == "indefinite" ]]; then
+        start_indefinite_session "$display_sleep_allow"
+    elif [[ "$INPUT" == "status" ]]; then
+        # Just for completeness - status is handled in the filter script
+        if pgrep -x "caffeinate" &gt;/dev/null; then
+            echo "Caffeinate is active."
+        else
+            echo "Caffeinate is not active."
+        fi
+    elif [[ "$INPUT" == TIME:* ]]; then
+        handle_target_time "$INPUT" "$display_sleep_allow"
+    elif [[ "$INPUT" =~ ^[0-9]+$ ]]; then
+        handle_duration "$INPUT" "$display_sleep_allow"
+    fi
+}
+
+INPUT="$1"
+main</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>11</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>97FB63B4-1A45-494B-AE1E-AF983C5654FF</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict/>
+			<key>type</key>
+			<string>alfred.workflow.utility.junction</string>
+			<key>uid</key>
+			<string>5B01CD05-6B04-4F93-80C4-D689A3BBA9DB</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argument</key>
+				<string>{query}</string>
+				<key>passthroughargument</key>
+				<false/>
+				<key>variables</key>
+				<dict>
+					<key>display_sleep_allow</key>
+					<string>true</string>
+				</dict>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.utility.argument</string>
+			<key>uid</key>
+			<string>D21CE85D-EB47-4EC5-9A4B-95BA6BBA9B68</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>readme</key>
+	<string># Caffeine Dose | Alfred Workflow
+
+A simple workflow that integrates with the `caffeinate` command-line utility to keep your Mac awake. This workflow allows you to activate or deactivate caffeinate, set it to stay awake for a specified number of minutes or until a specific time, and check the current status of caffeinate, all from within Alfred.
+
+## Getting Started
+
+### Toggle Caffeinate (coffee)
+
+Use the `coffee` keyword to toggle caffeinate on or off, preventing macOS from sleeping.
+
+**Keyword:** `coffee`
+
+If you hold the Command key while using the `coffee` command, the session will allow the display to sleep.
+
+### One command for everything (cfs)
+
+The `cfs` command allows you to set caffeinate to keep your Mac awake for a specific duration or until a specific time. It supports natural input formats for minutes, hours, and specific times, making it flexible and easy to use.
+
+**Keyword:** `cfs [duration or time]`
+
+If you hold the Command key while using the `cfs` command, the session will allow the display to sleep.
+
+**Examples**:
+- `cfs i`: Keeps your Mac awake indefinitely.
+- `cfs s`: Checks if caffeinate is active or the remaining time.
+- `cfs 15`: Keeps your Mac awake for 15 minutes.
+- `cfs 1 30`: Keeps your Mac awake for 1 hour and 30 minutes.
+- `cfs 2h`: Keeps your Mac awake for 2 hours.
+- `cfs 8am`: Keeps your Mac awake until 8:00 AM.
+- `cfs 9:30`: Keeps your Mac awake until the next 9:30.
+- `cfs 11:40pm`: Keeps your Mac awake until 11:40 PM.
+
+The `cfs` command supports both 12-hour (AM/PM) and 24-hour time formats.
+
+---
+
+Created by **Pedro Vázquez** (vanstrouble).</string>
+	<key>uidata</key>
+	<dict>
+		<key>05071E07-4DBE-4C95-BFD5-FCD77617D6CE</key>
+		<dict>
+			<key>xpos</key>
+			<real>260</real>
+			<key>ypos</key>
+			<real>95</real>
+		</dict>
+		<key>1BAAF107-A0E4-479A-A115-5E4F0A2E3A0A</key>
+		<dict>
+			<key>xpos</key>
+			<real>410</real>
+			<key>ypos</key>
+			<real>45</real>
+		</dict>
+		<key>231D6932-9005-4AB8-A7DB-107A74DBC175</key>
+		<dict>
+			<key>note</key>
+			<string>Turn On</string>
+			<key>xpos</key>
+			<real>260</real>
+			<key>ypos</key>
+			<real>160</real>
+		</dict>
+		<key>427E0D2E-86E2-42BE-88EF-A515B9081A07</key>
+		<dict>
+			<key>note</key>
+			<string>Turn Off Hotkey</string>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>265</real>
+		</dict>
+		<key>58A9AFD8-3811-48A0-A3D7-D293C2E98AF0</key>
+		<dict>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>400</real>
+		</dict>
+		<key>5B01CD05-6B04-4F93-80C4-D689A3BBA9DB</key>
+		<dict>
+			<key>xpos</key>
+			<real>405</real>
+			<key>ypos</key>
+			<real>430</real>
+		</dict>
+		<key>921AA255-FBD8-42EC-AA9A-4AB62F80DF09</key>
+		<dict>
+			<key>note</key>
+			<string>Turn On Hotkey</string>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>130</real>
+		</dict>
+		<key>97FB63B4-1A45-494B-AE1E-AF983C5654FF</key>
+		<dict>
+			<key>xpos</key>
+			<real>510</real>
+			<key>ypos</key>
+			<real>400</real>
+		</dict>
+		<key>A72FB2C7-3E3A-4718-9252-81B9F781C030</key>
+		<dict>
+			<key>xpos</key>
+			<real>30</real>
+			<key>ypos</key>
+			<real>15</real>
+		</dict>
+		<key>A7E04954-4F21-4963-B285-8C3A0ED1B1D1</key>
+		<dict>
+			<key>xpos</key>
+			<real>515</real>
+			<key>ypos</key>
+			<real>15</real>
+		</dict>
+		<key>B02CEF3F-AE77-4E88-B461-40850ADB2ABB</key>
+		<dict>
+			<key>xpos</key>
+			<real>705</real>
+			<key>ypos</key>
+			<real>215</real>
+		</dict>
+		<key>D21CE85D-EB47-4EC5-9A4B-95BA6BBA9B68</key>
+		<dict>
+			<key>xpos</key>
+			<real>255</real>
+			<key>ypos</key>
+			<real>485</real>
+		</dict>
+		<key>E5DD6A1C-CD20-435B-A701-C830DCCDE768</key>
+		<dict>
+			<key>note</key>
+			<string>Turn Off</string>
+			<key>xpos</key>
+			<real>255</real>
+			<key>ypos</key>
+			<real>295</real>
+		</dict>
+	</dict>
+	<key>userconfigurationconfig</key>
+	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>coffee</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Switch the workflow on or off via keyboard input.</string>
+			<key>label</key>
+			<string>Keyboard Toggle Control</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>toogle_keyword</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>cfs</string>
+				<key>placeholder</key>
+				<string></string>
+				<key>required</key>
+				<true/>
+				<key>trim</key>
+				<true/>
+			</dict>
+			<key>description</key>
+			<string>Use the keyboard to set a custom wake duration or time.</string>
+			<key>label</key>
+			<string>Activate Wake Timer</string>
+			<key>type</key>
+			<string>textfield</string>
+			<key>variable</key>
+			<string>cfs_keyword</string>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>default</key>
+				<string>a</string>
+				<key>pairs</key>
+				<array>
+					<array>
+						<string>12-hour (AM/PM)</string>
+						<string>a</string>
+					</array>
+					<array>
+						<string>24-hour</string>
+						<string>b</string>
+					</array>
+				</array>
+			</dict>
+			<key>description</key>
+			<string>Set your preferred time display: 12-hour (AM/PM) or 24-hour format.</string>
+			<key>label</key>
+			<string>Time Format Selection</string>
+			<key>type</key>
+			<string>popupbutton</string>
+			<key>variable</key>
+			<string>alfred_time_format</string>
+		</dict>
+	</array>
+	<key>variablesdontexport</key>
+	<array/>
+	<key>version</key>
+	<string>1.0.0</string>
+	<key>webaddress</key>
+	<string>https://github.com/vanstrouble/caffeine-dose-alfred-workflow.git</string>
+</dict>
+</plist>
