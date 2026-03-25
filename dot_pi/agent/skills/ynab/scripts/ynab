@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SKILL_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILL_DATA_DIR="${SKILL_DATA_DIR:-$SKILL_ROOT/.skills-data}"
+
+# Load .env if present
+ENV_FILE="$SKILL_DATA_DIR/.env"
+if [[ -f "$ENV_FILE" ]]; then
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+fi
+
+# Ensure ynab CLI is available
+YNAB_BIN="${YNAB_BIN:-}"
+if [[ -z "$YNAB_BIN" ]]; then
+  if command -v ynab >/dev/null 2>&1; then
+    YNAB_BIN="ynab"
+  elif [[ -x "$HOME/.bun/bin/ynab" ]]; then
+    YNAB_BIN="$HOME/.bun/bin/ynab"
+  else
+    echo "Error: ynab CLI not found. Install with: bun install -g @stephendolan/ynab-cli" >&2
+    exit 1
+  fi
+fi
+
+# Check setup on first run
+needs_setup=0
+if [[ ! -f "$SKILL_DATA_DIR/.env" ]]; then
+  needs_setup=1
+fi
+
+if [[ "$needs_setup" == "1" ]]; then
+  bash "$SKILL_ROOT/scripts/setup.sh"
+fi
+
+exec "$YNAB_BIN" "$@"

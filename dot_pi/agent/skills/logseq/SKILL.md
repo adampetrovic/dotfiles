@@ -228,6 +228,31 @@ For complete API documentation, see:
 }
 ```
 
+## Pi Agent Page Namespace
+
+All pages created by pi-agent **must** live under the `Pi Agent/` namespace. This keeps agent-generated content grouped under the [[Pi Agent]] parent page in Logseq.
+
+### Rules
+- **Page titles**: Always prefix with `Pi Agent/` — e.g. `Pi Agent/Coffee Switch OTA Failure`
+- **Filenames**: Use `Pi Agent___` prefix — e.g. `pages/Pi Agent___Coffee Switch OTA Failure.md`
+- **Journal links**: Use the full namespaced title — `[[Pi Agent/My Page Title]]`
+- **The `/logseq` extension** handles this automatically; these rules apply when creating pages manually via file writes
+
+### Creating a page manually
+```markdown
+<!-- File: pages/Pi Agent___My New Page.md -->
+tags:: #relevant-tag
+date:: 2026-03-14
+
+- # My New Page
+	- Content here...
+```
+
+### Linking from journals
+```markdown
+- Did some work on the thing [[Pi Agent/My New Page]]
+```
+
 ## Tips & Best Practices
 
 1. **Always check for null**: API methods may return `null` if entity doesn't exist
