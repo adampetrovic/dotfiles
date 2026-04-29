@@ -1,7 +1,8 @@
+{{ if .personal -}}
 Host *
 	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-
+{{ end -}}
 {{ if .work -}}
-# Work-specific SSH configuration
-# Add work hosts below as needed
+Host *
+	IdentityAgent /Users/apetrovic/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
 {{ end -}}

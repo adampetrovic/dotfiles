@@ -8,7 +8,11 @@ autoload -Uz _zinit
 # Critical environment variables (needed early)
 export EDITOR=vim
 export HOMEBREW_NO_ENV_HINTS=true
+{{ if .personal -}}
 export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/agent.sock
+{{ else if .work -}}
+export SSH_AUTH_SOCK=$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
+{{ end -}}
 export ASDF_FORCE_PREPEND=no
 export K9S_CONFIG_DIR=~/.config/k9s
 eval "$(/opt/homebrew/bin/brew shellenv)"
