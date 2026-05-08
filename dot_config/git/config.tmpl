@@ -3,7 +3,7 @@
     name = "{{ .full_name }}"
     email = "{{ .email }}"
 {{- if .work }}
-    signingkey = {{ (onepasswordRead "op://Private/SSH Key - Atlassian/public_key") }}
+    signingkey = {{ (onepasswordRead "op://Work/SSH Key - Atlassian/public_key") }}
 {{- else }}
     signingkey = {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
 {{- end }}
