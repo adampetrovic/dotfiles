@@ -916,7 +916,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 		if (await hasPendingChanges(pi)) {
 			const msg = detectedVcs === "jj"
 				? "Cannot checkout PR: there are unresolved conflicts."
-				: "Cannot checkout PR: you have uncommitted changes. Please commit or stash them first.";
+				: "Cannot checkout PR: you have uncommitted changes. Please commit or save them first.";
 			ctx.ui.notify(msg, "error");
 			return null;
 		}
@@ -946,7 +946,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 
 		// Check again for pending changes (in case something changed)
 		if (await hasPendingChanges(pi)) {
-			ctx.ui.notify("Cannot checkout PR: you have uncommitted changes. Please commit or stash them first.", "error");
+			ctx.ui.notify("Cannot checkout PR: you have uncommitted changes. Please commit or save them first.", "error");
 			return null;
 		}
 
@@ -1106,7 +1106,7 @@ export default function reviewExtension(pi: ExtensionAPI) {
 	async function handlePrCheckout(ctx: ExtensionContext, ref: string): Promise<ReviewTarget | null> {
 		// First check for pending changes
 		if (await hasPendingChanges(pi)) {
-			ctx.ui.notify("Cannot checkout PR: you have uncommitted changes. Please commit or stash them first.", "error");
+			ctx.ui.notify("Cannot checkout PR: you have uncommitted changes. Please commit or save them first.", "error");
 			return null;
 		}
 

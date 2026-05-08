@@ -70,35 +70,28 @@ Example output:
 const CODEX_MODEL_ID = "gpt-5.1-codex-mini";
 const HAIKU_MODEL_ID = "claude-haiku-4-5";
 
+type ModelRegistry = ExtensionContext["modelRegistry"];
+
+async function hasUsableApiKey(modelRegistry: ModelRegistry, model: Model<Api>): Promise<boolean> {
+	const auth = await modelRegistry.getApiKeyAndHeaders(model);
+	return auth.ok && !!auth.apiKey;
+}
+
 /**
  * Prefer Codex mini for extraction when available, otherwise fallback to haiku or the current model.
  */
-async function selectExtractionModel(
-	currentModel: Model<Api>,
-	modelRegistry: {
-		find: (provider: string, modelId: string) => Model<Api> | undefined;
-		getApiKey: (model: Model<Api>) => Promise<string | undefined>;
-	},
-): Promise<Model<Api>> {
+async function selectExtractionModel(currentModel: Model<Api>, modelRegistry: ModelRegistry): Promise<Model<Api>> {
 	const codexModel = modelRegistry.find("openai-codex", CODEX_MODEL_ID);
-	if (codexModel) {
-		const apiKey = await modelRegistry.getApiKey(codexModel);
-		if (apiKey) {
-			return codexModel;
-		}
+	if (codexModel && (await hasUsableApiKey(modelRegistry, codexModel))) {
+		return codexModel;
 	}
 
 	const haikuModel = modelRegistry.find("anthropic", HAIKU_MODEL_ID);
-	if (!haikuModel) {
-		return currentModel;
+	if (haikuModel && (await hasUsableApiKey(modelRegistry, haikuModel))) {
+		return haikuModel;
 	}
 
-	const apiKey = await modelRegistry.getApiKey(haikuModel);
-	if (!apiKey) {
-		return currentModel;
-	}
-
-	return haikuModel;
+	return currentModel;
 }
 
 /**
@@ -452,12 +445,17 @@ export default function (pi: ExtensionAPI) {
 			const extractionModel = await selectExtractionModel(ctx.model, ctx.modelRegistry);
 
 			// Run extraction with loader UI
+			let extractionError: string | undefined;
 			const extractionResult = await ctx.ui.custom<ExtractionResult | null>((tui, theme, _kb, done) => {
 				const loader = new BorderedLoader(tui, theme, `Extracting questions using ${extractionModel.id}...`);
 				loader.onAbort = () => done(null);
 
 				const doExtract = async () => {
-					const apiKey = await ctx.modelRegistry.getApiKey(extractionModel);
+					const auth = await ctx.modelRegistry.getApiKeyAndHeaders(extractionModel);
+					if (!auth.ok || !auth.apiKey) {
+						throw new Error(auth.ok ? `No API key for ${extractionModel.provider}` : auth.error);
+					}
+
 					const userMessage: UserMessage = {
 						role: "user",
 						content: [{ type: "text", text: lastAssistantText! }],
@@ -467,7 +465,7 @@ export default function (pi: ExtensionAPI) {
 					const response = await complete(
 						extractionModel,
 						{ systemPrompt: SYSTEM_PROMPT, messages: [userMessage] },
-						{ apiKey, signal: loader.signal },
+						{ apiKey: auth.apiKey, headers: auth.headers, signal: loader.signal },
 					);
 
 					if (response.stopReason === "aborted") {
@@ -479,18 +477,29 @@ export default function (pi: ExtensionAPI) {
 						.map((c) => c.text)
 						.join("\n");
 
-					return parseExtractionResult(responseText);
+					const parsed = parseExtractionResult(responseText);
+					if (!parsed) {
+						throw new Error("Question extractor returned invalid JSON");
+					}
+					return parsed;
 				};
 
 				doExtract()
 					.then(done)
-					.catch(() => done(null));
+					.catch((err) => {
+						extractionError = err instanceof Error ? err.message : String(err);
+						done(null);
+					});
 
 				return loader;
 			});
 
 			if (extractionResult === null) {
-				ctx.ui.notify("Cancelled", "info");
+				if (extractionError) {
+					ctx.ui.notify(`Question extraction failed: ${extractionError}`, "error");
+				} else {
+					ctx.ui.notify("Cancelled", "info");
+				}
 				return;
 			}
 

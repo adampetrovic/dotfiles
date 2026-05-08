@@ -1,0 +1,20 @@
+# Font
+font-family = JetBrains Mono
+font-size = 15
+adjust-cell-height = 10%
+
+# Theme
+theme = Material Darker
+
+# Window
+macos-titlebar-style = native
+window-padding-x = 10
+window-padding-y = 4,0
+confirm-close-surface = false
+
+# Cursor
+cursor-style = bar
+cursor-style-blink = false
+
+# macOS
+macos-option-as-alt = true

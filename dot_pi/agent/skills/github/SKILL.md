@@ -9,6 +9,33 @@ Use the `gh` CLI to interact with GitHub. Always specify `--repo owner/repo` whe
 
 ## Pull Requests
 
+### Multiline PR/Issue Bodies
+
+When creating or editing PRs/issues with multiline Markdown, **never pass escaped `\n` sequences in `--body`**. The shell will pass them literally and GitHub will render a broken one-line body.
+
+Use a real file/heredoc with `--body-file` instead:
+
+```bash
+body_file=$(mktemp)
+cat > "$body_file" <<'EOF'
+## Summary
+- concise bullet
+- another bullet with `code`
+
+## Validation
+- `command that was run`
+EOF
+
+gh pr create --repo owner/repo --title "feat: example" --body-file "$body_file"
+rm -f "$body_file"
+```
+
+For existing PRs, fix the body the same way:
+
+```bash
+gh pr edit 55 --repo owner/repo --body-file "$body_file"
+```
+
 Check CI status on a PR:
 ```bash
 gh pr checks 55 --repo owner/repo

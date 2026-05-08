@@ -14,6 +14,9 @@ import os from "node:os";
 const LOGSEQ_DIR = path.join(os.homedir(), "logseq");
 const JOURNALS_DIR = path.join(LOGSEQ_DIR, "journals");
 const PAGES_DIR = path.join(LOGSEQ_DIR, "pages");
+const LOGSEQ_MODEL_PROVIDER = "openai-codex";
+const LOGSEQ_MODEL_ID = "gpt-5.1-codex-mini";
+const LOGSEQ_MODEL_LABEL = `${LOGSEQ_MODEL_PROVIDER}/${LOGSEQ_MODEL_ID}`;
 
 type ContentBlock = { type?: string; text?: string; name?: string; arguments?: Record<string, unknown> };
 type SessionEntry = { type: string; message?: { role?: string; content?: unknown } };
@@ -86,12 +89,13 @@ function pageFilename(title: string): string {
 function completeText(
 	model: NonNullable<ReturnType<typeof getModel>>,
 	apiKey: string,
+	headers: Record<string, string> | undefined,
 	prompt: string,
 ): Promise<string> {
 	return complete(
 		model,
 		{ messages: [{ role: "user", content: [{ type: "text", text: prompt }], timestamp: Date.now() }] },
-		{ apiKey, reasoningEffort: "high" },
+		{ apiKey, headers, reasoningEffort: "medium" },
 	).then((r) =>
 		r.content
 			.filter((c): c is { type: "text"; text: string } => c.type === "text")
@@ -100,52 +104,173 @@ function completeText(
 	);
 }
 
-function extractJson(text: string): Record<string, unknown> {
-	const fenced = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
-	return JSON.parse((fenced ? fenced[1]! : text).trim());
+interface WriteupMeta {
+	title: string;
+	tags: string[];
+	journalSummary: string;
+}
+
+function extractJson(text: string): Record<string, unknown> | null {
+	const trimmed = text.trim();
+	if (!trimmed) return null;
+
+	const fenced = trimmed.match(/```(?:json)?\s*\n?([\s\S]*?)\n?```/);
+	const candidate = (fenced ? fenced[1]! : trimmed).trim();
+	if (!candidate) return null;
+
+	try {
+		return JSON.parse(candidate);
+	} catch {
+		const start = candidate.indexOf("{");
+		const end = candidate.lastIndexOf("}");
+		if (start === -1 || end === -1 || end <= start) return null;
+		try {
+			return JSON.parse(candidate.slice(start, end + 1));
+		} catch {
+			return null;
+		}
+	}
+}
+
+function cleanSingleLine(text: string, fallback: string, maxLength = 120): string {
+	const cleaned = text
+		.replace(/[\r\n\t]+/g, " ")
+		.replace(/\s+/g, " ")
+		.replace(/[\[\]`#]/g, "")
+		.trim();
+	return (cleaned || fallback).slice(0, maxLength).trim();
+}
+
+function fallbackTitle(conversationText: string): string {
+	const firstUserLine = conversationText
+		.split("\n")
+		.find((line) => line.trim().startsWith("User:"))
+		?.replace(/^\s*User:\s*/, "");
+	const seed = firstUserLine || conversationText.split("\n")[0] || "Session Writeup";
+	const words = cleanSingleLine(seed, "Session Writeup")
+		.replace(/[^\p{L}\p{N}\s-]/gu, "")
+		.split(/\s+/)
+		.filter(Boolean)
+		.slice(0, 5)
+		.join(" ");
+	return words || "Session Writeup";
+}
+
+function fallbackMetadata(conversationText: string): WriteupMeta {
+	const title = fallbackTitle(conversationText);
+	return {
+		title,
+		tags: ["pi-agent"],
+		journalSummary: `Captured session notes for ${title}`,
+	};
+}
+
+function parseMetadata(text: string, conversationText: string): WriteupMeta {
+	const fallback = fallbackMetadata(conversationText);
+	const parsed = extractJson(text);
+	if (!parsed) return fallback;
+
+	const tags = Array.isArray(parsed.tags)
+		? parsed.tags
+			.filter((tag): tag is string => typeof tag === "string")
+			.map((tag) => tag.toLowerCase().replace(/[^a-z0-9-]/g, "").trim())
+			.filter(Boolean)
+			.slice(0, 8)
+		: fallback.tags;
+
+	return {
+		title: cleanSingleLine(typeof parsed.title === "string" ? parsed.title : fallback.title, fallback.title, 80),
+		tags: tags.length > 0 ? tags : fallback.tags,
+		journalSummary: cleanSingleLine(
+			typeof parsed.journalSummary === "string" ? parsed.journalSummary : fallback.journalSummary,
+			fallback.journalSummary,
+			160,
+		),
+	};
+}
+
+function fallbackBody(conversationText: string): string {
+	const excerpt = conversationText
+		.split("\n")
+		.map((line) => cleanSingleLine(line, ""))
+		.filter(Boolean)
+		.slice(0, 20);
+	return [
+		"- **Summary**: The Logseq writeup model did not return body text, so this page captured a short conversation excerpt instead.",
+		"- **Conversation excerpt**:",
+		...excerpt.map((line) => `\t- ${line}`),
+	].join("\n");
 }
 
 async function generateWriteup(
 	conversationText: string,
 	apiKey: string,
+	headers: Record<string, string> | undefined,
 	model: ReturnType<typeof getModel>,
+	customPrompt?: string,
 ): Promise<{ title: string; tags: string[]; body: string; journalSummary: string }> {
+	const customGuidance = customPrompt
+		? `\n\nIMPORTANT — the user provided these specific instructions for this writeup:\n<user-instructions>\n${customPrompt}\n</user-instructions>\nFollow these instructions closely. They override the default structure and focus.`
+		: "";
+
 	// Step 1: Get metadata (small JSON — no multi-line strings)
 	const metaPrompt = `You are a technical writer. Given the conversation below, return ONLY a JSON object with:
 - "title": A short page title — 2-5 words max, like a project name not a sentence (e.g. "Coffee Switch OTA Failure", "Pool Pump Schedule", "Ecovacs WiFi Issue")
 - "tags": An array of relevant lowercase tags (e.g. ["home-assistant", "debugging"])
-- "journalSummary": A single concise line summarizing what was done (do NOT include any page link)
+- "journalSummary": A single concise line summarizing what was done (do NOT include any page link)${customGuidance}
 
 <conversation>
 ${conversationText}
 </conversation>`;
 
-	const metaText = await completeText(model!, apiKey, metaPrompt);
-	const meta = extractJson(metaText);
+	const metaText = await completeText(model!, apiKey, headers, metaPrompt);
+	const meta = parseMetadata(metaText, conversationText);
 
 	// Step 2: Get body (freeform markdown — no JSON escaping issues)
-	const bodyPrompt = `You are a technical writer. Given the conversation below, write a structured Logseq page.
+	const bodyPrompt = `You are a technical writer. Given the conversation below, write a Logseq page that matches the author's natural writing style.
 
 Output ONLY the Logseq-flavoured markdown body — no frontmatter, no code fences around the whole thing.
 
-Logseq formatting rules:
-- Every content line must start with "- " (top-level) or tab + "- " (nested)
-- Section headings use "- # Heading" or "- ## Heading"
-- Nested content under a heading uses one additional tab level
-- Code blocks and tables go inside bullet blocks
-- Include sections like Summary, Investigation, Findings, Root Cause, Resolution as appropriate
+Writing style rules:
+- DO NOT use markdown headings (# ## ###). Instead use **bold text** for section labels.
+- Keep the structure relatively flat. Prefer 1-2 levels of nesting, not deep hierarchies.
+- Write in complete, descriptive sentences rather than terse labels or sentence fragments.
+- Use **bold** inline for emphasis and key terms.
+- Every content line must start with "- " (top-level) or tab + "- " (nested).
+- Code blocks and tables go inside bullet blocks.
+- Be concise but informative. Summarise what was done, what was found, and what changed.
+- Group related information naturally rather than forcing rigid sections like "Investigation", "Findings", "Resolution".
+- Use Australian English spelling (e.g. organisation, colour, analyse, optimise, behaviour, defence, centre, licence).
+- Do NOT use em dashes or en dashes. Use commas, full stops, colons, or parentheses instead.
+- Use a natural, direct tone. Not overly formal or corporate.
+
+Example of CORRECT style:
+- **Background**: The server CT was threaded through Tesla Phase C (ch13), causing cross-phase measurement errors and requiring a min() hack to estimate server power.
+- **What changed**:
+	- Installed dedicated SCT-013-030 CT on channel 6 for the server circuit
+	- Simplified Tesla formula from a min() approximation to a clean 3-phase sum
+	- Added Kitchen and Laundry as separate per-phase residual outputs
+- **Configuration**: Generic CT with 1860 turns, phase lead 3, burden adjusted to 15.12Ω (parallel of internal 62Ω and IoTaWatt 20Ω)
+
+Example of WRONG style (do not do this):
+- # Server CT Migration
+	- ## Summary
+		- Migrated server monitoring to dedicated CT
+	- ## Investigation
+		- ### Current Setup
+			- Server wire threaded through Tesla_C${customGuidance}
 
 <conversation>
 ${conversationText}
 </conversation>`;
 
-	const body = await completeText(model!, apiKey, bodyPrompt);
+	const bodyText = (await completeText(model!, apiKey, headers, bodyPrompt)).trim();
 
 	return {
-		title: meta.title as string,
-		tags: (meta.tags as string[]) || [],
-		body: body.trim(),
-		journalSummary: meta.journalSummary as string,
+		title: meta.title,
+		tags: meta.tags,
+		body: bodyText || fallbackBody(conversationText),
+		journalSummary: meta.journalSummary,
 	};
 }
 
@@ -184,8 +309,10 @@ export default function (pi: ExtensionAPI) {
 	pi.on("session_fork", async (_event, ctx) => restoreState(ctx));
 
 	pi.registerCommand("logseq", {
-		description: "Write up the current session to Logseq with a journal entry",
+		description: "Write up the current session to Logseq with a journal entry. Optional: add a prompt to guide the writeup (e.g. /logseq focus on the root cause and fix only)",
 		handler: async (args, ctx: ExtensionCommandContext) => {
+			const customPrompt = args.trim() || undefined;
+
 			// 1. Extract conversation
 			const branch = ctx.sessionManager.getBranch();
 			const conversationText = buildConversationText(branch);
@@ -196,24 +323,29 @@ export default function (pi: ExtensionAPI) {
 			}
 
 			// 2. Get model & API key
-			const model = getModel("anthropic", "claude-sonnet-4-20250514");
+			const model = getModel(LOGSEQ_MODEL_PROVIDER, LOGSEQ_MODEL_ID);
 			if (!model) {
-				ctx.ui.notify("Model anthropic/claude-sonnet-4 not found", "error");
+				ctx.ui.notify(`Model ${LOGSEQ_MODEL_LABEL} not found`, "error");
 				return;
 			}
-			const apiKey = await ctx.modelRegistry.getApiKey(model);
-			if (!apiKey) {
-				ctx.ui.notify("No API key for anthropic/claude-sonnet-4", "error");
+			const auth = await ctx.modelRegistry.getApiKeyAndHeaders(model);
+			if (!auth.ok) {
+				ctx.ui.notify(auth.error, "error");
+				return;
+			}
+			if (!auth.apiKey) {
+				ctx.ui.notify(`No API key for ${LOGSEQ_MODEL_LABEL}`, "error");
 				return;
 			}
 
 			// 3. Generate writeup
 			const isUpdate = logseqState !== null;
-			ctx.ui.notify(isUpdate ? "Updating writeup..." : "Generating writeup...", "info");
+			const promptNote = customPrompt ? ` (with custom instructions)` : "";
+			ctx.ui.notify(isUpdate ? `Updating writeup${promptNote}...` : `Generating writeup${promptNote}...`, "info");
 
 			let writeup: Awaited<ReturnType<typeof generateWriteup>>;
 			try {
-				writeup = await generateWriteup(conversationText, apiKey, model);
+				writeup = await generateWriteup(conversationText, auth.apiKey, auth.headers, model, customPrompt);
 			} catch (e: unknown) {
 				const msg = e instanceof Error ? e.message : String(e);
 				ctx.ui.notify(`Failed to generate writeup: ${msg}`, "error");
