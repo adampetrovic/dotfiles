@@ -49,21 +49,28 @@ jj new -m "message"          # new change with description
 jj new <rev1> <rev2>         # new merge change with multiple parents
 ```
 
+For new feature work in this environment, prefer `jj start "message"` (documented below) so the change is created from `trunk()` and described before editing. If `@` already contains unrelated changes, run `jj new` first instead of mixing work.
+
 ### Diff
 ```bash
-jj diff                      # working copy changes vs parent
-jj diff -r <rev>             # show changes in a specific revision
-jj diff --from <rev1> --to <rev2>   # compare two revisions
+jj diff --git                # preferred for agents: standard unified +/- diff
+jj diff                      # working copy changes vs parent (may use configured formatter)
+jj diff -r <rev> --git       # show changes in a specific revision
+jj diff --from <rev1> --to <rev2> --git   # compare two revisions
 jj diff --stat               # summary only
 ```
 
+Prefer `--git` when reviewing, quoting, or parsing output; the default formatter may be customized and harder to read in agent transcripts.
+
 ### Squash (move changes into parent)
 ```bash
-jj squash                           # squash @ into @-
-jj squash -m "message"              # squash with new description
-jj squash --from <rev> --into <rev> # move changes between specific revisions
-jj squash <path>                    # squash only specific files
+jj squash -m "combined message"                  # squash @ into @- without opening an editor
+jj squash --use-destination-message              # squash and keep the destination/parent message
+jj squash --from <rev> --into <rev> -m "message" # move changes between specific revisions
+jj squash -m "combined message" <path>           # squash only specific files
 ```
+
+Bare `jj squash` can prompt for a combined message when both source and destination have descriptions; avoid it in agent/non-interactive sessions.
 
 ### Edit a previous change
 ```bash
@@ -72,9 +79,11 @@ jj edit <change_id>          # set working copy to an existing change
 
 ### Split a change
 ```bash
-jj split                     # interactively split @ into two changes
-jj split <paths>             # split specific files into a new change
+jj split -m "selected change message" <paths>  # non-interactively split specific files into the first change
+jj split -i                                    # interactive split; avoid in agent sessions unless explicitly requested
 ```
+
+Bare `jj split` is interactive and can hang waiting for a diff editor and messages.
 
 ### Rebase
 ```bash
@@ -169,24 +178,27 @@ left side content
 
 ### Resolving conflicts
 
-1. **Edit directly**: Modify the file to remove conflict markers, then let jj auto-snapshot.
-2. **Use merge tool**: `jj resolve` launches an external merge tool.
-3. **Choose a side**: `jj resolve --tool :ours` or `jj resolve --tool :theirs`.
-4. **List conflicts**: `jj resolve --list` or `jj log -r 'conflicts()'`.
+1. **Edit directly (preferred for agents)**: Modify the file to remove conflict markers, then let jj auto-snapshot.
+2. **List conflicts**: `jj resolve --list` or `jj log -r 'conflicts()'`.
+3. **Choose a side non-interactively**: `jj resolve --tool :ours` or `jj resolve --tool :theirs`.
+4. **Use merge tool only when interactive**: bare `jj resolve` launches an external merge tool and can hang.
 
 After editing conflict markers out of all files, the conflict is considered resolved on the next `jj` command.
 
 ## Important Notes for AI Agents
 
 1. **No staging area**: Never suggest `jj add`. Files are tracked automatically. Use `.gitignore` and `jj file untrack <path>` to untrack.
-2. **Non-interactive mode**: Always pass `-m "message"` to `describe`/`commit`/`new`. Never rely on `$EDITOR`.
-3. **Prefer change IDs**: When referencing revisions in commands, use change IDs (short alphabetic strings like `kntqzsqt`) rather than commit hashes, because change IDs survive rewrites.
-4. **Auto-rebase awareness**: Editing earlier commits automatically rebases descendants. Check for new conflicts with `jj log -r 'conflicts()'` after rewriting history.
-5. **`jj commit` vs `jj new`**: `jj commit -m "msg"` is equivalent to `jj describe -m "msg" && jj new`. Both are valid; `commit` is familiar to Git users.
-6. **Push workflow**: Set a bookmark → push. Example: `jj bookmark set my-feature -r @- && jj git push -b my-feature`.
-7. **Colocated repos**: If `.git/` also exists, jj auto-syncs. Prefer jj commands over git commands.
-8. **`--no-pager`**: Use `--no-pager` when capturing output programmatically: `jj --no-pager log`.
-9. **`--color never`**: Use `--color never` when parsing output to avoid ANSI escape codes.
+2. **Non-interactive mode**: Always pass `-m "message"` (or `--use-destination-message` for squash) to commands that may ask for descriptions: `describe`, `commit`, `new`, `squash`, `split`. Never rely on `$EDITOR`.
+3. **Avoid interactive modes**: Do not run bare `jj split`, `jj split -i`, `jj squash -i`, or bare `jj resolve` in agent sessions unless the user explicitly wants an interactive tool.
+4. **Prefer `jj diff --git`**: Use Git-format diffs when reviewing, quoting, or parsing output; add `--color never` for machine parsing.
+5. **Verify after mutations**: Run `jj st` after operations that rewrite or discard state (`squash`, `rebase`, `abandon`, `restore`, `undo`, `absorb`) to confirm the result.
+6. **Prefer change IDs**: When referencing revisions in commands, use change IDs (short alphabetic strings like `kntqzsqt`) rather than commit hashes, because change IDs survive rewrites.
+7. **Auto-rebase awareness**: Editing earlier commits automatically rebases descendants. Check for new conflicts with `jj log -r 'conflicts()'` after rewriting history.
+8. **`jj commit` vs `jj new`**: `jj commit -m "msg"` is equivalent to `jj describe -m "msg" && jj new`. Both are valid; `commit` is familiar to Git users.
+9. **Push workflow**: Set a bookmark → push. Example: `jj bookmark set my-feature -r @- && jj git push -b my-feature`.
+10. **Colocated repos**: If `.git/` also exists, jj auto-syncs. Prefer jj commands over git commands.
+11. **`--no-pager`**: Use `--no-pager` when capturing output programmatically: `jj --no-pager log`.
+12. **`--color never`**: Use `--color never` when parsing output to avoid ANSI escape codes.
 
 ## User Configuration (~/.jjconfig.toml)
 
@@ -206,8 +218,8 @@ The following customisations are active and **must be used in preference to gene
 
 ### Git Settings
 
-- `auto-local-bookmark = false` — fetching a remote bookmark does **not** create a local bookmark automatically.
-- `auto-track-bookmarks = true` — newly fetched remote bookmarks are tracked.
+- `[git] auto-local-bookmark = false` — fetching a remote bookmark does **not** create a local bookmark automatically.
+- `[remotes.origin] auto-track-bookmarks = "glob:*"` — newly fetched origin bookmarks are tracked.
 
 ### Fix Tools
 
@@ -267,7 +279,7 @@ jj start "Add new feature"
 # ... make edits (auto-tracked) ...
 
 # Review what you've done
-jj diff
+jj diff --git
 jj log
 
 # Create a bookmark and push
@@ -301,7 +313,7 @@ jj new trunk() -m "Add new feature"
 # ... make edits (auto-tracked) ...
 
 # Review what you've done
-jj diff
+jj diff --git
 jj log -r 'trunk()..@'
 
 # Create a bookmark and push
