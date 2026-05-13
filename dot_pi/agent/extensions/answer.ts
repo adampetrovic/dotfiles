@@ -10,7 +10,7 @@
  * 4. Submits the compiled answers when done
  */
 
-import { complete, type Model, type Api, type UserMessage } from "@earendil-works/pi-ai";
+import { complete, Type, type Api, type Model, type ToolCall, type UserMessage } from "@earendil-works/pi-ai";
 import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 import { BorderedLoader } from "@earendil-works/pi-coding-agent";
 import {
@@ -35,9 +35,9 @@ interface ExtractionResult {
 	questions: ExtractedQuestion[];
 }
 
-const SYSTEM_PROMPT = `You are a question extractor. Given text from a conversation, extract any questions that need answering.
+const SYSTEM_PROMPT = `You are a question extractor. Given text from a conversation, extract any questions that need user input.
 
-Output a JSON object with this structure:
+When the extract_questions tool is available, call it exactly once with this shape:
 {
   "questions": [
     {
@@ -47,14 +47,17 @@ Output a JSON object with this structure:
   ]
 }
 
+If tools are not available, output only the same JSON object. Do not wrap it in markdown. Do not add commentary.
+
 Rules:
 - Extract all questions that require user input
 - Keep questions in the order they appeared
 - Be concise with question text
 - Include context only when it provides essential information for answering
-- If no questions are found, return {"questions": []}
+- If no questions are found, return or call the tool with {"questions": []}
+- Do not answer the questions yourself
 
-Example output:
+Example payload:
 {
   "questions": [
     {
@@ -66,6 +69,24 @@ Example output:
     }
   ]
 }`;
+
+const EXTRACT_QUESTIONS_TOOL_NAME = "extract_questions";
+
+const EXTRACT_QUESTIONS_TOOL = {
+	name: EXTRACT_QUESTIONS_TOOL_NAME,
+	description: "Return every question in the supplied conversation text that needs user input.",
+	parameters: Type.Object({
+		questions: Type.Array(
+			Type.Object({
+				question: Type.String({ description: "The concise question text." }),
+				context: Type.Optional(
+					Type.String({ description: "Essential context needed to answer the question, if any." }),
+				),
+			}),
+			{ description: "Questions in the order they appeared." },
+		),
+	}),
+};
 
 const CODEX_MODEL_ID = "gpt-5.1-codex-mini";
 const HAIKU_MODEL_ID = "claude-haiku-4-5";
@@ -94,28 +115,214 @@ async function selectExtractionModel(currentModel: Model<Api>, modelRegistry: Mo
 	return currentModel;
 }
 
-/**
- * Parse the JSON response from the LLM
- */
-function parseExtractionResult(text: string): ExtractionResult | null {
-	try {
-		// Try to find JSON in the response (it might be wrapped in markdown code blocks)
-		let jsonStr = text;
+function isRecord(value: unknown): value is Record<string, unknown> {
+	return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
-		// Remove markdown code block if present
-		const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/);
-		if (jsonMatch) {
-			jsonStr = jsonMatch[1].trim();
-		}
-
-		const parsed = JSON.parse(jsonStr);
-		if (parsed && Array.isArray(parsed.questions)) {
-			return parsed as ExtractionResult;
-		}
-		return null;
-	} catch {
+function normalizeExtractionResult(value: unknown): ExtractionResult | null {
+	const root = Array.isArray(value) ? { questions: value } : value;
+	if (!isRecord(root) || !Array.isArray(root.questions)) {
 		return null;
 	}
+
+	const questions: ExtractedQuestion[] = [];
+	for (const item of root.questions) {
+		if (typeof item === "string") {
+			const question = item.trim();
+			if (question.length > 0) questions.push({ question });
+			continue;
+		}
+
+		if (!isRecord(item) || typeof item.question !== "string") {
+			return null;
+		}
+
+		const question = item.question.trim();
+		if (question.length === 0) continue;
+
+		const context = typeof item.context === "string" ? item.context.trim() : undefined;
+		questions.push(context ? { question, context } : { question });
+	}
+
+	return { questions };
+}
+
+function parseJsonCandidate(candidate: string): ExtractionResult | null {
+	const trimmed = candidate.trim().replace(/^\uFEFF/, "");
+	if (!trimmed) return null;
+
+	const jsonTagMatch = trimmed.match(/^<json>\s*([\s\S]*?)\s*<\/json>$/i);
+	const unwrapped = jsonTagMatch ? jsonTagMatch[1].trim() : trimmed;
+	const withoutTrailingCommas = unwrapped.replace(/,\s*([}\]])/g, "$1");
+	const variants = unwrapped === withoutTrailingCommas ? [unwrapped] : [unwrapped, withoutTrailingCommas];
+
+	for (const variant of variants) {
+		try {
+			const normalized = normalizeExtractionResult(JSON.parse(variant));
+			if (normalized) return normalized;
+		} catch {
+			// Try the next candidate.
+		}
+	}
+
+	return null;
+}
+
+function findBalancedJsonCandidates(text: string): string[] {
+	const candidates: string[] = [];
+	const closingFor: Record<string, string> = { "{": "}", "[": "]" };
+
+	for (let start = 0; start < text.length; start++) {
+		const first = text[start];
+		if (first !== "{" && first !== "[") continue;
+
+		const stack: string[] = [];
+		let inString = false;
+		let escaped = false;
+
+		for (let index = start; index < text.length; index++) {
+			const char = text[index];
+
+			if (inString) {
+				if (escaped) {
+					escaped = false;
+				} else if (char === "\\") {
+					escaped = true;
+				} else if (char === '"') {
+					inString = false;
+				}
+				continue;
+			}
+
+			if (char === '"') {
+				inString = true;
+				continue;
+			}
+
+			const expectedClosing = closingFor[char];
+			if (expectedClosing) {
+				stack.push(expectedClosing);
+				continue;
+			}
+
+			if (char === "}" || char === "]") {
+				if (stack.pop() !== char) break;
+				if (stack.length === 0) {
+					candidates.push(text.slice(start, index + 1));
+					if (candidates.length >= 20) return candidates;
+					break;
+				}
+			}
+		}
+	}
+
+	return candidates;
+}
+
+/**
+ * Parse the JSON response from the LLM. Be tolerant of common wrappers so the
+ * command doesn't fail just because the extractor included a preface or fence.
+ */
+function parseExtractionResult(text: string): ExtractionResult | null {
+	const candidates: string[] = [text];
+
+	const fenceRegex = /```(?:json|jsonc)?[^\n`]*\n?([\s\S]*?)```/gi;
+	for (const match of text.matchAll(fenceRegex)) {
+		if (match[1]) candidates.push(match[1]);
+	}
+
+	const jsonTagRegex = /<json>\s*([\s\S]*?)\s*<\/json>/gi;
+	for (const match of text.matchAll(jsonTagRegex)) {
+		if (match[1]) candidates.push(match[1]);
+	}
+
+	candidates.push(...findBalancedJsonCandidates(text));
+
+	const seen = new Set<string>();
+	for (const candidate of candidates) {
+		const key = candidate.trim();
+		if (!key || seen.has(key)) continue;
+		seen.add(key);
+
+		const parsed = parseJsonCandidate(candidate);
+		if (parsed) return parsed;
+	}
+
+	return null;
+}
+
+function isToolCallContent(content: unknown): content is ToolCall {
+	return isRecord(content) && content.type === "toolCall" && typeof content.name === "string";
+}
+
+function parseExtractionToolCall(content: unknown[]): ExtractionResult | null {
+	for (const item of content) {
+		if (!isToolCallContent(item) || item.name !== EXTRACT_QUESTIONS_TOOL_NAME) continue;
+
+		const parsed = typeof item.arguments === "string"
+			? parseExtractionResult(item.arguments)
+			: normalizeExtractionResult(item.arguments);
+		if (parsed) return parsed;
+	}
+
+	return null;
+}
+
+function getTextContent(content: unknown[]): string {
+	return content
+		.filter((c): c is { type: "text"; text: string } => isRecord(c) && c.type === "text" && typeof c.text === "string")
+		.map((c) => c.text)
+		.join("\n");
+}
+
+function getThinkingContent(content: unknown[]): string {
+	return content
+		.filter((c): c is { type: "thinking"; thinking: string } =>
+			isRecord(c) && c.type === "thinking" && typeof c.thinking === "string",
+		)
+		.map((c) => c.thinking)
+		.join("\n");
+}
+
+function summarizeInvalidResponse(text: string): string {
+	const compact = text.replace(/\s+/g, " ").trim();
+	if (!compact) return "empty model response";
+	return compact.length > 500 ? `${compact.slice(0, 500)}…` : compact;
+}
+
+function summarizeContentTypes(content: unknown[]): string {
+	const types = content.map((c) => (isRecord(c) && typeof c.type === "string" ? c.type : typeof c));
+	return types.length > 0 ? types.join(",") : "none";
+}
+
+function cleanHeuristicQuestion(question: string): string {
+	return question
+		.replace(/^\s*(?:[-*•]\s*)?(?:\d+[.)]\s*)?(?:Q\s*[:.)-]\s*)?/i, "")
+		.replace(/\s+/g, " ")
+		.trim();
+}
+
+function extractQuestionsHeuristically(text: string): ExtractionResult {
+	const questions: ExtractedQuestion[] = [];
+	const seen = new Set<string>();
+	const addQuestion = (raw: string) => {
+		const question = cleanHeuristicQuestion(raw);
+		if (!question.endsWith("?") || question.length < 4) return;
+		const key = question.toLowerCase();
+		if (seen.has(key)) return;
+		seen.add(key);
+		questions.push({ question });
+	};
+
+	for (const line of text.split(/\r?\n/)) {
+		const trimmed = line.trim();
+		if (!trimmed || /^```/.test(trimmed)) continue;
+		for (const match of trimmed.matchAll(/[^?]{3,}\?/g)) {
+			addQuestion(match[0]);
+		}
+	}
+
+	return { questions };
 }
 
 /**
@@ -462,26 +669,48 @@ export default function (pi: ExtensionAPI) {
 						timestamp: Date.now(),
 					};
 
-					const response = await complete(
-						extractionModel,
-						{ systemPrompt: SYSTEM_PROMPT, messages: [userMessage] },
-						{ apiKey: auth.apiKey, headers: auth.headers, signal: loader.signal },
+					const attempts = [
+						{ label: "tool", tools: [EXTRACT_QUESTIONS_TOOL] },
+						{ label: "json" },
+					];
+					let lastFailure = "no extraction attempts completed";
+
+					for (const attempt of attempts) {
+						const response = await complete(
+							extractionModel,
+							attempt.tools
+								? { systemPrompt: SYSTEM_PROMPT, messages: [userMessage], tools: attempt.tools }
+								: { systemPrompt: SYSTEM_PROMPT, messages: [userMessage] },
+							// Force SSE for Codex/Responses models here. The websocket path can complete
+							// with only reasoning blocks for function-call style extraction.
+							{ apiKey: auth.apiKey, headers: auth.headers, signal: loader.signal, transport: "sse" },
+						);
+
+						if (response.stopReason === "aborted") {
+							return null;
+						}
+
+						const toolParsed = parseExtractionToolCall(response.content);
+						if (toolParsed) return toolParsed;
+
+						const responseText = getTextContent(response.content);
+						const parsed = parseExtractionResult(responseText);
+						if (parsed) return parsed;
+
+						const diagnosticText = responseText || getThinkingContent(response.content);
+						lastFailure = `${attempt.label} attempt stopReason=${response.stopReason}; content=${summarizeContentTypes(
+							response.content,
+						)}; ${summarizeInvalidResponse(diagnosticText)}`;
+					}
+
+					const heuristic = extractQuestionsHeuristically(lastAssistantText!);
+					if (heuristic.questions.length > 0) {
+						return heuristic;
+					}
+
+					throw new Error(
+						`Question extractor returned neither an ${EXTRACT_QUESTIONS_TOOL_NAME} tool call nor valid JSON (${lastFailure})`,
 					);
-
-					if (response.stopReason === "aborted") {
-						return null;
-					}
-
-					const responseText = response.content
-						.filter((c): c is { type: "text"; text: string } => c.type === "text")
-						.map((c) => c.text)
-						.join("\n");
-
-					const parsed = parseExtractionResult(responseText);
-					if (!parsed) {
-						throw new Error("Question extractor returned invalid JSON");
-					}
-					return parsed;
 				};
 
 				doExtract()
