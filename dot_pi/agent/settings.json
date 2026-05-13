@@ -1,7 +1,15 @@
 {
-  "lastChangelogVersion": "0.70.2",
+  "lastChangelogVersion": "0.74.0",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "xhigh",
-  "packages": []
+  "packages": [
+    {
+      "source": "https://github.com/mitsuhiko/agent-stuff",
+      "extensions": ["extensions/multi-edit.ts"],
+      "skills": [],
+      "prompts": [],
+      "themes": []
+    }
+  ]
 }
