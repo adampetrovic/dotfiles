@@ -5,8 +5,8 @@
  * creates a Logseq page, and adds a journal entry for today linking to it.
  */
 
-import { complete, getModel } from "@mariozechner/pi-ai";
-import type { ExtensionAPI, ExtensionCommandContext } from "@mariozechner/pi-coding-agent";
+import { complete, getModel } from "@earendil-works/pi-ai";
+import type { ExtensionAPI, ExtensionCommandContext } from "@earendil-works/pi-coding-agent";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
