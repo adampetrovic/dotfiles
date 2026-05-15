@@ -1,15 +1,19 @@
 {
-  "lastChangelogVersion": "0.74.0",
+  "lastChangelogVersion": "0.74.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "xhigh",
   "packages": [
     {
       "source": "https://github.com/mitsuhiko/agent-stuff",
-      "extensions": ["extensions/multi-edit.ts"],
+      "extensions": [
+        "extensions/multi-edit.ts",
+        "extensions/loop.ts"
+      ],
       "skills": [],
       "prompts": [],
       "themes": []
-    }
+    },
+    "npm:@plannotator/pi-extension"
   ]
 }
