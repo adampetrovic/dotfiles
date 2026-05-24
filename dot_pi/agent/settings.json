@@ -14,6 +14,11 @@
       "prompts": [],
       "themes": []
     },
-    "npm:@plannotator/pi-extension"
+    "npm:@plannotator/pi-extension",
+    "npm:@juicesharp/rpiv-ask-user-question",
+    "npm:@juicesharp/rpiv-todo",
+    "npm:@juicesharp/rpiv-btw",
+    "npm:@tintinweb/pi-subagents",
+    "npm:@juicesharp/rpiv-web-tools"
   ]
 }
