@@ -1,272 +1,156 @@
 ---
 name: logseq
-description: Provide commands for interacting with a local Logseq instance through its Plugin API. Use for creating pages, inserting blocks, querying the graph database, managing tasks, retrieving content, or automating workflows in Logseq. Only works with a locally running instance with the API enabled; default port or set path expected for [$API accessible skill].
+description: Use the official Logseq CLI and local HTTP API server to query, search, and append to the currently open Logseq graph. Use for Logseq pages, blocks, tasks, graph queries, and Pi Agent notes.
 ---
 
-# Logseq Plugin API
+# Logseq CLI Skill
 
-Interact with your local Logseq instance through its JavaScript Plugin API. This skill enables reading, writing, querying, and automating workflows in your Logseq graph.
+Use the **official Logseq CLI** (`@logseq/cli`) against the locally running Logseq desktop HTTP API server.
 
-## Prerequisites
+## Current Setup
 
-**Logseq must be running locally** with a plugin that exposes the API. The standard way is:
+- Logseq stable desktop: `0.10.15`
+- Official CLI: `@logseq/cli@0.4.3`
+- API server: `http://127.0.0.1:12315/api`
+- Token is stored in Logseq settings and must be available as `LOGSEQ_API_SERVER_TOKEN`.
+- The CLI requires Node `>=22.17.0`; in pi sessions use `mise exec node@22 -- ...` if `node` resolves to v20.
 
-1. **Install a bridge plugin** that exposes `logseq` API via HTTP (e.g., via a custom plugin or localhost endpoint)
-2. **Alternative**: Use Node.js with `@logseq/libs` package to script against the running Logseq instance
-
-The API is primarily designed for in-browser plugins, so accessing it from external scripts requires a bridge/proxy.
-
-## Core API Namespaces
-
-The Logseq Plugin API is organized into these main proxies:
-
-### `logseq.App`
-Application-level operations: getting app info, user configs, current graph, commands, UI state, external links.
-
-**Key methods:**
-- `getInfo()` - Get app version and info
-- `getUserConfigs()` - Get user preferences (theme, format, language, etc.)
-- `getCurrentGraph()` - Get current graph info (name, path, URL)
-- `registerCommand(type, opts, action)` - Register custom commands
-- `pushState(route, params, query)` - Navigate to routes
-
-### `logseq.Editor`
-Block and page editing operations: creating, updating, moving, querying content.
-
-**Key methods:**
-- `getBlock(uuid)` - Get block by UUID
-- `getCurrentPage()` - Get current page entity
-- `getCurrentPageBlocksTree()` - Get all blocks on current page
-- `getPageBlocksTree(page)` - Get all blocks for a specific page
-- `insertBlock(target, content, opts)` - Insert a new block
-- `updateBlock(uuid, content)` - Update block content
-- `createPage(pageName, properties, opts)` - Create a new page
-- `deletePage(pageName)` - Delete a page
-- `getPageLinkedReferences(page)` - Get backlinks to a page
-- `registerSlashCommand(tag, action)` - Add custom slash commands
-
-### `logseq.DB`
-Database queries using Datalog.
-
-**Key methods:**
-- `q(query, ...inputs)` - Run Datalog query
-- `datascriptQuery(query, ...inputs)` - Direct Datascript query
-
-### `logseq.UI`
-UI operations: messages, dialogs, main UI visibility.
-
-**Key methods:**
-- `showMsg(content, status)` - Show toast notification
-- `queryElementById(id)` - Query DOM elements
-
-### `logseq.Git`
-Git operations for the current graph.
-
-**Key methods:**
-- `execCommand(args)` - Execute git command
-
-### `logseq.Assets`
-Asset management.
-
-**Key methods:**
-- `listFilesOfCurrentGraph(path)` - List files in graph
-
-## Common Workflows
-
-### Read Content
-
-```javascript
-// Get current page
-const page = await logseq.Editor.getCurrentPage();
-
-// Get all blocks on a page
-const blocks = await logseq.Editor.getPageBlocksTree('Daily Notes');
-
-// Get a specific block
-const block = await logseq.Editor.getBlock('block-uuid-here');
-
-// Query with Datalog
-const results = await logseq.DB.q(`
-  [:find (pull ?b [*])
-   :where [?b :block/marker "TODO"]]
-`);
-```
-
-### Write Content
-
-```javascript
-// Create a new page
-await logseq.Editor.createPage('Project Notes', {
-  tags: 'project',
-  status: 'active'
-}, { redirect: false });
-
-// Insert a block
-const block = await logseq.Editor.insertBlock(
-  'target-block-uuid',
-  '- New task item',
-  { before: false, sibling: true }
-);
-
-// Update a block
-await logseq.Editor.updateBlock('block-uuid', 'Updated content');
-
-// Batch insert multiple blocks
-const blocks = [
-  { content: 'First item' },
-  { content: 'Second item', children: [
-    { content: 'Nested item' }
-  ]}
-];
-await logseq.Editor.insertBatchBlock('parent-uuid', blocks, { sibling: false });
-```
-
-### Task Management
-
-```javascript
-// Find all TODO items
-const todos = await logseq.DB.q(`
-  [:find (pull ?b [*])
-   :where
-   [?b :block/marker ?marker]
-   [(contains? #{"TODO" "DOING"} ?marker)]]
-`);
-
-// Mark task as DONE
-await logseq.Editor.updateBlock('task-uuid', 'DONE Task content');
-
-// Get tasks on current page
-const page = await logseq.Editor.getCurrentPage();
-const blocks = await logseq.Editor.getPageBlocksTree(page.name);
-const tasks = blocks.filter(b => b.marker === 'TODO' || b.marker === 'DOING');
-```
-
-### Navigation and UI
-
-```javascript
-// Navigate to a page
-logseq.App.pushState('page', { name: 'Project Notes' });
-
-// Show notification
-logseq.UI.showMsg('✅ Task completed!', 'success');
-
-// Get app config
-const configs = await logseq.App.getUserConfigs();
-console.log('Theme:', configs.preferredThemeMode);
-console.log('Format:', configs.preferredFormat);
-```
-
-## Implementation Approaches
-
-Since Logseq's Plugin API is browser-based, you have several options:
-
-### Option 1: Bridge Plugin
-Create a minimal Logseq plugin that exposes API calls via HTTP:
-
-```javascript
-// In Logseq plugin (index.js)
-logseq.ready(() => {
-  // Expose API endpoints
-  logseq.provideModel({
-    async handleAPICall({ method, args }) {
-      return await logseq.Editor[method](...args);
-    }
-  });
-});
-
-// Then call from external script via HTTP POST
-```
-
-### Option 2: Node.js Script with @logseq/libs
-For automation scripts, use the `@logseq/libs` package:
+Check availability:
 
 ```bash
-npm install @logseq/libs
+mise exec node@22 -- logseq -v
+curl -s -i http://127.0.0.1:12315/ | head
 ```
 
-**Note:** This requires a running Logseq instance and proper connection setup.
+## Preferred Commands
 
-### Option 3: Direct Plugin Development
-Develop a full Logseq plugin following the plugin samples at:
-https://github.com/logseq/logseq-plugin-samples
+### Query current graph
 
-## API Reference
+Use official CLI query for reads/tasks/Datalog:
 
-For complete API documentation, see:
-- **API Docs**: https://logseq.github.io/plugins/
-- **Plugin Samples**: https://github.com/logseq/logseq-plugin-samples
-- **Type Definitions**: `references/api-types.md` (extracted from `@logseq/libs`)
-
-## Key Data Structures
-
-### BlockEntity
-```typescript
-{
-  id: number,           // Entity ID
-  uuid: string,         // Block UUID
-  content: string,      // Block content
-  format: 'markdown' | 'org',
-  page: { id: number }, // Parent page
-  parent: { id: number }, // Parent block
-  left: { id: number }, // Previous sibling
-  properties: {},       // Block properties
-  marker?: string,      // TODO/DOING/DONE
-  children?: []         // Child blocks
-}
+```bash
+mise exec node@22 -- logseq query '(task TODO)'
+mise exec node@22 -- logseq query '(task DOING)'
+mise exec node@22 -- logseq query '[:find (pull ?b [*]) :where [?b :block/marker "TODO"]]'
 ```
 
-### PageEntity
-```typescript
-{
-  id: number,
-  uuid: string,
-  name: string,              // Page name (lowercase)
-  originalName: string,       // Original case
-  'journal?': boolean,
-  properties: {},
-  journalDay?: number,       // YYYYMMDD for journals
-}
+`logseq query` automatically uses `$LOGSEQ_API_SERVER_TOKEN` when set. You can also pass `-a "$LOGSEQ_API_SERVER_TOKEN"` explicitly.
+
+### Append to current page
+
+Use official CLI append for simple additions to the page currently open in Logseq:
+
+```bash
+mise exec node@22 -- logseq append "Text to append"
+```
+
+### Search current graph
+
+Do **not** use `logseq search` on stable `0.10.15` directly. The released CLI expects API search blocks to contain `title`, but stable returns `block/content`, causing:
+
+```text
+Cannot read properties of null (reading 'replace')
+```
+
+Use the bundled workaround instead:
+
+```bash
+node ~/.pi/agent/skills/logseq/scripts/logseq-search.mjs --limit 20 "Pi Agent"
+node ~/.pi/agent/skills/logseq/scripts/logseq-search.mjs --json "search terms"
+```
+
+The workaround calls the same official Logseq API method (`logseq.app.search`) and normalizes stable response fields.
+
+## Official CLI Help
+
+```bash
+mise exec node@22 -- logseq -h
+mise exec node@22 -- logseq query -h
+mise exec node@22 -- logseq append -h
+mise exec node@22 -- logseq export-edn -h
+mise exec node@22 -- logseq import-edn -h
+```
+
+Useful API-mode commands:
+
+```bash
+mise exec node@22 -- logseq query '(task TODO)'
+mise exec node@22 -- logseq append "note text"
+mise exec node@22 -- logseq export-edn -f /tmp/logseq-export.edn
+mise exec node@22 -- logseq import-edn -f /path/to/file.edn
+mise exec node@22 -- logseq mcp-server
 ```
 
 ## Pi Agent Page Namespace
 
-All pages created by pi-agent **must** live under the `Pi Agent/` namespace. This keeps agent-generated content grouped under the [[Pi Agent]] parent page in Logseq.
+All pages created by pi-agent **must** live under the `Pi Agent/` namespace. This keeps agent-generated content grouped under the `[[Pi Agent]]` parent page.
 
-### Rules
-- **Page titles**: Always prefix with `Pi Agent/` — e.g. `Pi Agent/Coffee Switch OTA Failure`
-- **Filenames**: Use `Pi Agent___` prefix — e.g. `pages/Pi Agent___Coffee Switch OTA Failure.md`
-- **Journal links**: Use the full namespaced title — `[[Pi Agent/My Page Title]]`
-- **The `/logseq` extension** handles this automatically; these rules apply when creating pages manually via file writes
+Rules:
 
-### Creating a page manually
+- Page titles: always prefix with `Pi Agent/`, e.g. `Pi Agent/Coffee Switch OTA Failure`
+- Filenames for manual file writes: use `Pi Agent___`, e.g. `pages/Pi Agent___Coffee Switch OTA Failure.md`
+- Journal links: use the full namespaced title, e.g. `[[Pi Agent/My Page Title]]`
+
+## Writing Format for Pi Agent Pages
+
+Follow the flat narrative style used by `[[Pi Agent/Financial Advisor Meeting Narrative]]`.
+
+Rules:
+
+- Use Logseq page properties at the top: `tags::`, `date::` or `created::`, `source::` when relevant.
+- Do **not** add a markdown H1/H2/H3 heading inside the page body.
+- Do **not** use sections like `## Summary` or `# Title`.
+- Structure content as a flat set of top-level bullets with bolded labels, for example `- **Purpose**: ...`.
+- Use nested bullets only for details under a bolded top-level label.
+- Prefer narrative prose over report-style headings.
+
+Manual page file example:
+
 ```markdown
 <!-- File: pages/Pi Agent___My New Page.md -->
-tags:: #relevant-tag
-date:: 2026-03-14
-
-- # My New Page
-	- Content here...
+tags:: pi-agent
+created:: 2026-05-14
+source:: [[Pi Agent]]
+- **Purpose**: Briefly explain why this page exists.
+- **Context**:
+  - Supporting detail goes here.
+  - Another supporting detail goes here.
+- **Outcome**: Summarise the decision, result, or next step.
 ```
 
-### Linking from journals
-```markdown
-- Did some work on the thing [[Pi Agent/My New Page]]
+## When to Use File Writes Instead
+
+The released official CLI is limited on stable Logseq. Continue using direct file writes for:
+
+- Creating structured `Pi Agent/...` pages
+- Large multi-block documents
+- Precise edits to existing Markdown files
+- Cases where the current open page is not the desired append target
+
+After direct file writes, Logseq will pick up the file changes from the graph directory.
+
+## Troubleshooting
+
+### API auth failure
+
+Ensure the token exists and is exported:
+
+```bash
+export LOGSEQ_API_SERVER_TOKEN='...'
 ```
 
-## Tips & Best Practices
+### API server not reachable
 
-1. **Always check for null**: API methods may return `null` if entity doesn't exist
-2. **Use UUIDs over IDs**: Block UUIDs are stable, entity IDs can change
-3. **Batch operations**: Use `insertBatchBlock` for multiple inserts
-4. **Query efficiently**: Datalog queries are powerful but can be slow on large graphs
-5. **Properties are objects**: Access with `block.properties.propertyName`
-6. **Format matters**: Respect user's preferred format (markdown vs org-mode)
-7. **Async all the way**: All API calls return Promises
+In Logseq desktop, enable **Settings → Features → HTTP API server**.
 
-## Common Gotchas
+### Search crashes
 
-- **Page names are lowercase**: When querying, use lowercase page names
-- **Journal pages**: Use `journalDay` format (YYYYMMDD) not date strings
-- **Block hierarchy**: Respect parent/child relationships when inserting
-- **Format differences**: Markdown uses `-` for bullets, Org uses `*`
-- **Properties syntax**: Different between markdown (`prop::`) and org (`:PROPERTIES:`)
+Expected on stable if using `logseq search`. Use:
+
+```bash
+node ~/.pi/agent/skills/logseq/scripts/logseq-search.mjs "terms"
+```
+
+### Nightly note
+
+Logseq nightly `2.0.1-alpha` returns a newer search shape where official `logseq search` works, but it is DB-graph alpha software. Stay on stable for the main graph unless explicitly testing on a copy.
