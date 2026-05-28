@@ -1,3 +1,5 @@
 {
-  "followUp": ["alt+f"]
+  "app.message.followUp": [
+    "alt+f"
+  ]
 }
