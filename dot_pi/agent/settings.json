@@ -1,5 +1,5 @@
 {
-  "lastChangelogVersion": "0.74.1",
+  "lastChangelogVersion": "0.76.0",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "xhigh",
@@ -19,6 +19,9 @@
     "npm:@juicesharp/rpiv-todo",
     "npm:@juicesharp/rpiv-btw",
     "npm:@tintinweb/pi-subagents",
-    "npm:@juicesharp/rpiv-web-tools"
+    "npm:@juicesharp/rpiv-advisor",
+    "npm:@juicesharp/rpiv-i18n",
+    "npm:@juicesharp/rpiv-web-tools",
+    "npm:@juicesharp/rpiv-args"
   ]
 }
