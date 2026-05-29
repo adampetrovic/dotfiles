@@ -85,6 +85,87 @@ jj split -i                                    # interactive split; avoid in age
 
 Bare `jj split` is interactive and can hang waiting for a diff editor and messages.
 
+For **hunk-level** (sub-file) splitting without an interactive TUI, use `jjc` — see [Hunk-level operations with `jjc`](#hunk-level-operations-with-jjc) below.
+
+### Hunk-level operations with `jjc`
+
+`jjc` is a non-interactive companion tool for **hunk-level** edits — a scriptable alternative to interactive `jj split` / `jj squash -i`. It is ideal for agent sessions because it never opens a TUI or diff editor. It links directly against `jj-lib`, so it handles snapshots, transactions, and descendant rebasing the same way `jj` does.
+
+**Requirements & limits**: jj ≥ 0.41.0. Text files only — binary files, renames, and deletions are unsupported. Minimal immutable-commit checking, and `.gitignore` patterns from git config are not loaded.
+
+**Commands**:
+
+| Command | Purpose |
+|---|---|
+| `jjc hunks [ID]` | List selectable hunks in a revision; with an `ID` (or prefix), inspect that hunk with numbered diff lines |
+| `jjc pick [IDS]... -m <msg>` | Commit the selected hunks from a revision into a **new** commit |
+| `jjc drop [IDS]...` | Drop the selected hunks, reverting them to the parent's content |
+| `jjc fold [IDS]... --into <rev>` | Squash the selected hunks into another revision |
+
+Common options: `-r, --from <rev>` chooses the source revision (default `@`). `jjc hunks` also takes `--full` (numbered lines for every hunk) and `--blame` (originating commit per line). `jjc fold` takes `--into <rev>` and `--select <REVSET:ID[,ID...]>` to assign selectors to a source revision.
+
+**Hunk selectors** (the `IDS` arguments) target hunks non-interactively:
+- `ID` — a whole hunk by its ID or unique prefix (e.g. `07`)
+- `ID#N` — the Nth change-atom within a hunk
+- `ID@L` — a specific line (or `ID@L-R` for a line range) within a hunk
+
+**Typical flow** (extract one hunk into its own commit):
+```bash
+jjc hunks                         # discover hunk IDs in @, e.g. "07[6203…] a.txt (+2 -1)"
+jjc hunks 07 --full               # inspect that hunk with numbered lines
+jjc pick 07 -m "extract a.txt edits"   # split it into a new commit; remaining hunks stay in @
+jj st                             # verify the result
+```
+
+Note: brand-new files, renames, deletions, and binary files show as `file-level change; hunk selection not supported yet` — use `jj split <path>` for those instead.
+
+#### Splitting one change into several commits programmatically
+
+This is the primary agent use case: a working copy `@` contains several unrelated changes (often across the same files) that should become separate, well-described commits — without an interactive editor. `jjc pick` peels selected hunks **out of** the source revision into a **new commit placed below it**, leaving the remainder behind. Repeat to build a clean stack:
+
+```bash
+# 1. Enumerate the hunks in the working copy
+jjc hunks
+#   07[…] a.txt (+2 -1)
+#   0f[…] b.txt (+1 -1)
+#   1a[…] a.txt (+5 -0)
+
+# 2. Peel each logical group into its own commit, in the order you want them stacked.
+#    Multiple selectors in one `pick` go into a single commit.
+jjc pick 07 1a -m "feat: implement X"     # two hunks → one commit beneath @
+jjc pick 0f    -m "test: cover X"          # next commit beneath @
+
+# 3. Describe whatever logical change remains in @ (or pick it too).
+jj describe -m "chore: leftover tweak"
+
+# 4. Always verify the resulting stack.
+jj log -r 'trunk()..@'
+jj st
+```
+
+**Sub-hunk precision** — when a single hunk mixes concerns, split *within* it using the selector suffixes:
+- `ID#N` — only the Nth change-atom of hunk `ID` (atom indices are shown by `jjc hunks ID --full`).
+- `ID@L` or `ID@L-R` — only line `L` (or line range `L`–`R`) of hunk `ID`.
+
+```bash
+jjc hunks 07 --full                  # show numbered lines + atom indices for hunk 07
+jjc pick 07@10-20 -m "feat: just the new validation"   # take only lines 10–20
+```
+
+**Routing hunks into an existing commit** — to move specific hunks from `@` into an earlier commit in the stack (e.g. fixing up a commit you already made), use `fold`:
+
+```bash
+jjc fold 0f --into <change_id>       # squash hunk 0f from @ into an existing revision
+```
+
+**Discarding hunks** — to throw away selected hunks (revert them to parent content) rather than commit them:
+
+```bash
+jjc drop 1a                          # revert hunk 1a in @ back to parent
+```
+
+Guidance for agents: prefer `jjc pick`/`fold`/`drop` over `jj split -i` / `jj squash -i` whenever the user wants commits separated by **content** rather than by whole file — it is fully non-interactive and never opens a TUI. Hunk IDs are recomputed after each mutation, so re-run `jjc hunks` between operations, and finish with `jj st` + `jj log -r 'trunk()..@'` to confirm the stack.
+
 ### Rebase
 ```bash
 jj rebase -r @ -d <target>              # rebase single revision
@@ -189,9 +270,9 @@ After editing conflict markers out of all files, the conflict is considered reso
 
 1. **No staging area**: Never suggest `jj add`. Files are tracked automatically. Use `.gitignore` and `jj file untrack <path>` to untrack.
 2. **Non-interactive mode**: Always pass `-m "message"` (or `--use-destination-message` for squash) to commands that may ask for descriptions: `describe`, `commit`, `new`, `squash`, `split`. Never rely on `$EDITOR`.
-3. **Avoid interactive modes**: Do not run bare `jj split`, `jj split -i`, `jj squash -i`, or bare `jj resolve` in agent sessions unless the user explicitly wants an interactive tool.
+3. **Avoid interactive modes**: Do not run bare `jj split`, `jj split -i`, `jj squash -i`, or bare `jj resolve` in agent sessions unless the user explicitly wants an interactive tool. For hunk-level work, reach for `jjc` instead.
 4. **Prefer `jj diff --git`**: Use Git-format diffs when reviewing, quoting, or parsing output; add `--color never` for machine parsing.
-5. **Verify after mutations**: Run `jj st` after operations that rewrite or discard state (`squash`, `rebase`, `abandon`, `restore`, `undo`, `absorb`) to confirm the result.
+5. **Verify after mutations**: Run `jj st` after operations that rewrite or discard state (`squash`, `rebase`, `abandon`, `restore`, `undo`, `absorb`, `jjc pick/drop/fold`) to confirm the result.
 6. **Prefer change IDs**: When referencing revisions in commands, use change IDs (short alphabetic strings like `kntqzsqt`) rather than commit hashes, because change IDs survive rewrites.
 7. **Auto-rebase awareness**: Editing earlier commits automatically rebases descendants. Check for new conflicts with `jj log -r 'conflicts()'` after rewriting history.
 8. **`jj commit` vs `jj new`**: `jj commit -m "msg"` is equivalent to `jj describe -m "msg" && jj new`. Both are valid; `commit` is familiar to Git users.
@@ -199,6 +280,7 @@ After editing conflict markers out of all files, the conflict is considered reso
 10. **Colocated repos**: If `.git/` also exists, jj auto-syncs. Prefer jj commands over git commands.
 11. **`--no-pager`**: Use `--no-pager` when capturing output programmatically: `jj --no-pager log`.
 12. **`--color never`**: Use `--color never` when parsing output to avoid ANSI escape codes.
+13. **Programmatic commit splitting**: To break a mixed working copy into separate logical commits without a TUI, use `jjc pick` (peel hunks into new commits), `jjc fold` (route hunks into an existing commit), and `jjc drop` (discard hunks) — never `jj split -i`. See [Splitting one change into several commits programmatically](#splitting-one-change-into-several-commits-programmatically).
 
 ## User Configuration (~/.jjconfig.toml)
 
@@ -337,3 +419,5 @@ For detailed docs, see: https://jj-vcs.dev/latest/
 For command help: `jj help <command>` or `jj help -k <keyword>` where keyword is one of: bookmarks, config, filesets, glossary, revsets, templates, tutorial.
 
 Full user config: `~/.jjconfig.toml`
+
+`jjc` source & docs: https://tangled.org/akashina.tngl.sh/jjc
