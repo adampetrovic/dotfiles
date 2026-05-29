@@ -3,3 +3,5 @@ Alfred.alfredpreferences/snippets/Work/
 
 # Machine-specific preferences
 Alfred.alfredpreferences/preferences/local/
+# npm-backed workflow symlinks (machine-specific absolute paths)
+Alfred.alfredpreferences/workflows/@*
