@@ -20,8 +20,8 @@ log_step "Configuring macOS Dock & Hot Corners..."
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Telegram.app"
 {{ end -}}
 /opt/homebrew/bin/dockutil --no-restart --add "/System/Applications/System Settings.app"
-/opt/homebrew/bin/dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
-/opt/homebrew/bin/dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
+/opt/homebrew/bin/dockutil --no-restart --add '/Applications' --replacing Applications --view grid --display folder --sort name
+/opt/homebrew/bin/dockutil --no-restart --add "${HOME}/Downloads" --replacing Downloads --view grid --display folder --sort dateadded
 
 # Disable "click to reveal desktop" on Sonoma and above
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
@@ -63,5 +63,7 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 # Bottom right → Sleep display
 defaults write com.apple.dock wvous-br-corner -int 10
 defaults write com.apple.dock wvous-br-modifier -int 0
+
+killall Dock > /dev/null 2>&1 || true
 
 log_ok "Done configuring macOS Dock & Hot Corners."

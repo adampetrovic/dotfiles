@@ -51,4 +51,6 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	OpenWith -bool true \
 	Privileges -bool true
 
+killall Finder > /dev/null 2>&1 || true
+
 log_ok "Done configuring macOS Finder settings."

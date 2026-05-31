@@ -12,7 +12,7 @@ defaults write com.apple.screensaver askForPassword -int 1
 defaults write com.apple.screensaver askForPasswordDelay -int 0
 
 # Save screenshots to ~/Pictures/screenshots
-mkdir -p $HOME/Pictures/screenshots
+mkdir -p "${HOME}/Pictures/screenshots"
 defaults write com.apple.screencapture location -string "${HOME}/Pictures/screenshots"
 
 # Save screenshots in PNG format
@@ -23,5 +23,7 @@ defaults write NSGlobalDomain AppleFontSmoothing -int 1
 
 # Enable HiDPI display modes (requires restart)
 sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
+
+killall SystemUIServer cfprefsd > /dev/null 2>&1 || true
 
 log_ok "Done configuring macOS screen settings."

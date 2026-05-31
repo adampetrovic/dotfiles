@@ -35,10 +35,15 @@ defaults write com.apple.LaunchServices LSQuarantine -bool false
 # Reveal IP address, hostname, OS version, etc. when clicking the clock in the login window
 sudo defaults write /Library/Preferences/com.apple.loginwindow AdminHostInfo HostName
 
+# Set the timezone
+sudo systemsetup -settimezone "Australia/Sydney" > /dev/null 2>&1
+
 # Disable automatic capitalization
 defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
+
+killall ControlCenter SystemUIServer cfprefsd > /dev/null 2>&1 || true
 
 log_ok "Done configuring macOS general settings."
