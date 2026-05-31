@@ -12,6 +12,8 @@ export SSH_AUTH_SOCK=$HOME/Library/Group\ Containers/2BUA8C4S2C.com.1password/t/
 export ASDF_FORCE_PREPEND=no
 export K9S_CONFIG_DIR=~/.config/k9s
 eval "$(/opt/homebrew/bin/brew shellenv)"
+export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS:-}"
+export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS//--require-sha/}"
 export PATH=$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
 
 # Load theme first
