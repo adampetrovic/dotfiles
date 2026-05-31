@@ -14,5 +14,7 @@ cask "1password"
 cask "1password-cli"
 EOF
 
-op account add --address my.1password.com --email "{{ .email }}"
+# 1Password account that owns the vaults (Private/Work/Shared/k8s) — fixed,
+# independent of {{ "{{ .email }}" }} which is the git identity (may be a work email).
+op account add --address my.1password.com --email "adam@petrovic.com.au"
 eval $(op signin --account my)
