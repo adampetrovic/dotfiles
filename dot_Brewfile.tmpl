@@ -1,5 +1,7 @@
 {{/* base level packages for all environments */}}
-{{- $taps := list -}}
+{{- $taps := list
+    "adampetrovic/tap"
+    "lucasgelfond/zerobrew" -}}
 
 {{- $customTaps := dict -}}
 
@@ -13,10 +15,9 @@
     "git-extras"
     "gnu-sed"
     "grep"
-    "httpstat"
     "httpie"
+    "httpstat"
     "jj"
-    "lucasgelfond/zerobrew/zerobrew"
     "mise"
     "pipenv"
     "rsync"
@@ -24,30 +25,29 @@
     "vim"
     "watch"
     "wget"
+    "zerobrew"
     "zsh" -}}
 
 {{- $casks := list
     "1password"
     "1password-cli"
     "alfred"
-    "thaw"
     "cleanshot"
     "docker-desktop"
     "fantastical"
-    "font-hack-nerd-font"
-    "font-fira-code"
     "font-jetbrains-mono"
     "ghostty"
     "goland"
     "intellij-idea"
     "istat-menus"
     "keyboardcleantool"
-	"logseq"
+    "logseq"
     "mitmproxy"
     "pycharm"
     "rectangle-pro"
-    "webstorm"
-    "adampetrovic/tap/things" -}}
+    "thaw"
+    "things"
+    "webstorm" -}}
 
 {{- $mas := dict -}}
 
@@ -59,8 +59,8 @@
 
 {{-  $brews = concat $brews (list
     "mas"
-    "adampetrovic/tap/pi-telegram-bot"
-    "adampetrovic/tap/stash-sync") -}}
+    "pi-telegram-bot"
+    "stash-sync") -}}
 
 {{  $brewsWithArgs = merge $brewsWithArgs (dict) -}}
 
@@ -97,7 +97,7 @@
     "gcloud-cli") -}}
 
 {{  $brewsWithArgs = merge $brewsWithArgs (dict
-    "adampetrovic/tap/work-scripts" (list "HEAD")) -}}
+    "work-scripts" (list "HEAD")) -}}
 
 {{  $casks = concat $casks (list
     "loom") -}}
