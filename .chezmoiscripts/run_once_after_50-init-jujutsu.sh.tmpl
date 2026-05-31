@@ -6,9 +6,8 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 SRC="{{ .chezmoi.sourceDir }}"
 
-{{ if .personal }}
 git -C "$SRC" remote set-url origin git@github.com:adampetrovic/dotfiles.git
-{{ end }}
+
 if [ ! -d "$SRC/.jj" ]; then
     echo "Initializing colocated jujutsu repo in $SRC"
     ( cd "$SRC" && jj git init --colocate )
