@@ -149,12 +149,3 @@ zi wait lucid for \
     atload'export KUBECONFIG=$(atlas kitt context:create --pid=$$)' \
     zdharma-continuum/null
 {{ end -}}
-# >>> zerobrew >>>
-# zerobrew: binary installed via Homebrew; package store lives at /opt/zerobrew
-export ZEROBREW_ROOT=/opt/zerobrew
-export ZEROBREW_PREFIX=/opt/zerobrew
-case ":${PATH}:" in
-    *:"$ZEROBREW_PREFIX/bin":*) ;;
-    *) export PATH="$ZEROBREW_PREFIX/bin:$PATH" ;;
-esac
-# <<< zerobrew <<<
