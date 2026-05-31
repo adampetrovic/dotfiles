@@ -22,7 +22,8 @@
     "npm:@juicesharp/rpiv-advisor",
     "npm:@juicesharp/rpiv-i18n",
     "npm:@juicesharp/rpiv-web-tools",
-    "npm:@juicesharp/rpiv-args"
+    "npm:@juicesharp/rpiv-args",
+    "npm:@zosmaai/pi-llm-wiki"
   ],
   "theme": "dark"
 }
