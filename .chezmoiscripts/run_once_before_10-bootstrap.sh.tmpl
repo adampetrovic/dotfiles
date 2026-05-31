@@ -10,6 +10,7 @@ command -v brew >/dev/null 2>&1 || \
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+unset HOMEBREW_CASK_OPTS_REQUIRE_SHA
 export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS:-}"
 export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS//--require-sha/}"
 
