@@ -24,16 +24,20 @@ patterns = ["glob:'**/*.kt'"]
 auto-local-bookmark = false
 
 [remotes.origin]
-auto-track-bookmarks = "glob:*"
+# Track bookmarks I create locally, but don't import every collaborator branch on fetch.
+auto-track-created-bookmarks = "glob:*"
 
 [revsets]
-# show: trunk, current changset, any tree of changes where i have a mutable commit, or is a tracked branch
-log = "@ | ancestors(trunk()..((visible_heads() & mine()) | heads(bookmarks())), 2) | trunk()"
+# show: local changes I've authored, explicitly tracked bookmarks, and trunk
+log = "@ | trunk() | log_targets()"
 
 [revset-aliases]
 "mine()" = "user()"
 "user()" = "user(substring:'{{ .email }}')"
 "user(x)" = "author(x)"
+"log_local_changes()" = "mine() & remote_bookmarks().."
+"log_tracked_bookmarks()" = "tracked_remote_bookmarks() | (bookmarks() ~ remote_bookmarks())"
+"log_targets()" = "log_local_changes() | heads(log_tracked_bookmarks())"
 "immutable_heads()" = "trunk() | tags()"
 "stack()" = "ancestors(mutable() & (..@ | @::), 2)"
 "streams()" = "heads(::@ & bookmarks())"
