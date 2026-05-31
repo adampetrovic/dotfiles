@@ -11,9 +11,6 @@ Darwin)
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     fi
     eval "$(/opt/homebrew/bin/brew shellenv)"
-    unset HOMEBREW_CASK_OPTS_REQUIRE_SHA
-    export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS:-}"
-    export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS//--require-sha/}"
     brew list 1password &>/dev/null || brew install 1password
     brew list 1password-cli &>/dev/null || brew install 1password-cli
     if [[ $(op account list | wc -l) -lt 1 ]]; then
