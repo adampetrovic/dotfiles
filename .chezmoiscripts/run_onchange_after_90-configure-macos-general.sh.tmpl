@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS general settings..."
+log_step "Configuring macOS general settings..."
 
 {{ template "macos-sudo-prime.sh" . }}
 
@@ -40,4 +41,4 @@ defaults write NSGlobalDomain NSAutomaticCapitalizationEnabled -bool false
 # Disable auto-correct
 defaults write NSGlobalDomain NSAutomaticSpellingCorrectionEnabled -bool false
 
-echo "Done configuring macOS general settings."
+log_ok "Done configuring macOS general settings."

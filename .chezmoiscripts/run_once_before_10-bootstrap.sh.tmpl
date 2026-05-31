@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
+log_step "Bootstrap: Homebrew & 1Password"
 
 # Install Homebrew
 command -v brew >/dev/null 2>&1 || \
@@ -11,7 +13,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS:-}"
 export HOMEBREW_CASK_OPTS="${HOMEBREW_CASK_OPTS//--require-sha/}"
 
-echo 'Installing dotfiles dependencies'
+log_info 'Installing 1Password (cask + cli)'
 brew bundle --file=/dev/stdin <<EOF
 cask "1password"
 cask "1password-cli"

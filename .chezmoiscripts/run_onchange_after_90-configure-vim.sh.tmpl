@@ -3,6 +3,8 @@
 # vimrc hash: {{ include "dot_vimrc" | sha256sum }}
 
 set -eufo pipefail
+{{ template "log.sh" . }}
+log_step "Installing vim plugins (NeoBundle)"
 
 vim -c NeoBundleInstall -c qa
 vim -c GoInstallBinaries -c qa

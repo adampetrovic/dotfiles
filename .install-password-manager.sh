@@ -5,7 +5,7 @@ type op >/dev/null 2>&1 && exit
 
 case "$(uname -s)" in
 Darwin)
-    echo "Installing Homebrew and 1Password"
+    printf '\n\033[1;35m==> %s\033[0m\n' "Bootstrap prerequisite: Homebrew & 1Password"
     # commands to install password-manager-binary on Darwin
     if ! command -v brew &>/dev/null; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"

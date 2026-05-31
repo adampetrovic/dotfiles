@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
+log_step "Setting up jujutsu (colocated repo)"
 
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
@@ -9,6 +11,6 @@ SRC="{{ .chezmoi.sourceDir }}"
 git -C "$SRC" remote set-url origin git@github.com:adampetrovic/dotfiles.git
 
 if [ ! -d "$SRC/.jj" ]; then
-    echo "Initializing colocated jujutsu repo in $SRC"
+    log_info "Initializing colocated jujutsu repo in $SRC"
     ( cd "$SRC" && jj git init --colocate )
 fi

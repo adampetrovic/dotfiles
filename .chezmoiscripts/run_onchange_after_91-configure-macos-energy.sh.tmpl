@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS energy settings..."
+log_step "Configuring macOS energy settings..."
 
 {{ template "macos-sudo-prime.sh" . }}
 
@@ -26,4 +27,4 @@ sudo rm -f /private/var/vm/sleepimage
 sudo touch /private/var/vm/sleepimage
 sudo chflags uchg /private/var/vm/sleepimage
 
-echo "Done configuring macOS energy settings."
+log_ok "Done configuring macOS energy settings."

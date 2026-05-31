@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS screen settings..."
+log_step "Configuring macOS screen settings..."
 
 {{ template "macos-sudo-prime.sh" . }}
 
@@ -23,4 +24,4 @@ defaults write NSGlobalDomain AppleFontSmoothing -int 1
 # Enable HiDPI display modes (requires restart)
 sudo defaults write /Library/Preferences/com.apple.windowserver DisplayResolutionEnabled -bool true
 
-echo "Done configuring macOS screen settings."
+log_ok "Done configuring macOS screen settings."

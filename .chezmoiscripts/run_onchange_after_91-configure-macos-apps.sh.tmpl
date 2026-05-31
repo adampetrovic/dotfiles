@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS application settings..."
+log_step "Configuring macOS application settings..."
 
 # Terminal: Only use UTF-8
 defaults write com.apple.terminal StringEncodings -array 4
@@ -38,4 +39,4 @@ defaults write com.google.Chrome DisablePrintPreview -bool true
 # Google Chrome: Expand the print dialog by default
 defaults write com.google.Chrome PMPrintingExpandedStateForPrint2 -bool true
 
-echo "Done configuring macOS application settings."
+log_ok "Done configuring macOS application settings."

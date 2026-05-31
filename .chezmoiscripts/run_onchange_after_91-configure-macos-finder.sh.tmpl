@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS Finder settings..."
+log_step "Configuring macOS Finder settings..."
 
 {{ template "macos-sudo-prime.sh" . }}
 
@@ -50,4 +51,4 @@ defaults write com.apple.finder FXInfoPanesExpanded -dict \
 	OpenWith -bool true \
 	Privileges -bool true
 
-echo "Done configuring macOS Finder settings."
+log_ok "Done configuring macOS Finder settings."

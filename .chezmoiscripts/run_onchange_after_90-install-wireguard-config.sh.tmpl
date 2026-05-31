@@ -1,5 +1,7 @@
 #!/bin/bash
 set -e
+{{ template "log.sh" . }}
+log_step "Installing WireGuard config"
 
 WIREGUARD_CONFIG_PATH="/opt/homebrew/etc/wireguard"
 mkdir -p $WIREGUARD_CONFIG_PATH

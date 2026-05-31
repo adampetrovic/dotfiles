@@ -2,8 +2,9 @@
 # current dock: {{ output "/opt/homebrew/bin/dockutil" "-L" | splitList "\n" }}
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS Dock & Hot Corners..."
+log_step "Configuring macOS Dock & Hot Corners..."
 
 /opt/homebrew/bin/dockutil --no-restart --remove all
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Google Chrome.app"
@@ -65,4 +66,4 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.dock wvous-br-corner -int 10
 defaults write com.apple.dock wvous-br-modifier -int 0
 
-echo "Done configuring macOS Dock & Hot Corners."
+log_ok "Done configuring macOS Dock & Hot Corners."

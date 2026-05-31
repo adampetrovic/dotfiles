@@ -1,8 +1,9 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
 
-echo "Configuring macOS trackpad, mouse, keyboard..."
+log_step "Configuring macOS trackpad, mouse, keyboard..."
 
 # Trackpad: enable tap to click for this user and for the login screen
 defaults write com.apple.driver.AppleBluetoothMultitouch.trackpad Clicking -bool true
@@ -40,4 +41,4 @@ defaults write NSGlobalDomain AppleMetricUnits -bool true
 # Set the timezone
 sudo systemsetup -settimezone "Australia/Sydney" > /dev/null 2>&1
 
-echo "Done configuring macOS input settings."
+log_ok "Done configuring macOS input settings."

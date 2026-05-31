@@ -1,6 +1,8 @@
 #!/bin/bash
 
 set -eufo pipefail
+{{ template "log.sh" . }}
+log_step "Setting up Kubernetes (talosctl/kubectl)"
 
 # Step 1: Check if ~/code/home-ops doesn't exist. If it does, skip cloning.
 if [ ! -d "$HOME/code/home-ops" ]; then
