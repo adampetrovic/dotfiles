@@ -3,14 +3,16 @@
     name = "{{ .full_name }}"
     email = "{{ .email }}"
 {{- if .work }}
-    signingkey = {{ .chezmoi.homeDir }}/.ssh/secretive_signing.pub
+    signingkey = {{ (onepasswordRead "op://Work/SSH Key - Work/public_key") }}
 {{- else }}
     signingkey = {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
 {{- end }}
 
-{{- if .personal }}
 [url "git@github.com:"]
     insteadOf = "https://github.com/"
+{{- if .work }}
+[url "git@bitbucket.org:"]
+	insteadOf = https://bitbucket.org/
 {{- end }}
 
 [remote "origin"]
@@ -58,9 +60,7 @@
   format = ssh
 
 [gpg "ssh"]
-{{- if not .work }}
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-{{- end }}
   allowedSignersFile = ~/.config/git/allowed_ssh_signers
 
 [push]

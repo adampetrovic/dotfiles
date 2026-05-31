@@ -3,14 +3,14 @@ name = "{{ .full_name }}"
 email = "{{ .email }}"
 
 [signing]
-behaviour = "own"
+behavior = "own"
 backend = "ssh"
 {{- if .work }}
-key = "{{ .chezmoi.homeDir }}/.ssh/secretive_signing.pub"
+key = "{{ (onepasswordRead "op://Work/SSH Key - Work/public_key") }}"
 {{- else }}
 key = "{{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}"
-backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{- end }}
+backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 backends.ssh.allowed-signers = "~/.config/git/allowed_ssh_signers"
 
 [ui]
