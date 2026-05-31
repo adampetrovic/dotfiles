@@ -1,3 +1,4 @@
+{{ if .personal -}}
 #!/bin/bash
 
 set -eufo pipefail
@@ -50,3 +51,4 @@ if kubectl krew >/dev/null 2>&1; then
     )
     kubectl krew install ${krew_pkgs[@]}
 fi
+{{ end -}}
