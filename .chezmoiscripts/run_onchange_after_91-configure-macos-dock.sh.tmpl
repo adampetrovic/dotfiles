@@ -18,7 +18,6 @@ log_step "Configuring macOS Dock & Hot Corners..."
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Things3.app"
 {{ if .personal -}}
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Telegram.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Spotify.app"
 {{ end -}}
 /opt/homebrew/bin/dockutil --no-restart --add "/System/Applications/System Settings.app"
 /opt/homebrew/bin/dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
