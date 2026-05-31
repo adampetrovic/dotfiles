@@ -61,11 +61,7 @@
 {{- if not .work }}
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 {{- end }}
-{{- if .work }}
-  allowedSignersFile = {{ .chezmoi.homeDir }}/.ssh/git_allowed_signers
-{{- else }}
   allowedSignersFile = ~/.config/git/allowed_ssh_signers
-{{- end }}
 
 [push]
     default = simple
