@@ -91,13 +91,13 @@
 {{  $customTaps = merge $customTaps (dict) -}}
 
 {{  $brews = concat $brews (list
-    "awscli"
-    "gcloud-cli") -}}
+    "awscli") -}}
 
 {{  $brewsWithArgs = merge $brewsWithArgs (dict
     "adampetrovic/tap/work-scripts" (list "HEAD")) -}}
 
 {{  $casks = concat $casks (list
+    "gcloud-cli"
     "loom") -}}
 
 {{  $mas = merge $mas (dict) -}}
