@@ -4,7 +4,7 @@
 
 ## Repository Overview
 
-Chezmoi-managed dotfiles for macOS. Supports **personal** and **work** profiles via Go templating. Secrets are encrypted with age and sourced from 1Password.
+Chezmoi-managed dotfiles for macOS. Supports **personal** and **work** profiles via Go templating. Personal secrets and SSH agent/signing use 1Password; work machines must use Keeper for secrets and Secretive for SSH instead of 1Password.
 
 ## Version Control
 
@@ -13,11 +13,11 @@ This repo uses **Jujutsu (jj)**, not Git. Use `jj` commands for all VCS operatio
 ## Key Files & Structure
 
 ```
-.chezmoi.toml.tmpl          # Chezmoi config — profile selection, age encryption, 1Password hook
+.chezmoi.toml.tmpl          # Chezmoi config — profile selection, age encryption, password-manager hook
 .chezmoiexternal.toml       # External deps (zinit)
 .chezmoiignore.tmpl         # Files to skip (conditional on profile)
 .chezmoiscripts/            # Run scripts triggered by chezmoi apply
-  run_once_before_*         # Bootstrap (Homebrew, 1Password)
+  run_once_before_*         # Bootstrap (Homebrew, 1Password for personal, Self Service reminders for work Keeper/Secretive)
   run_onchange_after_10-*   # Package install (Brewfile)
   run_onchange_after_30-*   # Kubernetes setup
   run_onchange_after_90-*   # macOS defaults, vim, languages, wireguard
@@ -31,8 +31,8 @@ dot_wezterm.lua.tmpl        # WezTerm terminal config
 dot_aerospace.toml.tmpl     # AeroSpace window manager
 dot_config/git/config.tmpl  # Git config
 dot_config/mise/config.toml.tmpl  # mise (language version manager)
-dot_config/sops/age/keys.txt.tmpl # SOPS age key (from 1Password)
-dot_ssh/config.tmpl         # SSH config
+dot_config/sops/age/keys.txt.tmpl # SOPS age key (personal, from 1Password)
+private_dot_ssh/private_config.tmpl # SSH config (0600 file / 0700 dir; personal 1Password agent, work Secretive agent)
 dot_pi/agent/              # Pi coding agent config (extensions, skills, settings)
 
 alfred/                     # Alfred preferences (not applied to target, in .chezmoiignore)
@@ -48,7 +48,8 @@ Files ending in `.tmpl` use Go templates. Available variables:
 - `{{ .work }}` / `{{ .personal }}` — boolean flags
 - `{{ .email }}` — email address
 - `{{ .full_name }}` — `"Adam Petrovic"`
-- 1Password references via `onepasswordRead` template function
+- Personal profile can use 1Password references via `onepasswordRead` template function
+- Work profile must not call `onepasswordRead`/`onepasswordDocument`; use Keeper (`keeper`, `keeperDataFields`, `keeperFindPassword`) or skip until migrated
 
 ## Encryption
 
@@ -82,4 +83,5 @@ chezmoi managed            # List all managed files
 3. **Run scripts**: Scripts in `.chezmoiscripts/` execute during `chezmoi apply`. `run_onchange_` scripts re-run when their content changes — edit carefully.
 4. **Don't delete files**: A previous incident wiped 203 files from this repo. Always use targeted edits, never bulk operations on the source directory.
 5. **Test before pushing**: Run `chezmoi diff` to verify changes won't clobber existing config.
-6. **1Password dependency**: The pre-hook (`.install-password-manager.sh`) requires 1Password CLI. If it fails, scripts that reference `onepasswordRead` will also fail.
+6. **Password manager dependency**: The pre-hook (`.install-password-manager.sh`) installs 1Password for personal profiles only. Work Keeper Password Manager, Keeper Commander CLI, and Secretive installation is handled via work Self Service, not Homebrew; the hook only warns if they are missing. Do not add active work-profile `onepasswordRead` or `onepasswordDocument` calls.
+7. **SSH agent split**: Personal profile keeps 1Password SSH agent/signing. Work profile uses Secretive's socket (`~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh`) for SSH auth; do not reintroduce 1Password agent paths into active work templates.

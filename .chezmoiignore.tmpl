@@ -9,3 +9,11 @@ AGENTS.md
 {{ if not .work }}
 .pi/agent/skills/jira-ai
 {{ end }}
+
+{{ if .work }}
+.config/1Password
+.config/sops/age/keys.txt
+.pi/agent/AGENTS.md
+.pi/agent/skills/1password
+.pi/agent/skills/actual-budget
+{{ end }}

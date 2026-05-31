@@ -1,7 +1,9 @@
+{{ if .personal -}}
 Host *
-	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-
-{{ if .work -}}
-# Work-specific SSH configuration
-# Add work hosts below as needed
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{ else if .work -}}
+# Secretive is installed via work Self Service, not Homebrew.
+# If this socket is missing, install/launch Secretive and create a key in the app with Command+N.
+Host *
+    IdentityAgent ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
 {{ end -}}

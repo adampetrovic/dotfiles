@@ -289,7 +289,11 @@ The following customisations are active and **must be used in preference to gene
 ### Identity & Signing
 
 - **User**: Adam Petrovic (`adam@petrovic.com.au`)
+{{ if .personal -}}
 - **Commit signing**: SSH-based via 1Password (`behaviour = "own"` — signs only the user's own commits automatically).
+{{ else if .work -}}
+- **Commit signing**: disabled until the work profile is migrated to a Keeper-compatible signing flow.
+{{ end -}}
 
 ### UI Settings
 

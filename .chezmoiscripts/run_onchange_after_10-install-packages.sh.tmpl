@@ -8,8 +8,15 @@ log_step "Installing Homebrew packages"
 BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
 eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
+{{ if .personal -}}
 # needed for private homebrew tap
 export HOMEBREW_GITHUB_API_TOKEN="{{ (onepasswordRead "op://Private/Github/personal access token") }}"
+{{ else if .work -}}
+# needed for private homebrew tap. Work devices cannot use 1Password/op, so
+# export this from Keeper before running chezmoi until this template is fully
+# migrated to keeperFindPassword.
+: "${HOMEBREW_GITHUB_API_TOKEN:=}"
+{{ end -}}
 [ -n "$HOMEBREW_GITHUB_API_TOKEN" ] || log_warn "HOMEBREW_GITHUB_API_TOKEN is empty — private/custom tap installs may fail"
 
 trust_custom_taps() {
@@ -43,6 +50,7 @@ trust_custom_taps() {
 
 log_info "Trusting custom Homebrew taps"
 trust_custom_taps "$HOME/.Brewfile"
+
 log_info "Updating Homebrew"
 brew update
 log_info "Installing packages from Brewfile"

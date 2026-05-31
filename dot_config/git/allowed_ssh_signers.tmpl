@@ -1,1 +1,5 @@
-{{ .email }} {{ if .work }}{{ (onepasswordRead "op://Work/SSH Key - Work/public_key") }}{{ else }}{{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}{{ end }}
+{{- if .personal -}}
+{{ .email }} {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
+{{- else if .work -}}
+# Work SSH signing is not configured until the Keeper migration supplies a signing key.
+{{- end -}}

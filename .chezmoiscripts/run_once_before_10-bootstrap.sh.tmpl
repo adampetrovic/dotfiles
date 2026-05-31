@@ -2,7 +2,7 @@
 
 set -eufo pipefail
 {{ template "log.sh" . }}
-log_step "Bootstrap: Homebrew & 1Password"
+log_step "Bootstrap: Homebrew & password manager"
 
 BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
 
@@ -28,6 +28,12 @@ command -v brew >/dev/null 2>&1 || [ -x "$BREW_PREFIX/bin/brew" ] || \
 
 eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
+{{ if .work -}}
+log_warn 'Work profile expects Keeper Password Manager, Keeper Commander CLI (`keeper`), and Secretive to be installed via work Self Service, not Homebrew.'
+command -v keeper >/dev/null 2>&1 || log_warn "Keeper Commander CLI is missing; install it from Self Service before rendering Keeper-backed templates."
+[ -d "/Applications/Keeper Password Manager.app" ] || [ -d "$HOME/Applications/Keeper Password Manager.app" ] || log_warn "Keeper desktop app is missing; install it from Self Service."
+[ -d "/Applications/Secretive.app" ] || [ -d "$HOME/Applications/Secretive.app" ] || log_warn "Secretive is missing; install it from Self Service before using SSH."
+{{ else -}}
 log_info 'Installing 1Password (cask + cli)'
 brew bundle --file=/dev/stdin <<EOF
 cask "1password"
@@ -41,3 +47,4 @@ if ! op account list 2>/dev/null | grep -q 'my.1password.com'; then
 fi
 
 op signin --account my >/dev/null || log_warn "1Password sign-in did not complete; unlock 1Password and re-run chezmoi apply if secret reads fail"
+{{ end -}}

@@ -131,9 +131,11 @@ run = "move-node-to-workspace T"
 if.app-id = 'com.jetbrains.pycharm'
 run = 'move-node-to-workspace I'
 
+{{ if .personal -}}
 [[on-window-detected]]
 if.app-id = 'com.1password.1password'
 run = 'layout floating'
+{{ end }}
 
 [[on-window-detected]]
 if.app-id = 'com.apple.MobileSMS'

@@ -1,8 +1,5 @@
+{{ if .personal -}}
 [[ssh-keys]]
 vault = "Private"
 item = "SSH Key - Personal"
-{{ if .work }}
-[[ssh-keys]]
-vault = "Work"
-item = "SSH Key - Work"
 {{ end -}}

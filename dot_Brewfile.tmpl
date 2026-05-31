@@ -30,8 +30,6 @@
     "zsh" -}}
 
 {{- $casks := list
-    "1password"
-    "1password-cli"
     "alfred"
     "cleanshot"
     "codex"
@@ -61,6 +59,8 @@
 {{  $brewsWithArgs = merge $brewsWithArgs (dict) -}}
 
 {{-  $casks = concat $casks (list
+    "1password"
+    "1password-cli"
     "bambu-studio"
     "claude-code"
     "helium-browser"
