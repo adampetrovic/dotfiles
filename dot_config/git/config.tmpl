@@ -8,11 +8,9 @@
     signingkey = {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
 {{- end }}
 
+{{- if .personal }}
 [url "git@github.com:"]
     insteadOf = "https://github.com/"
-{{- if .work }}
-[url "git@bitbucket.org:"]
-	insteadOf = https://bitbucket.org/
 {{- end }}
 
 [remote "origin"]

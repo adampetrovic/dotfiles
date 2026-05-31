@@ -7,12 +7,12 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 SRC="{{ .chezmoi.sourceDir }}"
 
 # The bootstrap clones this repo over HTTPS so no SSH key is required on a fresh
-# machine. Now switch the remote to SSH for authenticated push/pull, and
-# colocate a jujutsu repo so the dotfiles source can be managed with jj.
-
-# HTTPS -> SSH (only the initial unauthenticated clone needed HTTPS)
+# machine. Colocate a jujutsu repo so the dotfiles source can be managed with jj.
+{{ if .personal }}
+# personal has the 1Password SSH agent — switch the remote to SSH for
+# authenticated push/pull. (work has no SSH agent, so it stays on HTTPS.)
 git -C "$SRC" remote set-url origin git@github.com:adampetrovic/dotfiles.git
-
+{{ end }}
 # Colocate jj alongside the existing git repo (idempotent)
 if [ ! -d "$SRC/.jj" ]; then
     echo "Initializing colocated jujutsu repo in $SRC"
