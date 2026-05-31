@@ -9,7 +9,7 @@ log_step "Configuring macOS Dock & Hot Corners..."
 /opt/homebrew/bin/dockutil --no-restart --remove all
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Google Chrome.app"
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Fantastical.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/WezTerm.app"
+/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Ghostty.app"
 {{ if .work -}}
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Slack.app"
 {{ end -}}
@@ -20,7 +20,6 @@ log_step "Configuring macOS Dock & Hot Corners..."
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Telegram.app"
 /opt/homebrew/bin/dockutil --no-restart --add "/Applications/Spotify.app"
 {{ end -}}
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Reeder.app"
 /opt/homebrew/bin/dockutil --no-restart --add "/System/Applications/System Settings.app"
 /opt/homebrew/bin/dockutil --add '/Applications' --replacing Applications --view grid --display folder --sort name
 /opt/homebrew/bin/dockutil --add '~/Downloads' --replacing Downloads --view grid --display folder --sort dateadded
