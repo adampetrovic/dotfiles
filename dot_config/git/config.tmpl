@@ -3,7 +3,7 @@
     name = "{{ .full_name }}"
     email = "{{ .email }}"
 {{- if .work }}
-    signingkey = {{ (onepasswordRead "op://Work/SSH Key - Atlassian/public_key") }}
+    signingkey = {{ .chezmoi.homeDir }}/.ssh/secretive_signing.pub
 {{- else }}
     signingkey = {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
 {{- end }}
@@ -58,8 +58,14 @@
   format = ssh
 
 [gpg "ssh"]
+{{- if not .work }}
   program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+{{- end }}
+{{- if .work }}
+  allowedSignersFile = {{ .chezmoi.homeDir }}/.ssh/git_allowed_signers
+{{- else }}
   allowedSignersFile = ~/.config/git/allowed_ssh_signers
+{{- end }}
 
 [push]
     default = simple

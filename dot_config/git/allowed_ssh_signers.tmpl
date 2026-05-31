@@ -1,2 +1,3 @@
+{{ if .personal -}}
 {{ (onepasswordRead "op://Private/SSH Key - Personal/email") }} {{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}
-{{ (onepasswordRead "op://Work/SSH Key - Atlassian/email") }} {{ (onepasswordRead "op://Work/SSH Key - Atlassian/public_key") }}
+{{ end -}}
