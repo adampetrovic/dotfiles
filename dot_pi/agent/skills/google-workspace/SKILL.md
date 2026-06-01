@@ -9,12 +9,18 @@ description: "Interact with Google Workspace (Drive, Gmail, Calendar, Sheets, Do
 
 ## Local Installation Notes
 
-- Homebrew package: `googleworkspace-cli` (formula), which provides `/opt/homebrew/bin/gws`.
-- Do **not** install Homebrew `gws`; that is an unrelated git-workspace tool and conflicts with `googleworkspace-cli`.
-- If `gws` is missing, reinstall with `brew reinstall googleworkspace-cli`. The package is managed from chezmoi's `dot_Brewfile.tmpl` as `brew "googleworkspace-cli"`.
+- `gws` is installed via global mise, not Homebrew. Chezmoi manages this in `dot_config/mise/config.toml.tmpl` as:
+  ```toml
+  "github:googleworkspace/cli" = "0.22.5"
+  ```
+- This uses mise's GitHub backend because `googleworkspace-cli` is not in the mise registry.
+- The executable should resolve through the mise shim: `~/.local/share/mise/shims/gws`.
+- Do **not** install Homebrew `gws`; that is an unrelated git-workspace tool. Do not re-add `brew "googleworkspace-cli"` to the Brewfile unless deliberately moving back to Homebrew.
+- If `gws` is missing, run `mise install github:googleworkspace/cli@0.22.5 && mise reshim`.
 - In Pi/headless sessions, always prefix `gws` commands with `GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file`. The default macOS keyring backend can hang waiting for Keychain UI.
 
 ```bash
+mise which gws
 GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file gws --version
 GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file gws auth status
 ```
