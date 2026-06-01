@@ -5,20 +5,34 @@ description: "Interact with Google Workspace (Drive, Gmail, Calendar, Sheets, Do
 
 # Google Workspace — `gws` CLI
 
-`gws` is a unified CLI for all Google Workspace APIs. **Prefer `+helper` commands** for common tasks — they handle pagination, formatting, encoding, and threading automatically. Fall back to the raw API (`gws <service> <resource> <method>`) for advanced or uncommon operations.
+`gws` is a unified CLI for all Google Workspace APIs. **Prefer `+helper` commands** for common tasks — they handle pagination, formatting, encoding, and threading automatically. Fall back to the raw API (`gws <service> <resource> [sub-resource] <method>`) for advanced or uncommon operations.
+
+## Local Installation Notes
+
+- Homebrew package: `googleworkspace-cli` (formula), which provides `/opt/homebrew/bin/gws`.
+- Do **not** install Homebrew `gws`; that is an unrelated git-workspace tool and conflicts with `googleworkspace-cli`.
+- If `gws` is missing, reinstall with `brew reinstall googleworkspace-cli`. The package is managed from chezmoi's `dot_Brewfile.tmpl` as `brew "googleworkspace-cli"`.
+- In Pi/headless sessions, always prefix `gws` commands with `GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file`. The default macOS keyring backend can hang waiting for Keychain UI.
+
+```bash
+GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file gws --version
+GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file gws auth status
+```
 
 ## Authentication
 
 ```bash
-gws auth status                                    # check current auth
-gws auth login -s drive,gmail,calendar,sheets,tasks # login with specific scopes
-gws auth list                                       # list accounts
-gws auth default work@company.com                   # switch default account
-gws auth setup                                      # configure GCP project + OAuth client (requires gcloud)
-gws auth export                                     # print decrypted credentials to stdout
-gws --account personal@gmail.com gmail +triage      # one-off account override
+GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file gws auth status  # check current auth in headless/Pi sessions
+gws auth login -s drive,gmail,calendar,sheets,tasks        # login with specific scopes (interactive browser)
+gws auth list                                              # list accounts
+gws auth default work@company.com                          # switch default account
+gws auth setup                                             # configure GCP project + OAuth client (requires gcloud)
+gws auth export                                            # print decrypted credentials to stdout; never show this to users
+gws --account personal@gmail.com gmail +triage             # one-off account override
 ```
 
+> **Current expected auth:** encrypted credentials in `~/.config/gws/credentials.enc`, token cache present, `token_valid: true`, and scopes include `gmail.modify`, `calendar`, `drive`, `spreadsheets`, and `tasks`.
+>
 > **Scope limit:** Unverified OAuth apps are limited to ~25 scopes. Always use `-s service1,service2` to select only what you need.
 
 ## Helpers (Preferred)
@@ -329,12 +343,13 @@ When the user asks about events for a specific date range (e.g. "this weekend", 
 
 ## Rules
 
-1. **Use helpers first** — `+triage`, `+read`, `+agenda`, `+send`, `+reply`, `+upload`, etc. are faster and handle encoding/pagination automatically. **Use `+read` to read email bodies** instead of manually fetching and base64-decoding via the raw API. Fall back to raw API only when needed.
-2. **Discover before guessing** — run `gws <service> --help` and `gws schema <method>` before constructing raw API calls.
-3. **Confirm before mutating** — show the user the command (or use `--dry-run`) before any create/update/delete. Read operations don't need confirmation. **Use `--draft` with `+send`/`+reply`/`+forward` to save as draft** instead of sending immediately when the user wants to review first.
-4. **Verify after acting** — fetch the resource after a write to confirm it took effect.
-5. **Use `--page-all` for bulk reads** — pipe to `jq` for filtering large result sets.
-6. **Never output tokens or secrets** — don't echo `GOOGLE_WORKSPACE_CLI_TOKEN` or credential file contents.
-7. **Single-quote Sheets ranges** — the `!` in `Sheet1!A1` triggers bash history expansion in double quotes.
-8. **Use `--format table`** for human-readable output when displaying results to the user.
-9. **Respect timezone** — see the Timezone section above. All dates and times shown to the user must be in Australia/Sydney.
+1. **Use the headless backend in Pi** — prefix `gws` commands with `GOOGLE_WORKSPACE_CLI_KEYRING_BACKEND=file` so they do not hang on macOS Keychain prompts.
+2. **Use helpers first** — `+triage`, `+read`, `+agenda`, `+send`, `+reply`, `+upload`, etc. are faster and handle encoding/pagination automatically. **Use `+read` to read email bodies** instead of manually fetching and base64-decoding via the raw API. Fall back to raw API only when needed.
+3. **Discover before guessing** — run `gws <service> --help` and `gws schema <method>` before constructing raw API calls.
+4. **Confirm before mutating** — show the user the command (or use `--dry-run`) before any create/update/delete. Read operations don't need confirmation. **Use `--draft` with `+send`/`+reply`/`+forward` to save as draft** instead of sending immediately when the user wants to review first.
+5. **Verify after acting** — fetch the resource after a write to confirm it took effect.
+6. **Use `--page-all` for bulk reads** — pipe to `jq` for filtering large result sets.
+7. **Never output tokens or secrets** — don't echo `GOOGLE_WORKSPACE_CLI_TOKEN` or credential file contents.
+8. **Single-quote Sheets ranges** — the `!` in `Sheet1!A1` triggers bash history expansion in double quotes.
+9. **Use `--format table`** for human-readable output when displaying results to the user.
+10. **Respect timezone** — see the Timezone section above. All dates and times shown to the user must be in Australia/Sydney.
