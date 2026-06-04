@@ -3,6 +3,6 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@actual-app/api": "^26.3.0"
+    "@actual-app/api": "^26.6.0"
   }
 }
