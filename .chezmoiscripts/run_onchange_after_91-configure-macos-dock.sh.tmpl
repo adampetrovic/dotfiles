@@ -29,8 +29,10 @@ DOCKUTIL="$BREW_PREFIX/bin/dockutil"
 "$DOCKUTIL" --no-restart --add '/Applications' --replacing Applications --view grid --display folder --sort name
 "$DOCKUTIL" --no-restart --add "${HOME}/Downloads" --replacing Downloads --view grid --display folder --sort dateadded
 
-# Disable "click to reveal desktop" on Sonoma and above
+# Disable "click wallpaper to reveal desktop" and desktop widgets on Sonoma/Tahoe and above
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+defaults write com.apple.WindowManager StandardHideWidgets -bool true
+defaults write com.apple.WindowManager StageManagerHideWidgets -bool true
 
 # Set the icon size of Dock items to 48 pixels
 defaults write com.apple.dock tilesize -int 48
@@ -70,6 +72,6 @@ defaults write com.apple.dock wvous-tr-modifier -int 0
 defaults write com.apple.dock wvous-br-corner -int 10
 defaults write com.apple.dock wvous-br-modifier -int 0
 
-killall Dock > /dev/null 2>&1 || true
+killall Dock WindowManager > /dev/null 2>&1 || true
 
 log_ok "Done configuring macOS Dock & Hot Corners."
