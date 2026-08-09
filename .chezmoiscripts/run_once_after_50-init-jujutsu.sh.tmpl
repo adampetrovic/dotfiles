@@ -4,7 +4,8 @@ set -eufo pipefail
 {{ template "log.sh" . }}
 log_step "Setting up jujutsu (colocated repo)"
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
 SRC="{{ .chezmoi.sourceDir }}"
 

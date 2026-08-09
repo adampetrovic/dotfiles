@@ -2,4 +2,8 @@
 # current config: {{ include "dot_config/mise/config.toml.tmpl" | sha256sum }}
 {{ template "log.sh" . }}
 log_step "Installing language runtimes (mise)"
+
+BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+
 mise install

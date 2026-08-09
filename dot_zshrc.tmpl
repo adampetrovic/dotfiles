@@ -80,11 +80,10 @@ zi wait lucid for \
     atload'!_zsh_autosuggest_start' \
     zsh-users/zsh-autosuggestions \
 
-# zinit completion
-zi ice has"jj" as"completion" id-as"jj-completion" \
-    atclone"mkdir -p ~/.local/share/zinit/completions" \
-    atload'source <(jj util completion zsh); source <(COMPLETE=zsh jj)'
-zi light zdharma-continuum/null
+# jujutsu completion
+if command -v jj >/dev/null 2>&1; then
+    source <(jj util completion zsh)
+fi
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20

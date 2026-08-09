@@ -32,7 +32,6 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 NeoBundle 'kaicataldo/material.vim'
 NeoBundle 'tpope/vim-fugitive'
 NeoBundle 'tpope/vim-git'
-NeoBundle 'adampetrovic/vim-jjdescription', {'rev': 'main'}
 NeoBundle 'tpope/vim-surround'
 NeoBundle 'ctrlpvim/ctrlp.vim'
 NeoBundle 'vim-airline/vim-airline'

@@ -4,11 +4,29 @@ set -eufo pipefail
 {{ template "log.sh" . }}
 log_step "Bootstrap: Homebrew & 1Password"
 
+BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+
+ensure_ssh_agent_config() {
+    mkdir -p "$HOME/.ssh"
+    chmod 700 "$HOME/.ssh"
+    touch "$HOME/.ssh/config"
+    chmod 600 "$HOME/.ssh/config"
+
+    if ! grep -Fq '2BUA8C4S2C.com.1password/t/agent.sock' "$HOME/.ssh/config"; then
+        log_info "Priming SSH config for 1Password agent"
+        cat >>"$HOME/.ssh/config" <<'EOF'
+
+Host *
+	IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+EOF
+    fi
+}
+
 # Install Homebrew
-command -v brew >/dev/null 2>&1 || \
+command -v brew >/dev/null 2>&1 || [ -x "$BREW_PREFIX/bin/brew" ] || \
   (echo '🍺  Installing Homebrew' && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)")
 
-eval "$(/opt/homebrew/bin/brew shellenv)"
+eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
 log_info 'Installing 1Password (cask + cli)'
 brew bundle --file=/dev/stdin <<EOF
@@ -16,5 +34,10 @@ cask "1password"
 cask "1password-cli"
 EOF
 
-op account add --address my.1password.com --email "adam@petrovic.com.au"
-eval $(op signin --account my)
+ensure_ssh_agent_config
+
+if ! op account list 2>/dev/null | grep -q 'my.1password.com'; then
+    op account add --address my.1password.com --email "adam@petrovic.com.au"
+fi
+
+op signin --account my >/dev/null || log_warn "1Password sign-in did not complete; unlock 1Password and re-run chezmoi apply if secret reads fail"

@@ -1,27 +1,33 @@
 #!/bin/bash
-# current dock: {{ output "/opt/homebrew/bin/dockutil" "-L" | splitList "\n" }}
 
 set -eufo pipefail
 {{ template "log.sh" . }}
 
 log_step "Configuring macOS Dock & Hot Corners..."
 
-/opt/homebrew/bin/dockutil --no-restart --remove all
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Google Chrome.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Fantastical.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Ghostty.app"
+BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+DOCKUTIL="$BREW_PREFIX/bin/dockutil"
+
+"$DOCKUTIL" --no-restart --remove all
 {{ if .work -}}
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Slack.app"
+"$DOCKUTIL" --no-restart --add "/Applications/Google Chrome.app"
+{{ else if .personal -}}
+"$DOCKUTIL" --no-restart --add "/Applications/Helium.app"
 {{ end -}}
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/IntelliJ IDEA.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Logseq.app"
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Things3.app"
+"$DOCKUTIL" --no-restart --add "/Applications/Fantastical.app"
+"$DOCKUTIL" --no-restart --add "/Applications/Ghostty.app"
+{{ if .work -}}
+"$DOCKUTIL" --no-restart --add "/Applications/Slack.app"
+{{ end -}}
+"$DOCKUTIL" --no-restart --add "/Applications/IntelliJ IDEA.app"
+"$DOCKUTIL" --no-restart --add "/Applications/Logseq.app"
+"$DOCKUTIL" --no-restart --add "/Applications/Things3.app"
 {{ if .personal -}}
-/opt/homebrew/bin/dockutil --no-restart --add "/Applications/Telegram.app"
+"$DOCKUTIL" --no-restart --add "/Applications/Telegram.app"
 {{ end -}}
-/opt/homebrew/bin/dockutil --no-restart --add "/System/Applications/System Settings.app"
-/opt/homebrew/bin/dockutil --no-restart --add '/Applications' --replacing Applications --view grid --display folder --sort name
-/opt/homebrew/bin/dockutil --no-restart --add "${HOME}/Downloads" --replacing Downloads --view grid --display folder --sort dateadded
+"$DOCKUTIL" --no-restart --add "/System/Applications/System Settings.app"
+"$DOCKUTIL" --no-restart --add '/Applications' --replacing Applications --view grid --display folder --sort name
+"$DOCKUTIL" --no-restart --add "${HOME}/Downloads" --replacing Downloads --view grid --display folder --sort dateadded
 
 # Disable "click to reveal desktop" on Sonoma and above
 defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false

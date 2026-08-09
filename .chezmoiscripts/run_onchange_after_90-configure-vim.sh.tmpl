@@ -1,6 +1,7 @@
 {{ if (eq .chezmoi.os "darwin" "linux") -}}
 #!/bin/bash
 # vimrc hash: {{ include "dot_vimrc" | sha256sum }}
+# vim config hash: {{ include "dot_vim/01-bundles.vim" | sha256sum }} {{ include "dot_vim/05-misc.vim" | sha256sum }}
 
 set -eufo pipefail
 {{ template "log.sh" . }}

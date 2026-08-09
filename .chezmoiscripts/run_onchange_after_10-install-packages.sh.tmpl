@@ -4,16 +4,51 @@
 set -eufo pipefail
 {{ template "log.sh" . }}
 log_step "Installing Homebrew packages"
-eval "$(/opt/homebrew/bin/brew shellenv)"
+
+BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
 # needed for private homebrew tap
 export HOMEBREW_GITHUB_API_TOKEN="{{ (onepasswordRead "op://Private/Github/personal access token") }}"
-[ -n "$HOMEBREW_GITHUB_API_TOKEN" ] || log_warn "HOMEBREW_GITHUB_API_TOKEN is empty — private tap installs (work-scripts, stash-sync) will fail"
+[ -n "$HOMEBREW_GITHUB_API_TOKEN" ] || log_warn "HOMEBREW_GITHUB_API_TOKEN is empty — private/custom tap installs may fail"
 
+trust_custom_taps() {
+    local brewfile="$1"
+    local taps
+
+    [ -f "$brewfile" ] || return 0
+
+    taps=$(awk -F'"' '
+        /^[[:space:]]*(tap|brew|cask)[[:space:]]+"/ {
+            token = $2
+            n = split(token, parts, "/")
+            if ($1 ~ /^[[:space:]]*tap[[:space:]]*$/ && n == 2 && parts[1] != "homebrew") {
+                print token
+            } else if (n >= 3 && parts[1] != "homebrew") {
+                print parts[1] "/" parts[2]
+            }
+        }
+    ' "$brewfile" | sort -u)
+
+    [ -n "$taps" ] || return 0
+
+    while IFS= read -r tap; do
+        [ -n "$tap" ] || continue
+        log_info "Trusting Homebrew tap: $tap"
+        if ! brew trust --tap "$tap" >/dev/null; then
+            log_warn "Could not trust Homebrew tap: $tap"
+        fi
+    done <<<"$taps"
+}
+
+log_info "Trusting custom Homebrew taps"
+trust_custom_taps "$HOME/.Brewfile"
 log_info "Updating Homebrew"
 brew update
 log_info "Installing packages from Brewfile"
 brew bundle --file=~/.Brewfile
 log_info "Pruning packages not in Brewfile"
-brew bundle cleanup --zap --force --file=~/.Brewfile
+if ! brew bundle cleanup --zap --force --file=~/.Brewfile; then
+    log_warn "Homebrew cleanup failed; continuing bootstrap. Run 'brew cleanup' manually if needed."
+fi
 log_ok "Homebrew packages installed"

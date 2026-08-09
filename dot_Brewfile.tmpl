@@ -1,5 +1,7 @@
 {{/* base level packages for all environments */}}
-{{- $taps := list -}}
+{{- $taps := list
+    "adampetrovic/tap"
+    "lucasgelfond/zerobrew" -}}
 
 {{- $customTaps := dict -}}
 
@@ -57,8 +59,7 @@
 
 {{-  $brews = concat $brews (list
     "mas"
-    "adampetrovic/tap/pi-telegram-bot"
-    "adampetrovic/tap/stash-sync") -}}
+    "adampetrovic/tap/pi-telegram-bot") -}}
 
 {{  $brewsWithArgs = merge $brewsWithArgs (dict) -}}
 

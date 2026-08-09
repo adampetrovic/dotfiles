@@ -7,10 +7,13 @@ log_step "Configuring macOS general settings..."
 
 {{ template "macos-sudo-prime.sh" . }}
 
-# Disable the sound effects on boot
-sudo nvram SystemAudioVolume=" "
+# Disable the startup sound where supported (StartupMute for modern macOS, SystemAudioVolume for older Macs)
+sudo nvram StartupMute=%01 > /dev/null 2>&1 || true
+sudo nvram SystemAudioVolume=" " > /dev/null 2>&1 || true
 
+# Show battery in the menu bar with percentage (legacy menu extra + modern Control Center key)
 defaults write com.apple.menuextra.battery ShowPercent -string "YES"
+defaults write com.apple.controlcenter "NSStatusItem VisibleCC Battery" -bool true
 
 # Disable window animations
 defaults write -g NSAutomaticWindowAnimationsEnabled -bool false

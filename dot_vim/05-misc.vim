@@ -4,8 +4,10 @@ cmap w!! %!sudo tee > /dev/null %
 " show git diff in vsplit with git commit
 autocmd FileType gitcommit DiffGitCached | wincmd L | wincmd p
 
-" show jj diff in vsplit with jj describe  
-autocmd FileType jjdescription JJDiff | wincmd L | wincmd p | wincmd L
+" show jj diff in vsplit with jj describe when JJDiff is available
+if exists(':JJDiff')
+    autocmd FileType jjdescription JJDiff | wincmd L | wincmd p | wincmd L
+endif
 
 " strip trailing whitespace on save
 autocmd FileType c,cpp,python,ruby,java,php autocmd BufWritePre <buffer> :%s/\s\+$//e
