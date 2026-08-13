@@ -1,0 +1,141 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Configure persistent 1Password auth for Pi agent shells.
+# This helper never prints tokens and stores either:
+# - a service-account token in macOS Keychain, or
+# - a short-lived manual-account OP_SESSION in ~/.cache/pi-agent/op-session.
+
+find_real_op() {
+    local self candidate real_candidate
+    self="$HOME/.pi/agent/bin/op"
+    for candidate in "/opt/homebrew/bin/op" "/usr/local/bin/op"; do
+        [[ -x "$candidate" ]] || continue
+        real_candidate="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$candidate")"
+        [[ "$real_candidate" == "$self" ]] && continue
+        printf '%s\n' "$candidate"
+        return 0
+    done
+    while IFS= read -r candidate; do
+        [[ -n "$candidate" ]] || continue
+        real_candidate="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$candidate")"
+        [[ "$real_candidate" == "$self" ]] && continue
+        [[ "$candidate" == "$self" ]] && continue
+        printf '%s\n' "$candidate"
+        return 0
+    done < <(type -P -a op 2>/dev/null || true)
+    return 1
+}
+
+REAL_OP="$(find_real_op)" || {
+    echo "pi-op-login: could not find real 1Password CLI" >&2
+    exit 127
+}
+OP_ACCOUNT_DEFAULT="${OP_ACCOUNT:-my.1password.com}"
+SESSION_FILE="${OP_SESSION_FILE:-$HOME/.cache/pi-agent/op-session}"
+KEYCHAIN_SERVICE="${PI_OP_SERVICE_ACCOUNT_KEYCHAIN_SERVICE:-pi-agent-op-service-account-token}"
+
+usage() {
+    cat <<'EOF'
+Usage:
+  pi-op-login service-token   Store a 1Password service-account token in macOS Keychain
+  pi-op-login manual-session  Cache OP_SESSION from a manually-added CLI account
+  pi-op-login status          Show non-secret auth status
+
+Recommended permanent mode:
+  1. Create a scoped 1Password service account token in 1Password.
+  2. Run: pi-op-login service-token
+  3. Paste the token at the hidden prompt.
+
+Manual-account mode:
+  Requires an account added with `op account add` (not desktop-app-only auth).
+  The cached OP_SESSION expires after inactivity and may need refresh.
+EOF
+}
+
+status() {
+    echo "op binary: $REAL_OP"
+    echo "account: ${OP_ACCOUNT:-$OP_ACCOUNT_DEFAULT}"
+    if security find-generic-password -a "${USER:-$(id -un)}" -s "$KEYCHAIN_SERVICE" -w >/dev/null 2>&1; then
+        echo "keychain service-token: present"
+    else
+        echo "keychain service-token: absent"
+    fi
+    if [[ -r "$SESSION_FILE" ]]; then
+        echo "cached OP_SESSION: present ($SESSION_FILE)"
+    else
+        echo "cached OP_SESSION: absent"
+    fi
+    if op whoami --account "$OP_ACCOUNT_DEFAULT" >/dev/null 2>&1; then
+        echo "op whoami: ok"
+    else
+        echo "op whoami: failed"
+    fi
+}
+
+service_token() {
+    if ! command -v security >/dev/null 2>&1; then
+        echo "macOS security CLI not found; cannot store token in Keychain" >&2
+        exit 1
+    fi
+
+    printf 'Paste 1Password service-account token (input hidden): ' >&2
+    IFS= read -r -s token
+    printf '\n' >&2
+    if [[ -z "$token" ]]; then
+        echo "No token entered" >&2
+        exit 1
+    fi
+
+    security add-generic-password \
+        -U \
+        -a "${USER:-$(id -un)}" \
+        -s "$KEYCHAIN_SERVICE" \
+        -w "$token" >/dev/null
+    unset token
+
+    if op whoami >/dev/null 2>&1; then
+        echo "Stored service-account token in Keychain and verified op access."
+    else
+        echo "Stored token, but op verification failed. Check token scope/validity." >&2
+        exit 1
+    fi
+}
+
+manual_session() {
+    mkdir -p "$(dirname "$SESSION_FILE")"
+    chmod 700 "$(dirname "$SESSION_FILE")"
+
+    echo "Requesting manual CLI session for $OP_ACCOUNT_DEFAULT..." >&2
+    session="$(PI_OP_WRAPPER_BYPASS=1 "$REAL_OP" signin --account "$OP_ACCOUNT_DEFAULT" --raw)"
+    if [[ -z "$session" ]]; then
+        cat >&2 <<EOF
+op signin --raw returned no reusable session.
+
+This usually means the account is desktop-app-integration-only. To use manual
+session caching, first run in a real terminal:
+
+  op account add --address $OP_ACCOUNT_DEFAULT --email adam@petrovic.com.au --signin
+
+For fully non-interactive Pi automation, prefer:
+
+  pi-op-login service-token
+EOF
+        exit 1
+    fi
+
+    umask 077
+    printf '%s' "$session" > "$SESSION_FILE"
+    chmod 600 "$SESSION_FILE"
+    unset session
+    echo "Cached OP_SESSION at $SESSION_FILE"
+}
+
+cmd="${1:-}"
+case "$cmd" in
+    service-token) service_token ;;
+    manual-session) manual_session ;;
+    status) status ;;
+    -h|--help|help|'') usage ;;
+    *) echo "Unknown command: $cmd" >&2; usage >&2; exit 2 ;;
+esac

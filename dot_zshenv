@@ -1,0 +1,3 @@
+# Keep Apple Terminal from creating per-session zsh history files.
+# Atuin owns command history/search/autosuggestions.
+export SHELL_SESSION_HISTORY=0

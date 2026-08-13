@@ -14,6 +14,17 @@ export K9S_CONFIG_DIR=~/.config/k9s
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH=$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
 
+# Disable zsh's native history; Atuin owns command history/search/autosuggestions.
+unset HISTFILE
+HISTSIZE=0
+SAVEHIST=0
+unsetopt APPEND_HISTORY EXTENDED_HISTORY INC_APPEND_HISTORY INC_APPEND_HISTORY_TIME SHARE_HISTORY 2>/dev/null
+
+# Load Atuin before zsh-autosuggestions so suggestions never fall back to native zsh history.
+if command -v atuin >/dev/null 2>&1; then
+    eval "$(atuin init zsh)"
+fi
+
 # Load theme first
 zinit light NICHOLAS85/z-a-eval
 
@@ -111,12 +122,6 @@ zi wait"0" lucid for \
 zi wait lucid for \
     has"zoxide" \
     atload'eval "$(zoxide init --cmd cd zsh)"' \
-    zdharma-continuum/null
-
-# atuin
-zi wait lucid for \
-    has"atuin" \
-    atload'eval "$(atuin init zsh --disable-up-arrow)"' \
     zdharma-continuum/null
 
 # mise

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+set -Eeuo pipefail
+
+# Pi-local 1Password CLI wrapper.
+#
+# Why this exists:
+# - Pi tool calls run in fresh shell processes.
+# - 1Password desktop-app integration does not provide a reusable OP_SESSION token.
+# - Fresh shells therefore repeatedly see "account is not signed in" / authorization timeouts.
+#
+# Durable auth order:
+# 1. Existing OP_SERVICE_ACCOUNT_TOKEN from the environment.
+# 2. OP_SERVICE_ACCOUNT_TOKEN stored in macOS Keychain under
+#    service "pi-agent-op-service-account-token".
+# 3. Cached manual-account OP_SESSION at ~/.cache/pi-agent/op-session.
+# 4. Fall back to the real op CLI unchanged (desktop integration/manual prompts).
+
+find_real_op() {
+    local self candidate real_candidate
+    self="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)/$(basename "${BASH_SOURCE[0]}")"
+
+    # Prefer the Homebrew cask binary because it is the current signed macOS
+    # install and is less likely to fall behind 1Password desktop integration.
+    for candidate in "/opt/homebrew/bin/op" "/usr/local/bin/op"; do
+        [[ -x "$candidate" ]] || continue
+        real_candidate="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$candidate")"
+        [[ "$real_candidate" == "$self" ]] && continue
+        printf '%s\n' "$candidate"
+        return 0
+    done
+
+    while IFS= read -r candidate; do
+        [[ -n "$candidate" ]] || continue
+        real_candidate="$(python3 -c 'import os,sys; print(os.path.realpath(sys.argv[1]))' "$candidate")"
+        [[ "$real_candidate" == "$self" ]] && continue
+        [[ "$candidate" == "$self" ]] && continue
+        printf '%s\n' "$candidate"
+        return 0
+    done < <(type -P -a op 2>/dev/null || true)
+
+    return 1
+}
+
+REAL_OP="$(find_real_op)" || {
+    echo "pi op wrapper: could not find the real 1Password CLI" >&2
+    exit 127
+}
+
+# Let callers opt out when debugging the real CLI.
+if [[ "${PI_OP_WRAPPER_BYPASS:-}" == "1" ]]; then
+    exec "$REAL_OP" "$@"
+fi
+
+# Prefer an explicit environment token if the caller already supplied one.
+if [[ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]] && command -v security >/dev/null 2>&1; then
+    keychain_service="${PI_OP_SERVICE_ACCOUNT_KEYCHAIN_SERVICE:-pi-agent-op-service-account-token}"
+    if token="$(security find-generic-password -a "${USER:-$(id -un)}" -s "$keychain_service" -w 2>/dev/null)" && [[ -n "$token" ]]; then
+        export OP_SERVICE_ACCOUNT_TOKEN="$token"
+    fi
+fi
+
+# If using a manually-added CLI account, reuse its short-lived session across
+# fresh Pi shell processes. This intentionally stores only OP_SESSION, not the
+# account password or Secret Key.
+if [[ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" && -z "${OP_SESSION:-}" ]]; then
+    session_file="${OP_SESSION_FILE:-$HOME/.cache/pi-agent/op-session}"
+    if [[ -r "$session_file" ]]; then
+        export OP_SESSION="$(<"$session_file")"
+    fi
+fi
+
+exec "$REAL_OP" "$@"
