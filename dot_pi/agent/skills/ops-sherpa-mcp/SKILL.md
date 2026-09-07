@@ -112,10 +112,11 @@ If secrets are supplied by global `mise` configuration, avoid copying them into 
 
 The wrapper validates required env vars, then runs `npx --yes @atlassian/ops-sherpa@1.4.0`. Override with `OPS_SHERPA_PACKAGE=@atlassian/ops-sherpa` or another pinned version if needed. See `references/mcp-config-mise-wrapper.json`.
 
-For global mise env, configure the required variables in your global mise config using your normal secret source. Do not commit plaintext tokens. After changing mise config, open a fresh shell and run:
+For global mise env, configure the required variables in your global mise config using your normal secret source. Do not commit plaintext tokens. The wrapper retries once through `mise exec --` if Codex did not inherit an activated shell environment.
+
+After changing mise config, open a fresh shell and run the doctor. Do **not** paste `mise env` output into chat or tickets because it can print secrets.
 
 ```bash
-mise env
 ./scripts/ops-sherpa-doctor.sh
 ```
 

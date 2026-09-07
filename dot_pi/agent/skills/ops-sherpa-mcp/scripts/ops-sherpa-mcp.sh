@@ -14,12 +14,30 @@ set -euo pipefail
 
 PACKAGE="${OPS_SHERPA_PACKAGE:-@atlassian/ops-sherpa@1.4.0}"
 
+required_env=(
+  ATLASSIAN_EMAIL
+  ATLASSIAN_API_TOKEN
+  BITBUCKET_API_TOKEN
+  OPS_JIRA_TOKEN
+  SIGNALFX_API_TOKEN
+  SIGNALFX_REALM
+  SENTRY_API_TOKEN
+  SPLUNK_TIMEOUT
+)
+
 missing=()
-for name in ATLASSIAN_EMAIL ATLASSIAN_API_TOKEN BITBUCKET_API_TOKEN OPS_JIRA_TOKEN SIGNALFX_API_TOKEN SIGNALFX_REALM SENTRY_API_TOKEN SPLUNK_TIMEOUT; do
+for name in "${required_env[@]}"; do
   if [[ -z "${!name:-}" ]]; then
     missing+=("$name")
   fi
 done
+
+# If Codex did not inherit an activated shell, retry once through mise so global
+# mise env vars are loaded without copying secrets into ~/.codex/config.toml.
+if (( ${#missing[@]} > 0 )) && [[ -z "${OPS_SHERPA_MISE_REEXEC:-}" ]] && command -v mise >/dev/null 2>&1; then
+  export OPS_SHERPA_MISE_REEXEC=1
+  exec mise exec -- "$0" "$@"
+fi
 
 if (( ${#missing[@]} > 0 )); then
   printf 'Ops Sherpa MCP missing required environment variables:\n' >&2
