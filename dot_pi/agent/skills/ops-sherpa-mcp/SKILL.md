@@ -201,15 +201,15 @@ http://go/logs/prod/raptor-archetype/level=ERROR/24h
 
 Natural-language mapping:
 
-- “check logs for `tdp-os-prod-east-01` shard” → infer archetype/service `tdp-os`, env type `prod`, shard `tdp-os-prod-east-01`.
+- “check logs for `tdp-os-prod-east-01` shard” → infer env type `prod`, shard `tdp-os-prod-east-01`, and likely archetype `tdp-os-archetype` unless evidence says otherwise.
 - Start with a macro count query such as:
 
 ```spl
-search `sliver_tdp-os_prod` (tdp-os-prod-east-01 OR shard=tdp-os-prod-east-01 OR micros_shard=tdp-os-prod-east-01 OR cell=tdp-os-prod-east-01)
+search `sliver_tdp-os-archetype_prod` (tdp-os-prod-east-01 OR shard=tdp-os-prod-east-01 OR micros_shard=tdp-os-prod-east-01 OR cell=tdp-os-prod-east-01)
 | timechart span=5m count
 ```
 
-- If that returns zero, run a bounded field-discovery/sample query against `` `sliver_tdp-os_prod` `` for the same ≤15-30 minute window to identify the correct shard/cell field before broadening.
+- If that returns zero, run a bounded field-discovery/sample query against `` `sliver_tdp-os-archetype_prod` `` for the same ≤15-30 minute window to identify the correct shard/cell field before broadening.
 - For service-only Micros logs where Sliver macro is not applicable, fall back to `` `micros_<service>` `` with application-log sidecar exclusions.
 
 ### 4. Change and deployment correlation
