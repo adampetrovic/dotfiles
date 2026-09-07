@@ -1,0 +1,11 @@
+{
+  "skillName": "twg",
+  "target": "global",
+  "installPath": "/Users/apetrovic/.agents/skills/twg-status-rollups",
+  "binaryPath": "/Users/apetrovic/.local/bin/twg",
+  "installedAt": "2026-09-07T02:45:58.153Z",
+  "installedVersion": "1.2.7",
+  "buildProfile": "external",
+  "buildCommit": "8598ad408044",
+  "builtAt": "2026-08-28T18:37:55.198Z"
+}
