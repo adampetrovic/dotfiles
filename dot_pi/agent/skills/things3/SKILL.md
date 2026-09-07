@@ -21,9 +21,14 @@ Resolve relative paths from this skill directory.
 ```bash
 ./scripts/things3-url.py doctor
 ./scripts/things3-url.py inbox
+./scripts/things3-url.py areas
+./scripts/things3-url.py projects
 ./scripts/things3-url.py list today --limit 10
+./scripts/things3-url.py list-area work --limit 10
 ./scripts/things3-url.py search "insurance"
+./scripts/things3-url.py locate "Call dentist"
 ./scripts/things3-url.py add-todo "Call dentist" --when tomorrow --tag Home
+./scripts/things3-url.py add-todo "Review PR" --list work
 ./scripts/things3-url.py add-project "Trip planning" --area Personal --todo "Book flights" --todo "Check passports"
 ./scripts/things3-url.py import-json ./payload.json
 ./scripts/things3-url.py show today
@@ -41,18 +46,22 @@ Use the helper instead of writing ad hoc AppleScript.
 
 ```bash
 ./scripts/things3-url.py inbox                         # Inbox titles
+./scripts/things3-url.py areas                         # Area names, including emoji prefixes
+./scripts/things3-url.py projects                      # Project names
 ./scripts/things3-url.py list today --limit 10          # Built-in list titles
 ./scripts/things3-url.py list upcoming --limit 20
+./scripts/things3-url.py list-area work --limit 10      # Fuzzy-resolves to e.g. 💼 Work
 ./scripts/things3-url.py search "renewal" --limit 10
+./scripts/things3-url.py locate "renewal"              # Show matching item locations
 ```
 
 Supported built-in lists: `inbox`, `today`, `upcoming`, `anytime`, `someday`, `logbook`, `trash`.
 
-These read commands use Things' AppleScript dictionary and print one title per line. If richer reads/metadata are needed, use the full MCP option in `references/things-mcp.md`.
+These read commands use Things' AppleScript dictionary and print one title per line. `locate` prints matching titles with their area/project. If richer reads/metadata are needed, use the full MCP option in `references/things-mcp.md`.
 
 ## Creating todos
 
-Use `add-todo` for single tasks:
+Use `add-todo` for single tasks. For area/project placement, pass `--list`; the helper resolves fuzzy names like `work` to the exact Things area/project name such as `💼 Work`, creates the task, moves it via AppleScript, and prints the verified location.
 
 ```bash
 ./scripts/things3-url.py add-todo "Task title" \
@@ -60,9 +69,16 @@ Use `add-todo` for single tasks:
   --when today \
   --deadline 2026-09-30 \
   --tag Work \
-  --list "Project or Area" \
+  --list work \
   --checklist "First step" \
   --checklist "Second step"
+```
+
+After creating into a non-Inbox list, verify with:
+
+```bash
+./scripts/things3-url.py locate "Task title"
+./scripts/things3-url.py list-area work
 ```
 
 Date guidance:
