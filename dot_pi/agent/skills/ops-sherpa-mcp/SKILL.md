@@ -173,6 +173,45 @@ Suggested flow:
 
 Avoid broad raw searches such as `error` over a whole day. If a query times out, shrink the window or add filters; do not simply increase timeout.
 
+#### Sliver archetype logs
+
+For Sliver/archetype logs, prefer the generated Splunk macros when the user names an archetype, env type, or shard.
+
+Macro format:
+
+- `` `sliver_<archetype>_all` ``
+- `` `sliver_<archetype>_dev` ``
+- `` `sliver_<archetype>_staging` ``
+- `` `sliver_<archetype>_prod` ``
+
+These macros include commercial-perimeter shards for the selected env type.
+
+Go link format for human handoff:
+
+```text
+http://go/logs/<envType>/<archetype>/<query?>/<timeframe?>
+```
+
+Examples:
+
+```text
+http://go/logs/dev/raptor-archetype
+http://go/logs/prod/raptor-archetype/level=ERROR/24h
+```
+
+Natural-language mapping:
+
+- “check logs for `tdp-os-prod-east-01` shard” → infer archetype/service `tdp-os`, env type `prod`, shard `tdp-os-prod-east-01`.
+- Start with a macro count query such as:
+
+```spl
+search `sliver_tdp-os_prod` (tdp-os-prod-east-01 OR shard=tdp-os-prod-east-01 OR micros_shard=tdp-os-prod-east-01 OR cell=tdp-os-prod-east-01)
+| timechart span=5m count
+```
+
+- If that returns zero, run a bounded field-discovery/sample query against `` `sliver_tdp-os_prod` `` for the same ≤15-30 minute window to identify the correct shard/cell field before broadening.
+- For service-only Micros logs where Sliver macro is not applicable, fall back to `` `micros_<service>` `` with application-log sidecar exclusions.
+
 ### 4. Change and deployment correlation
 
 Check recent changes for the affected service before forming a root-cause hypothesis.
