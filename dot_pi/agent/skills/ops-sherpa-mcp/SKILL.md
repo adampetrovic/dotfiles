@@ -212,6 +212,52 @@ search `sliver_tdp-os-archetype_prod` (tdp-os-prod-east-01 OR shard=tdp-os-prod-
 - If that returns zero, run a bounded field-discovery/sample query against `` `sliver_tdp-os-archetype_prod` `` for the same ≤15-30 minute window to identify the correct shard/cell field before broadening.
 - For service-only Micros logs where Sliver macro is not applicable, fall back to `` `micros_<service>` `` with application-log sidecar exclusions.
 
+#### TDP OS log fields and slices
+
+Observed against `tdp-os-stg-east-01` with `` `sliver_tdp-os-archetype_staging` ``:
+
+Core fields:
+
+- `m.si` = Micros service ID (`micros_service_id`), e.g. `tdp-os-stg-east-01` or `tdp-os-prod-east-01`. Prefer this over free-text shard matching once discovered.
+- `env` = Micros environment, e.g. `stg-east`, `prod-east`.
+- `m.t` = log type, e.g. `application`, `platform`, `syslog`.
+- `micros_container` = container/source within the shard.
+- `ec2.sn` = deployment-ish service node name including shard, env, build number, commit-ish ID, UTC build/deploy timestamp, and EC2 suffix.
+- `host` = backing EC2 host/IP name.
+- Application fields commonly include `level`, `logger_name`, `md.httpStatus`, `md.httpMethod`, `md.exceptionType`, `md.Atl-TraceId`, and many OS domain fields under `md.*`.
+
+Important SPL dot-field rule: for aggregation, rename dotted fields first rather than grouping on them directly:
+
+```spl
+| rename m.si as micros_service_id m.t as log_type ec2.sn as ec2_service_name
+| stats count by micros_service_id env micros_container log_type
+```
+
+TDP OS slice defaults:
+
+- Main OS application logs: `m.t=application micros_container=tdpos`.
+- OS support application containers: `m.t=application (micros_container=hofund OR micros_container=uploader)`.
+- Platform/sidecar logs: `micros_container=platform-*`; examples include `platform-statsd-psapi`, `platform-service-proxy-ingress`, `platform-metricshostagent`, `platform-tracing-psapi`, and `platform-tcs`.
+- System/kernel/syslog-like logs: `m.t=syslog micros_container=platform-logging`.
+
+Recommended first-pass shard query:
+
+```spl
+search `sliver_tdp-os-archetype_staging` m.si=tdp-os-stg-east-01 m.t=application micros_container=tdpos
+| timechart span=5m count
+```
+
+Recommended slice-discovery query:
+
+```spl
+search `sliver_tdp-os-archetype_staging` tdp-os-stg-east-01
+| rename m.si as micros_service_id m.t as log_type ec2.sn as ec2_service_name
+| stats count dc(host) as hosts values(micros_container) as containers by micros_service_id env log_type
+| sort - count
+```
+
+Use `tdpos` + `m.t=application` for product/application behavior. Only include `platform-*` or `m.t=syslog` when investigating sidecar, proxy, logging pipeline, host, kernel, or infrastructure symptoms.
+
 ### 4. Change and deployment correlation
 
 Check recent changes for the affected service before forming a root-cause hypothesis.

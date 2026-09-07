@@ -4,7 +4,7 @@ import { once } from 'node:events';
 import { setTimeout as sleep } from 'node:timers/promises';
 
 const SERVER = new URL('./ops-sherpa-mcp.sh', import.meta.url).pathname;
-const TIMEOUT_MS = Number(process.env.MCP_CLIENT_TIMEOUT || 30000);
+const TIMEOUT_MS = Number(process.env.MCP_CLIENT_TIMEOUT || 180000);
 
 function usage() {
   console.error(`Usage:
