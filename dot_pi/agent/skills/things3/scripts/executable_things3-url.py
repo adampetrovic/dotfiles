@@ -38,12 +38,12 @@ def things_add_url(params: dict[str, Any]) -> str:
                 cleaned[key] = ",".join(value)
         else:
             cleaned[key] = str(value)
-    return "things:///add?" + urllib.parse.urlencode(cleaned)
+    return "things:///add?" + urllib.parse.urlencode(cleaned, quote_via=urllib.parse.quote)
 
 
 def things_json_url(items: list[dict[str, Any]]) -> str:
     payload = json.dumps(items, ensure_ascii=False, separators=(",", ":"))
-    return "things:///json?" + urllib.parse.urlencode({"data": payload})
+    return "things:///json?" + urllib.parse.urlencode({"data": payload}, quote_via=urllib.parse.quote)
 
 
 def add_todo(args: argparse.Namespace) -> None:
