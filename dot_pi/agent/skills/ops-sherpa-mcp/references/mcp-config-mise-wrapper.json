@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "ops-sherpa": {
+      "command": "/Users/apetrovic/.pi/agent/skills/ops-sherpa-mcp/scripts/ops-sherpa-mcp.sh",
+      "args": []
+    }
+  }
+}

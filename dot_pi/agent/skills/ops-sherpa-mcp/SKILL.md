@@ -95,6 +95,30 @@ Pinned example:
 
 A reusable template is in `references/mcp-config-template.json`.
 
+### Mise/global environment wrapper
+
+If secrets are supplied by global `mise` configuration, avoid copying them into the MCP client JSON. Point the MCP client at the wrapper script instead:
+
+```json
+{
+  "mcpServers": {
+    "ops-sherpa": {
+      "command": "/Users/apetrovic/.pi/agent/skills/ops-sherpa-mcp/scripts/ops-sherpa-mcp.sh",
+      "args": []
+    }
+  }
+}
+```
+
+The wrapper validates required env vars, then runs `npx --yes @atlassian/ops-sherpa@1.4.0`. Override with `OPS_SHERPA_PACKAGE=@atlassian/ops-sherpa` or another pinned version if needed. See `references/mcp-config-mise-wrapper.json`.
+
+For global mise env, configure the required variables in your global mise config using your normal secret source. Do not commit plaintext tokens. After changing mise config, open a fresh shell and run:
+
+```bash
+mise env
+./scripts/ops-sherpa-doctor.sh
+```
+
 ## Investigation workflow
 
 ### 0. Frame the investigation
