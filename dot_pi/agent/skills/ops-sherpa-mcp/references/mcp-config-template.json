@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "ops-sherpa": {
+      "command": "npx",
+      "args": ["@atlassian/ops-sherpa@1.4.0"],
+      "env": {
+        "ATLASSIAN_EMAIL": "<your-email>",
+        "ATLASSIAN_API_TOKEN": "<redacted>",
+        "BITBUCKET_API_TOKEN": "<redacted>",
+        "OPS_JIRA_TOKEN": "<redacted>",
+        "SIGNALFX_API_TOKEN": "<redacted>",
+        "SIGNALFX_REALM": "us1",
+        "SENTRY_API_TOKEN": "<redacted>",
+        "SPLUNK_TIMEOUT": "60000"
+      }
+    }
+  }
+}
