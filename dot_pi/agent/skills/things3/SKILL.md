@@ -20,6 +20,9 @@ Resolve relative paths from this skill directory.
 
 ```bash
 ./scripts/things3-url.py doctor
+./scripts/things3-url.py inbox
+./scripts/things3-url.py list today --limit 10
+./scripts/things3-url.py search "insurance"
 ./scripts/things3-url.py add-todo "Call dentist" --when tomorrow --tag Home
 ./scripts/things3-url.py add-project "Trip planning" --area Personal --todo "Book flights" --todo "Check passports"
 ./scripts/things3-url.py import-json ./payload.json
@@ -31,6 +34,21 @@ Use `--dry-run` to print the `things:///` URL without opening Things:
 ```bash
 ./scripts/things3-url.py add-todo "Review PR" --when today --dry-run
 ```
+
+## Reading todos
+
+Use the helper instead of writing ad hoc AppleScript.
+
+```bash
+./scripts/things3-url.py inbox                         # Inbox titles
+./scripts/things3-url.py list today --limit 10          # Built-in list titles
+./scripts/things3-url.py list upcoming --limit 20
+./scripts/things3-url.py search "renewal" --limit 10
+```
+
+Supported built-in lists: `inbox`, `today`, `upcoming`, `anytime`, `someday`, `logbook`, `trash`.
+
+These read commands use Things' AppleScript dictionary and print one title per line. If richer reads/metadata are needed, use the full MCP option in `references/things-mcp.md`.
 
 ## Creating todos
 

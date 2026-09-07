@@ -2,8 +2,8 @@
 """Small Pi-friendly Things 3 helper using Things URL scheme.
 
 This intentionally avoids storing tokens. It can create tasks/projects via
-Things' unauthenticated add/json URLs and open Things views. Reads/updates are
-not implemented here because robust reads require MCP/SQLite + macOS TCC access.
+Things' unauthenticated add/json URLs, open Things views, and perform simple
+read-only list/search operations through Things' AppleScript dictionary.
 """
 from __future__ import annotations
 
@@ -22,6 +22,14 @@ def run_open(url: str, dry_run: bool) -> None:
         return
     subprocess.run(["open", "-g", url], check=True)
     print("Opened Things URL")
+
+
+def run_osascript(script: str) -> str:
+    return subprocess.check_output(["osascript", "-e", script], text=True, timeout=30).strip()
+
+
+def applescript_string(value: str) -> str:
+    return '"' + value.replace('\\', '\\\\').replace('"', '\\"') + '"'
 
 
 def compact_dict(d: dict[str, Any]) -> dict[str, Any]:
@@ -98,8 +106,67 @@ def show(args: argparse.Namespace) -> None:
     if target in {"inbox", "today", "upcoming", "anytime", "someday", "logbook"}:
         url = f"things:///show?id={target}"
     else:
-        url = "things:///show?" + urllib.parse.urlencode({"query": target})
+        url = "things:///show?" + urllib.parse.urlencode({"query": target}, quote_via=urllib.parse.quote)
     run_open(url, args.dry_run)
+
+
+def list_todos(args: argparse.Namespace) -> None:
+    list_names = {
+        "inbox": "Inbox",
+        "today": "Today",
+        "upcoming": "Upcoming",
+        "anytime": "Anytime",
+        "someday": "Someday",
+        "logbook": "Logbook",
+        "trash": "Trash",
+    }
+    list_name = list_names[args.list]
+    limit = max(args.limit, 0)
+    script = f'''
+tell application "Things3"
+  set out to ""
+  set n to 0
+  repeat with t in to dos of list {applescript_string(list_name)}
+    set n to n + 1
+    if {limit} is 0 or n ≤ {limit} then
+      set out to out & name of t & linefeed
+    end if
+  end repeat
+  if out is "" then
+    return "(empty)"
+  else
+    return out
+  end if
+end tell
+'''
+    print(run_osascript(script))
+
+
+def search_todos(args: argparse.Namespace) -> None:
+    query = args.query.lower()
+    limit = max(args.limit, 0)
+    script = f'''
+tell application "Things3"
+  set out to ""
+  set n to 0
+  repeat with t in to dos
+    set todoName to name of t
+    set todoNotes to notes of t
+    if (todoName as text) contains {applescript_string(query)} or (todoNotes as text) contains {applescript_string(query)} then
+      set n to n + 1
+      if {limit} is 0 or n ≤ {limit} then
+        set out to out & todoName & linefeed
+      end if
+    end if
+  end repeat
+  if out is "" then
+    return "(empty)"
+  else
+    return out
+  end if
+end tell
+'''
+    print(run_osascript(script))
 
 
 def doctor(_: argparse.Namespace) -> None:
@@ -150,6 +217,20 @@ def main() -> None:
     s = sub.add_parser("show", parents=[common_parent], help="open a Things list or search")
     s.add_argument("target", help="inbox/today/upcoming/anytime/someday/logbook or search text")
     s.set_defaults(func=show)
+
+    lt = sub.add_parser("list", help="print to-do titles from a Things built-in list")
+    lt.add_argument("list", choices=["inbox", "today", "upcoming", "anytime", "someday", "logbook", "trash"])
+    lt.add_argument("--limit", type=int, default=0, help="maximum rows to print; 0 means all")
+    lt.set_defaults(func=list_todos)
+
+    inbox = sub.add_parser("inbox", help="print Things Inbox to-do titles")
+    inbox.add_argument("--limit", type=int, default=0, help="maximum rows to print; 0 means all")
+    inbox.set_defaults(func=lambda args: list_todos(argparse.Namespace(list="inbox", limit=args.limit)))
+
+    st = sub.add_parser("search", help="print matching to-do titles")
+    st.add_argument("query")
+    st.add_argument("--limit", type=int, default=0, help="maximum rows to print; 0 means all")
+    st.set_defaults(func=search_todos)
 
     d = sub.add_parser("doctor", help="check local prerequisites")
     d.set_defaults(func=doctor)
