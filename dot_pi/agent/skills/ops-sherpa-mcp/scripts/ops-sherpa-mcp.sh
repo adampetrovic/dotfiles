@@ -40,10 +40,9 @@ if (( ${#missing[@]} > 0 )) && [[ -z "${OPS_SHERPA_MISE_REEXEC:-}" ]] && command
 fi
 
 if (( ${#missing[@]} > 0 )); then
-  printf 'Ops Sherpa MCP missing required environment variables:\n' >&2
+  printf 'Ops Sherpa MCP warning: some integration environment variables are missing; affected tools may be unavailable:\n' >&2
   printf '  %s\n' "${missing[@]}" >&2
-  printf 'Configure them in global mise or the MCP client env block.\n' >&2
-  exit 2
+  printf 'Continuing so SLauth/atlas-backed tools such as Splunk can still be used.\n' >&2
 fi
 
 exec npx --yes "$PACKAGE"

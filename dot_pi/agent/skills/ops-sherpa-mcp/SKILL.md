@@ -35,7 +35,7 @@ Required local/runtime dependencies:
 atlas slauth token --aud splunk.paas-inf.net --ttl 1h --groups atlassian-all --mfa
 ```
 
-SLauth tokens are short-lived. Never print them in summaries, logs, pull requests, or tickets.
+SLauth tokens are short-lived. Never print them in summaries, logs, pull requests, or tickets. For Ops Sherpa MCP, do not store the printed SLauth token in `mise` or MCP JSON; Ops Sherpa uses SLauth through the `atlas` CLI, and running the command refreshes/proves your local SLauth/MFA session for about an hour.
 
 Use the helper for local readiness checks:
 

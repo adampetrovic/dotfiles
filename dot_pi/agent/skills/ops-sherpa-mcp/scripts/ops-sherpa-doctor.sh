@@ -31,6 +31,11 @@ else
   say "OK atlas: $(command -v atlas)"
   say "Hint: run 'atlas packages secrets' if npx cannot resolve @atlassian/ops-sherpa."
   say "Hint: refresh Splunk SLauth with: atlas slauth token --aud splunk.paas-inf.net --ttl 1h --groups atlassian-all --mfa"
+  if atlas slauth token --aud splunk.paas-inf.net --ttl 1h --groups atlassian-all --cached >/dev/null 2>&1; then
+    say "OK Splunk SLauth: cached token available (value not printed)"
+  else
+    warn "Splunk SLauth cached token not available; run the atlas slauth token command with --mfa when using Splunk tools"
+  fi
 fi
 
 required_env=(
@@ -43,6 +48,21 @@ required_env=(
   SENTRY_API_TOKEN
   SPLUNK_TIMEOUT
 )
+
+missing_names=()
+for name in "${required_env[@]}"; do
+  if [[ -z "${!name:-}" ]]; then
+    missing_names+=("$name")
+  fi
+done
+
+# Match the MCP launcher: if the current shell has not loaded mise env, retry
+# once through mise before reporting missing variables. Do not print mise env;
+# it may contain secrets.
+if (( ${#missing_names[@]} > 0 )) && [[ -z "${OPS_SHERPA_DOCTOR_MISE_REEXEC:-}" ]] && command -v mise >/dev/null 2>&1; then
+  export OPS_SHERPA_DOCTOR_MISE_REEXEC=1
+  exec mise exec -- "$0" "$@"
+fi
 
 missing=0
 for name in "${required_env[@]}"; do
