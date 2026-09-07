@@ -212,33 +212,95 @@ search `sliver_tdp-os-archetype_prod` (tdp-os-prod-east-01 OR shard=tdp-os-prod-
 - If that returns zero, run a bounded field-discovery/sample query against `` `sliver_tdp-os-archetype_prod` `` for the same ≤15-30 minute window to identify the correct shard/cell field before broadening.
 - For service-only Micros logs where Sliver macro is not applicable, fall back to `` `micros_<service>` `` with application-log sidecar exclusions.
 
-#### TDP OS log fields and slices
+#### TDP OS application log fields and slices
 
-Observed against `tdp-os-stg-east-01` with `` `sliver_tdp-os-archetype_staging` ``:
+Observed against `tdp-os-stg-east-01` with `` `sliver_tdp-os-archetype_staging` `` and confirmed from `~/code/tdp-os` logging classes.
 
-Core fields:
+Use this taxonomy to avoid confusing common log-envelope fields with custom application fields emitted by individual log statements.
 
-- `m.si` = Micros service ID (`micros_service_id`), e.g. `tdp-os-stg-east-01` or `tdp-os-prod-east-01`. Prefer this over free-text shard matching once discovered.
+##### Log slices
+
+- **Main OS application logs:** `m.t=application micros_container=tdpos`. Use this by default for product/application behavior.
+- **OS support application containers:** `m.t=application (micros_container=hofund OR micros_container=uploader)`.
+- **Platform/sidecar logs:** `micros_container=platform-*`; examples include `platform-statsd-psapi`, `platform-service-proxy-ingress`, `platform-metricshostagent`, `platform-tracing-psapi`, and `platform-tcs`.
+- **System/kernel/syslog-like logs:** `m.t=syslog micros_container=platform-logging`.
+
+Only include `platform-*` or `m.t=syslog` when investigating sidecar, proxy, logging pipeline, host, kernel, or infrastructure symptoms.
+
+##### Platform / Micros envelope fields
+
+These fields are common logging/Splunk/Micros envelope fields, not custom per-call-site fields:
+
+- `_time` = Splunk event timestamp.
 - `env` = Micros environment, e.g. `stg-east`, `prod-east`.
 - `m.t` = log type, e.g. `application`, `platform`, `syslog`.
+- `m.si` = Micros service ID (`micros_service_id`), e.g. `tdp-os-stg-east-01` or `tdp-os-prod-east-01`. Prefer this over free-text shard matching once discovered.
+- `m.sv` = service version/build metadata; useful for deploy correlation when populated.
+- `m.g` = Micros group/archetype-ish metadata.
+- `m.di` = deployment/runtime identity metadata.
 - `micros_container` = container/source within the shard.
-- `ec2.sn` = deployment-ish service node name including shard, env, build number, commit-ish ID, UTC build/deploy timestamp, and EC2 suffix.
-- `host` = backing EC2 host/IP name.
-- Application fields commonly include `level`, `logger_name`, `md.httpStatus`, `md.httpMethod`, `md.exceptionType`, `md.Atl-TraceId`, and many OS domain fields under `md.*`.
+- `host` = backing host/IP name.
+- `source`, `sourcetype`, `index` = Splunk source metadata; usually unnecessary when using Sliver macros.
+- `ec2.az`, `ec2.id`, `ec2.ip`, `ec2.hn`, `ec2.sn` = EC2/runtime metadata. `ec2.sn` is especially useful for build/deploy correlation because it contains shard, env, build number, commit-ish ID, UTC timestamp, and EC2 suffix.
 
-Important SPL dot-field rule: for aggregation, rename dotted fields first rather than grouping on them directly:
+##### Standard log event fields
+
+These are common log-framework/encoder fields:
+
+- `level` = log level.
+- `logger_name` = logger/class name. Useful for grouping noisy code paths.
+- `message` = human log message.
+- `stackTrace` or exception-related top-level fields = throwable details when the log call includes an exception.
+- `thread_name` or similar thread fields, when emitted by the Micros JSON encoder.
+
+##### TDP OS common context fields
+
+TDP OS `StructuredLogger` / `CoStructuredLogger` merges a common logging context under `os`, while additional per-log properties go under `md`. Common `os.*` fields include:
+
+- `os.pId` = partition ID.
+- `os.iss` = issuer.
+- `os.sub` = subject.
+- `os.ti` = ASAP token ID.
+- `os.tCl` = traffic class.
+- `os.bK` = bucket key.
+- `os.oId` = object ID.
+- `os.uId` = upload ID.
+- `os.r.p` = request path or route pattern.
+- `os.r.m` = request HTTP method.
+- `os.r.qP` = request query parameters when captured.
+- `os.tId` = trace ID.
+- `os.spId` = HTTP server span ID.
+- `os.git.commitId`, `os.git.branch` = non-prod common properties only; prod omits them because the commit can be found via service version metadata.
+
+##### Access-log exception
+
+Normal application logs should treat `md.*` as custom per-log properties. Access logs are the main exception: `AccessLogConfiguration` emits a consistent access-log shape with common `md.*` fields such as:
+
+- `md.accessTime`
+- `md.httpMethod`
+- `md.path`
+- `md.httpStatus`
+- `md.duration`
+- `md.requestLength`
+- `md.responseLength`
+- `md.userAgent`
+- `md.protocol`
+- `md.requestTraceId`
+- `md.Atl-TraceId`
+- `md.baggage` with an allowlisted subset of baggage entries
+
+##### Custom field guardrail
+
+For non-access application logs, do **not** assume arbitrary `md.*` fields are common. `StructuredLogger` and `CoStructuredLogger` place call-site additional properties under `md`, so fields like `md.exceptionType`, `md.httpStatus`, object/version fields, queue names, migration fields, or domain-specific IDs may be useful but are controlled by the code emitting that specific log.
+
+##### SPL dot-field rule
+
+For aggregation, rename dotted fields first rather than grouping on them directly:
 
 ```spl
-| rename m.si as micros_service_id m.t as log_type ec2.sn as ec2_service_name
+| rename m.si as micros_service_id m.t as log_type ec2.sn as ec2_service_name os.pId as partition_id os.tId as trace_id
 | stats count by micros_service_id env micros_container log_type
 ```
-
-TDP OS slice defaults:
-
-- Main OS application logs: `m.t=application micros_container=tdpos`.
-- OS support application containers: `m.t=application (micros_container=hofund OR micros_container=uploader)`.
-- Platform/sidecar logs: `micros_container=platform-*`; examples include `platform-statsd-psapi`, `platform-service-proxy-ingress`, `platform-metricshostagent`, `platform-tracing-psapi`, and `platform-tcs`.
-- System/kernel/syslog-like logs: `m.t=syslog micros_container=platform-logging`.
 
 Recommended first-pass shard query:
 
@@ -255,8 +317,6 @@ search `sliver_tdp-os-archetype_staging` tdp-os-stg-east-01
 | stats count dc(host) as hosts values(micros_container) as containers by micros_service_id env log_type
 | sort - count
 ```
-
-Use `tdpos` + `m.t=application` for product/application behavior. Only include `platform-*` or `m.t=syslog` when investigating sidecar, proxy, logging pipeline, host, kernel, or infrastructure symptoms.
 
 ### 4. Change and deployment correlation
 
