@@ -1,12 +1,11 @@
-{{- $work := .work | default false -}}
 {
   "toolDescriptionMode": "compact",
   "agentMentions": "direct",
   "reportUsage": true,
   "showCost": true,
   "showModel": true,
-  "maxConcurrent": {{ if $work }}6{{ else }}4{{ end }},
-  "maxConcurrentForeground": {{ if $work }}3{{ else }}2{{ end }},
+  "maxConcurrent": {{ if .work }}6{{ else }}4{{ end }},
+  "maxConcurrentForeground": {{ if .work }}3{{ else }}2{{ end }},
   "schedulingEnabled": false,
   "workflowsEnabled": false,
   "worktreeIsolation": false,
