@@ -1,156 +1,159 @@
 ---
 name: logseq
-description: Use the official Logseq CLI and local HTTP API server to query, search, and append to the currently open Logseq graph. Use for Logseq pages, blocks, tasks, graph queries, and Pi Agent notes.
+description: Query and manage Logseq DB graphs with the official Logseq CLI. Use for Logseq pages, blocks, journals, tasks, searches, graph queries, and saving Pi session notes.
 ---
 
 # Logseq CLI Skill
 
-Use the **official Logseq CLI** (`@logseq/cli`) against the locally running Logseq desktop HTTP API server.
+Use the official `logseq` CLI against Logseq DB graphs. The CLI talks to Logseq's DB worker; it does not require the desktop HTTP API or `LOGSEQ_API_SERVER_TOKEN`.
 
-## Current Setup
+## Start Here
 
-- Logseq stable desktop: `0.10.15`
-- Official CLI: `@logseq/cli@0.4.3`
-- API server: `http://127.0.0.1:12315/api`
-- Token is stored in Logseq settings and must be available as `LOGSEQ_API_SERVER_TOKEN`.
-- The CLI requires Node `>=22.17.0`; in pi sessions use `mise exec node@22 -- ...` if `node` resolves to v20.
-
-Check availability:
+Check the installation and available graphs:
 
 ```bash
-mise exec node@22 -- logseq -v
-curl -s -i http://127.0.0.1:12315/ | head
+logseq doctor
+logseq graph list -o json
 ```
 
-## Preferred Commands
-
-### Query current graph
-
-Use official CLI query for reads/tasks/Datalog:
+Select the requested graph explicitly with `-g`. If there is only one graph, use it. If several graphs exist and the target is unclear, ask the user.
 
 ```bash
-mise exec node@22 -- logseq query '(task TODO)'
-mise exec node@22 -- logseq query '(task DOING)'
-mise exec node@22 -- logseq query '[:find (pull ?b [*]) :where [?b :block/marker "TODO"]]'
+GRAPH="fy27-notes"
+logseq -g "$GRAPH" graph info -o json
 ```
 
-`logseq query` automatically uses `$LOGSEQ_API_SERVER_TOKEN` when set. You can also pass `-a "$LOGSEQ_API_SERVER_TOKEN"` explicitly.
+Prefer `-o json` for parsing. Run `logseq <command> --help` or `logseq example` before using an unfamiliar mutation.
 
-### Append to current page
-
-Use official CLI append for simple additions to the page currently open in Logseq:
+## Read and Search
 
 ```bash
-mise exec node@22 -- logseq append "Text to append"
+# Search pages and blocks
+logseq -g "$GRAPH" search page --content "incident" -o json
+logseq -g "$GRAPH" search block --content "BLOB-4260" -o json
+
+# Show a page or block tree
+logseq -g "$GRAPH" show --page "Project Notes" --level 3 -o json
+logseq -g "$GRAPH" show --id 123 --level 3 -o json
+logseq -g "$GRAPH" show --uuid 11111111-1111-1111-1111-111111111111 -o json
+
+# Include page hierarchy or linked references when useful
+logseq -g "$GRAPH" show --page "Project Notes" --page-hierarchy true --linked-references true -o json
+
+# List tasks
+logseq -g "$GRAPH" list task --status todo --limit 100 -o json
+logseq -g "$GRAPH" list task --content "release" --sort updated-at --order desc -o json
 ```
 
-### Search current graph
-
-Do **not** use `logseq search` on stable `0.10.15` directly. The released CLI expects API search blocks to contain `title`, but stable returns `block/content`, causing:
-
-```text
-Cannot read properties of null (reading 'replace')
-```
-
-Use the bundled workaround instead:
+For structured or relationship-heavy retrieval, use Datascript:
 
 ```bash
-node ~/.pi/agent/skills/logseq/scripts/logseq-search.mjs --limit 20 "Pi Agent"
-node ~/.pi/agent/skills/logseq/scripts/logseq-search.mjs --json "search terms"
+logseq -g "$GRAPH" query --query '[:find [?e ...] :where [?e :block/name]]' -o json
+logseq -g "$GRAPH" query --name recent-updated --inputs '[30]' -o json
+logseq -g "$GRAPH" query list -o json
 ```
 
-The workaround calls the same official Logseq API method (`logseq.app.search`) and normalizes stable response fields.
+## Pages and Blocks
 
-## Official CLI Help
+Create or update a page, then add content to it:
 
 ```bash
-mise exec node@22 -- logseq -h
-mise exec node@22 -- logseq query -h
-mise exec node@22 -- logseq append -h
-mise exec node@22 -- logseq export-edn -h
-mise exec node@22 -- logseq import-edn -h
+logseq -g "$GRAPH" upsert page --page "Pi Agent/Example" --update-tags '["pi-agent"]' -o json
+logseq -g "$GRAPH" upsert block --target-page "Pi Agent/Example" --pos last-child --content "Summary text" -o json
 ```
 
-Useful API-mode commands:
+Update an existing block using its stable ID or UUID:
 
 ```bash
-mise exec node@22 -- logseq query '(task TODO)'
-mise exec node@22 -- logseq append "note text"
-mise exec node@22 -- logseq export-edn -f /tmp/logseq-export.edn
-mise exec node@22 -- logseq import-edn -f /path/to/file.edn
-mise exec node@22 -- logseq mcp-server
+logseq -g "$GRAPH" upsert block --id 123 --content "Updated text" -o json
+logseq -g "$GRAPH" upsert block --uuid "$UUID" --content "Updated text" -o json
 ```
 
-## Pi Agent Page Namespace
+For several nested blocks, write EDN to a temporary file and use `--blocks-file` rather than fighting shell quoting:
 
-All pages created by pi-agent **must** live under the `Pi Agent/` namespace. This keeps agent-generated content grouped under the `[[Pi Agent]]` parent page.
-
-Rules:
-
-- Page titles: always prefix with `Pi Agent/`, e.g. `Pi Agent/Coffee Switch OTA Failure`
-- Filenames for manual file writes: use `Pi Agent___`, e.g. `pages/Pi Agent___Coffee Switch OTA Failure.md`
-- Journal links: use the full namespaced title, e.g. `[[Pi Agent/My Page Title]]`
-
-## Writing Format for Pi Agent Pages
-
-Follow the flat narrative style used by `[[Pi Agent/Financial Advisor Meeting Narrative]]`.
-
-Rules:
-
-- Use Logseq page properties at the top: `tags::`, `date::` or `created::`, `source::` when relevant.
-- Do **not** add a markdown H1/H2/H3 heading inside the page body.
-- Do **not** use sections like `## Summary` or `# Title`.
-- Structure content as a flat set of top-level bullets with bolded labels, for example `- **Purpose**: ...`.
-- Use nested bullets only for details under a bolded top-level label.
-- Prefer narrative prose over report-style headings.
-
-Manual page file example:
-
-```markdown
-<!-- File: pages/Pi Agent___My New Page.md -->
-tags:: pi-agent
-created:: 2026-05-14
-source:: [[Pi Agent]]
-- **Purpose**: Briefly explain why this page exists.
-- **Context**:
-  - Supporting detail goes here.
-  - Another supporting detail goes here.
-- **Outcome**: Summarise the decision, result, or next step.
+```bash
+logseq -g "$GRAPH" upsert block --target-page "Pi Agent/Example" --pos last-child --blocks-file /tmp/logseq-blocks.edn -o json
 ```
 
-## When to Use File Writes Instead
+Inspect the resulting page or returned IDs after every write.
 
-The released official CLI is limited on stable Logseq. Continue using direct file writes for:
+## Tasks
 
-- Creating structured `Pi Agent/...` pages
-- Large multi-block documents
-- Precise edits to existing Markdown files
-- Cases where the current open page is not the desired append target
+```bash
+# Create
+logseq -g "$GRAPH" upsert task \
+  --target-page "Weekly Plan" \
+  --content "Ship release" \
+  --status todo \
+  --priority high \
+  -o json
 
-After direct file writes, Logseq will pick up the file changes from the graph directory.
+# Update by stable ID
+logseq -g "$GRAPH" upsert task --id 123 --status doing -o json
+
+# Remove selected task fields
+logseq -g "$GRAPH" upsert task --id 123 --no-priority --no-deadline -o json
+```
+
+Use ISO timestamps for `--scheduled` and `--deadline`.
+
+## Journals
+
+Target journals deterministically; do not rely on whichever page is open in Logseq.
+
+Convert the Sydney-local date to `YYYYMMDD`, then find the journal page:
+
+```bash
+DAY="20260916"
+logseq -g "$GRAPH" query \
+  --query "[:find (pull ?p [*]) :where [?p :block/journal-day $DAY]]" \
+  -o json
+```
+
+Use the returned page name or ID as the `upsert block` target. Create a parent block first when adding a structured entry, then add children with `--target-id <id> --pos last-child`. Verify the inserted IDs with `show` or a query.
+
+## Saving a Pi Session
+
+When asked to save or summarise the current Pi session:
+
+1. Summarise the conversation directly; do not call a second model.
+2. Use a concise title under the `Pi Agent/` namespace.
+3. Create or update that page with `upsert page` and `upsert block`.
+4. Add a concise entry to today's journal linking to `[[Pi Agent/<Title>]]`.
+5. Search the journal first to avoid duplicate links.
+6. Verify both the page and journal entry after writing.
+
+Write Logseq-native blocks, not Markdown files. Keep the structure relatively flat, use complete sentences and Australian English, and avoid Markdown headings inside blocks.
+
+## Mutation Safety
+
+- Inspect before mutating and verify afterwards.
+- Prefer stable IDs or UUIDs when updating existing entities.
+- Search for an existing page/block before creating a duplicate.
+- Ask for confirmation before deleting pages, deleting multiple blocks, restoring backups, importing graphs, or performing broad updates.
+- Never infer the target graph when multiple graphs exist.
+- Do not edit Logseq's DB files directly.
+
+Deletion commands, only after confirmation:
+
+```bash
+logseq -g "$GRAPH" remove block --id 123 -o json
+logseq -g "$GRAPH" remove page --page "Old Page" -o json
+```
 
 ## Troubleshooting
 
-### API auth failure
-
-Ensure the token exists and is exported:
-
 ```bash
-export LOGSEQ_API_SERVER_TOKEN='...'
+logseq doctor
+logseq server list
+logseq server restart -g "$GRAPH"
+logseq graph validate -g "$GRAPH"
 ```
 
-### API server not reachable
-
-In Logseq desktop, enable **Settings → Features → HTTP API server**.
-
-### Search crashes
-
-Expected on stable if using `logseq search`. Use:
+If a command's shape has changed, trust the installed CLI help:
 
 ```bash
-node ~/.pi/agent/skills/logseq/scripts/logseq-search.mjs "terms"
+logseq --help
+logseq <command> --help
+logseq example
 ```
-
-### Nightly note
-
-Logseq nightly `2.0.1-alpha` returns a newer search shape where official `logseq search` works, but it is DB-graph alpha software. Stay on stable for the main graph unless explicitly testing on a copy.
