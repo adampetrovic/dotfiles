@@ -62,6 +62,20 @@ jj diff --stat               # summary only
 
 Prefer `--git` when reviewing, quoting, or parsing output; the default formatter may be customized and harder to read in agent transcripts.
 
+#### Bounded diff inspection for agents
+
+Do **not** start with an unrestricted `jj diff --git` when the change size is unknown, and do not pass multiple files or a directory to it if the combined patch may be large. Large unified diffs waste context and can be truncated before the useful section.
+
+Use this progressive workflow instead:
+
+```bash
+jj diff --stat                         # establish scope and identify changed paths
+jjc hunks                              # compact hunk inventory for text changes
+jjc hunks <ID> --full                  # inspect only the relevant hunk
+```
+
+Only use `jj diff --git -- <path>` after the stat or hunk inventory shows that the result is small, or when exact whole-file patch context is genuinely needed. Inspect one bounded path at a time. For large files or several paths, continue hunk-by-hunk with `jjc`; use targeted `read` calls for surrounding source context rather than ingesting the complete patch.
+
 ### Squash (move changes into parent)
 ```bash
 jj squash -m "combined message"                  # squash @ into @- without opening an editor
