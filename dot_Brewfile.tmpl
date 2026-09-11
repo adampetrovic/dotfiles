@@ -1,7 +1,6 @@
 {{/* base level packages for all environments */}}
 {{- $taps := list
-    "adampetrovic/tap"
-    "lucasgelfond/zerobrew" -}}
+    "adampetrovic/tap" -}}
 
 {{- $customTaps := dict -}}
 
@@ -60,8 +59,9 @@
 {{-  $casks = concat $casks (list
     "1password"
     "1password-cli"
+    "adobe-creative-cloud"
     "bambu-studio"
-    "claude-code"
+    "brave-browser"
     "helium-browser"
     "home-assistant"
     "istat-menus"
