@@ -20,15 +20,16 @@ export K9S_CONFIG_DIR=~/.config/k9s
 eval "$(/opt/homebrew/bin/brew shellenv)"
 export PATH=$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
 
-# Disable zsh's native history; Atuin owns command history/search/autosuggestions.
-unset HISTFILE
-HISTSIZE=0
-SAVEHIST=0
-unsetopt APPEND_HISTORY EXTENDED_HISTORY INC_APPEND_HISTORY INC_APPEND_HISTORY_TIME SHARE_HISTORY 2>/dev/null
+# Keep native history for immediate Up/Down recall; Atuin provides synced search and autosuggestions.
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt APPEND_HISTORY EXTENDED_HISTORY INC_APPEND_HISTORY SHARE_HISTORY
+setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
-# Load Atuin before zsh-autosuggestions so suggestions never fall back to native zsh history.
+# Load Atuin before zsh-autosuggestions, but preserve zsh's native Up/Down bindings.
 if command -v atuin >/dev/null 2>&1; then
-    eval "$(atuin init zsh)"
+    eval "$(atuin init zsh --disable-up-arrow)"
 fi
 
 # Load theme first
