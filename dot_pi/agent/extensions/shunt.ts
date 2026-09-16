@@ -17,7 +17,7 @@ import {
 	withFileMutationQueue,
 } from "@earendil-works/pi-coding-agent";
 
-const DEFAULT_WORKER_MODEL = "openai-codex/gpt-5.4-mini";
+const DEFAULT_WORKER_MODEL = "openai-codex/gpt-5.6-luna";
 const DEFAULT_MIN_LINES = 350;
 const DEFAULT_MIN_BYTES = 24 * 1024;
 const DEFAULT_MAX_TARGETED_LINES = 250;

@@ -1,8 +1,19 @@
 {
-  "lastChangelogVersion": "0.84.1",
+  "lastChangelogVersion": "0.85.1",
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.5",
-  "defaultThinkingLevel": "xhigh",
+  "defaultThinkingLevel": "medium",
+  "compaction": {
+    "enabled": true,
+    "reserveTokens": 32768,
+    "keepRecentTokens": 12000
+  },
+  "llm-wiki": {
+    "ambientPersonalVault": false,
+    "notices": false,
+    "recallLinksThreshold": 0,
+    "recallSkillInlineMax": 0
+  },
   "packages": [
     {
       "source": "https://github.com/mitsuhiko/agent-stuff",

@@ -3,5 +3,13 @@
   "agentMentions": "direct",
   "reportUsage": true,
   "showCost": true,
-  "showModel": true
+  "showModel": true,
+  "maxConcurrent": 4,
+  "maxConcurrentForeground": 2,
+  "schedulingEnabled": false,
+  "workflowsEnabled": false,
+  "worktreeIsolation": false,
+  "fallbackSubagent": "none",
+  "scopeModels": true,
+  "maxSubagentDepth": 1
 }
