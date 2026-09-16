@@ -99,11 +99,13 @@ Files prefixed with `encrypted_` and suffixed `.age` are age-encrypted.
 
 **Rules for encrypted files:**
 - NEVER copy plaintext into the chezmoi source directory
-- To update: `chezmoi encrypt <live-file> > <chezmoi-source-path>`
+- For encrypted non-templates: edit the live file, then run `chezmoi encrypt <live-file> > <chezmoi-source-path>`
+- For encrypted templates (`encrypted_*.tmpl.age`): decrypt to a private temporary file, edit and validate every profile there, then re-encrypt the template; do not encrypt the rendered live file
 - To verify: `chezmoi decrypt <source-file>`
+- Remove temporary plaintext files when finished
 - The age recipient key is in `.chezmoi.toml.tmpl`
 
-Currently encrypted: `dot_pi/agent/encrypted_AGENTS.md.age`
+Currently encrypted: `dot_pi/agent/encrypted_AGENTS.md.tmpl.age`
 
 ## Common Commands
 
