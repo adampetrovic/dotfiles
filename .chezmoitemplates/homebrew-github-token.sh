@@ -12,7 +12,7 @@ load_homebrew_github_api_token() {
         return 1
     fi
 
-    token="$({ keeper get --format=json "$record_title" 2>/dev/null || true; } | python3 -c '
+    token="$({ keeper get --format=json "$record_title" || true; } | python3 -c '
 import json
 import sys
 
