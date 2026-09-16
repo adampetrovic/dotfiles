@@ -8,20 +8,13 @@
     "reserveTokens": 32768,
     "keepRecentTokens": 12000
   },
-  "llm-wiki": {
-    "ambientPersonalVault": false,
-    "notices": false,
-    "recallLinksThreshold": 0,
-    "recallSkillInlineMax": 0
-  },
   "packages": [
     "npm:@juicesharp/rpiv-ask-user-question",
     "npm:@juicesharp/rpiv-todo",
     "npm:@juicesharp/rpiv-btw",
     "npm:@tintinweb/pi-subagents",
-    "npm:@juicesharp/rpiv-web-tools",
-    "npm:@juicesharp/rpiv-args",
-    "npm:@zosmaai/pi-llm-wiki"{{ if .personal }},
+    "npm:pi-web-access",
+    "npm:@juicesharp/rpiv-args"{{ if .personal }},
     "npm:@narumitw/pi-usage"{{ end }}
   ],
   "theme": "dark"
