@@ -6,4 +6,11 @@ log_step "Installing language runtimes (mise)"
 BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
 eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
+{{ if .work -}}
+# Authenticate GitHub API and artifact-attestation requests made by mise.
+export GITHUB_TOKEN={{ keeperFindPassword "Homebrew GitHub API Token" | quote }}
+{{ end -}}
 mise install
+{{ if .work -}}
+unset GITHUB_TOKEN
+{{ end -}}
