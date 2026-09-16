@@ -145,8 +145,9 @@ zi ice wait="1" lucid if'[[ -f $(brew --prefix)/share/work-scripts/aliases.zsh ]
     atload'source $(brew --prefix)/share/work-scripts/aliases.zsh'
 zi light zdharma-continuum/null
 
-zi wait lucid for \
-    has"atlas" \
-    atload'export KUBECONFIG=$(atlas kitt context:create --pid=$$)' \
-    zdharma-continuum/null
+# Lazily initialise the Atlas kubeconfig on first Kubernetes command use.
+# The timeout bounds failures when offline or disconnected from the VPN.
+zi ice has"atlas" trigger-load'!kubectl;!helm;!k9s' \
+    atload'local kubeconfig; kubeconfig=$(gtimeout --kill-after=1s 5s atlas kitt context:create --pid=$$ 2>/dev/null) && [[ -n $kubeconfig ]] && export KUBECONFIG=$kubeconfig'
+zi light zdharma-continuum/null
 {{ end -}}
