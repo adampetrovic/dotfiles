@@ -3,14 +3,13 @@
 
 set -eufo pipefail
 {{ template "log.sh" . }}
-{{ template "homebrew-github-token.sh" . }}
 log_step "Updating work-scripts"
 
 BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
 FORMULA="adampetrovic/tap/work-scripts"
 eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
-load_homebrew_github_api_token || exit 1
+export HOMEBREW_GITHUB_API_TOKEN={{ keeperFindPassword "Homebrew GitHub API Token" | quote }}
 export HOMEBREW_NO_ASK=1
 
 log_info "Updating Homebrew"
