@@ -12,10 +12,9 @@ eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 # needed for private homebrew tap
 export HOMEBREW_GITHUB_API_TOKEN="{{ (onepasswordRead "op://Private/Github/personal access token") }}"
 {{ else if .work -}}
-# needed for private homebrew tap. Work devices cannot use 1Password/op, so
-# export this from Keeper before running chezmoi until this template is fully
-# migrated to keeperFindPassword.
-: "${HOMEBREW_GITHUB_API_TOKEN:=}"
+# Read the token at execution time so it is never rendered into chezmoi state.
+{{ template "homebrew-github-token.sh" . }}
+load_homebrew_github_api_token || exit 1
 {{ end -}}
 [ -n "$HOMEBREW_GITHUB_API_TOKEN" ] || log_warn "HOMEBREW_GITHUB_API_TOKEN is empty — private/custom tap installs may fail"
 

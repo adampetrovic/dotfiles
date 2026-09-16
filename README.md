@@ -26,8 +26,9 @@ For work-profile `chezmoi apply` to be fully Keeper-backed, the remaining work i
    required by chezmoi's Keeper template functions (`keeper`,
    `keeperDataFields`, and `keeperFindPassword`).
 2. Create Keeper records for every work secret that chezmoi needs, then record
-   their Keeper UID or path names. At minimum this includes:
-   - GitHub/Homebrew token used for private taps such as `adampetrovic/tap/work-scripts`.
+   their Keeper UID or path names. For private Homebrew access, create a **Login**
+   record titled `Homebrew GitHub API Token` and put the token in its password
+   field. Other records still needed include:
    - Work sudo password if non-interactive sudo priming is still desired; otherwise `sudo -v` prompts interactively.
    - Any work WireGuard config if it should be managed by chezmoi.
    - Atuin sync settings, SOPS age identity, and encrypted Pi agent config if those should exist on work machines.
@@ -45,8 +46,7 @@ For work-profile `chezmoi apply` to be fully Keeper-backed, the remaining work i
    Bitbucket. Secure Enclave keys cannot be created via CLI. Git/Jujutsu commit
    signing remains disabled for work until a Secretive-compatible signing
    configuration is explicitly added.
-5. Once the Keeper records and signing approach are known, migrate these files:
-   - `.chezmoiscripts/run_onchange_after_10-install-packages.sh.tmpl`
+5. Once the remaining Keeper records and signing approach are known, migrate these files:
    - `.chezmoiscripts/run_onchange_after_90-install-wireguard-config.sh.tmpl`
    - `.chezmoitemplates/macos-sudo-prime.sh`
    - `.chezmoiignore.tmpl`
@@ -59,5 +59,7 @@ For work-profile `chezmoi apply` to be fully Keeper-backed, the remaining work i
    - `dot_config/sops/age/keys.txt.tmpl`
    - any ignored personal-only agent config that should exist on work machines
 
-Until those mappings exist, run work-profile apply with a Keeper-sourced
-`HOMEBREW_GITHUB_API_TOKEN` exported if private Homebrew taps are required.
+The package installation scripts read `HOMEBREW_GITHUB_API_TOKEN` directly
+from Keeper at execution time, so the token is not rendered into chezmoi state.
+Keeper Commander must be installed, logged in, and usable non-interactively
+before running a work-profile `chezmoi apply`.

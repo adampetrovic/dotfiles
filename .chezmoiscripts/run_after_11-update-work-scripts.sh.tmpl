@@ -1,0 +1,29 @@
+{{ if .work -}}
+#!/bin/bash
+
+set -eufo pipefail
+{{ template "log.sh" . }}
+{{ template "homebrew-github-token.sh" . }}
+log_step "Updating work-scripts"
+
+BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
+FORMULA="adampetrovic/tap/work-scripts"
+eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+
+load_homebrew_github_api_token || exit 1
+export HOMEBREW_NO_ASK=1
+
+log_info "Updating Homebrew"
+brew update
+brew fetch --HEAD --force "$FORMULA"
+if brew list --formula work-scripts >/dev/null 2>&1; then
+    brew upgrade --fetch-HEAD "$FORMULA"
+else
+    brew install --HEAD "$FORMULA"
+fi
+
+unset HOMEBREW_GITHUB_API_TOKEN
+WORK_SCRIPTS_PREFIX="$(brew --prefix work-scripts)"
+"$WORK_SCRIPTS_PREFIX/bin/sync-pi-skills" "$WORK_SCRIPTS_PREFIX/share/work-scripts/pi-skills"
+log_ok "work-scripts and packaged Pi skills are current"
+{{ end -}}
