@@ -17,9 +17,11 @@ Read secrets and credentials from 1Password using the `op` CLI. Requires the 1Pa
 
 - **Never log, print, or expose secrets** in chat, code, or files. Use `op read` or `op run` to inject secrets at runtime.
 - **Prefer `op run` / `op inject`** over writing secrets to disk.
-- **Verify access first**: run `op whoami` before attempting any secret reads.
+- **Prefer one long-running `op run`** for workflows that need repeated secret access.
+- **Verify access first** only when useful; avoid repeated `op whoami` preflights with desktop app integration because they can create extra prompts.
 - **If sign-in fails**: ask the user to unlock the 1Password desktop app, then retry.
 - **Use secret references** (`op://vault/item/field`) instead of raw values wherever possible.
+- For repeated non-interactive commands, read `references/session-handling.md`.
 
 ## Quick Start
 
@@ -110,3 +112,4 @@ op whoami
 
 - `references/get-started.md` — Installation and desktop app integration setup
 - `references/cli-examples.md` — Complete `op` CLI command examples
+- `references/session-handling.md` — Session-token caching, desktop integration caveats, and long-running `op run` patterns

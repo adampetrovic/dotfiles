@@ -27,7 +27,7 @@ The CLI reads all config from environment variables. Use `op run` to inject secr
 | `ACTUAL_ENCRYPTION_KEY` | No | E2E encryption password (if enabled) |
 | `ACTUAL_DATA_DIR` | No | Local cache dir (default: `/tmp/actual-budget-skill-cache`) |
 
-**The specific `op://` references and sync ID for this user are in AGENTS.md** — check there for the concrete `op run` invocation to use.
+Read `references/adam-budget-context.md` for Adam's concrete `op run` invocation, budget structure, account list, and Australian import quirks.
 
 ## Running Commands
 
@@ -37,7 +37,7 @@ All commands go through the CLI wrapper. The `op run` prefix injects secrets:
 op run --env-file=<env-file> -- node ~/.pi/agent/skills/actual-budget/scripts/actual.js <command> [args]
 ```
 
-Refer to AGENTS.md for the exact invocation with the user's 1Password references.
+Refer to `references/adam-budget-context.md` for the exact invocation with the user's 1Password references.
 
 ## Operating Rules
 
@@ -137,7 +137,7 @@ No bank sync is available in Australia. To import transactions:
 4. The `imported_id` field should be derived from date+amount+description for dedup
 5. Review uncategorized transactions and apply categories
 
-CommBank CSV columns: `Date, Amount, Description, Balance` (no unique transaction ID — OFX exports have broken empty FITIDs).
+CommBank CSV columns and other local quirks are documented in `references/adam-budget-context.md`.
 
 ## Tips
 
