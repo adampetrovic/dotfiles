@@ -64,6 +64,39 @@ warn_missing_self_service() {
     } >&2
 }
 
+ensure_work_age_identity() {
+    local identity_file="$HOME/.config/sops/age/keys.txt"
+    local identity_dir
+    local identity
+    local temp_file
+
+    if grep -Eq '^AGE-SECRET-KEY-1[0-9A-Za-z]+$' "$identity_file" 2>/dev/null; then
+        chmod 600 "$identity_file"
+        return
+    fi
+
+    if ! command -v keeper >/dev/null 2>&1; then
+        echo "Keeper Commander is required to provision the chezmoi age identity." >&2
+        return 1
+    fi
+
+    if ! identity="$(keeper find-password "Chezmoi Age Identity")"; then
+        echo "Unable to retrieve the chezmoi age identity from Keeper." >&2
+        return 1
+    fi
+    if [[ ! "$identity" =~ ^AGE-SECRET-KEY-1[0-9A-Za-z]+$ ]]; then
+        echo "Keeper record 'Chezmoi Age Identity' did not return a valid age identity." >&2
+        return 1
+    fi
+
+    identity_dir="$(dirname "$identity_file")"
+    mkdir -p "$identity_dir"
+    temp_file="$(mktemp "$identity_dir/.keys.txt.XXXXXX")"
+    chmod 600 "$temp_file"
+    printf '%s\n' "$identity" >"$temp_file"
+    mv "$temp_file" "$identity_file"
+}
+
 case "$(uname -s)" in
 Darwin)
     if ! command -v brew >/dev/null 2>&1 && [[ ! -x "$BREW_PREFIX/bin/brew" ]]; then
@@ -84,6 +117,8 @@ Darwin)
                 echo "Run 'keeper login' in an interactive terminal before rendering Keeper-backed templates."
             } >&2
         fi
+
+        ensure_work_age_identity
 
         if [ ! -d "/Applications/Keeper Password Manager.app" ] && [ ! -d "$HOME/Applications/Keeper Password Manager.app" ]; then
             missing_self_service=true

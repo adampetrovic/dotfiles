@@ -60,8 +60,9 @@ Work secrets are injected with chezmoi's Keeper template functions. Keeper Comma
 
 - `Homebrew GitHub API Token` — GitHub PAT in the standard Password field. Used as `HOMEBREW_GITHUB_API_TOKEN` for private Homebrew access and as `GITHUB_TOKEN` while `mise install` performs GitHub API and artifact-attestation requests.
 - `Work Mac Login` — macOS login password in the standard Password field. Used for work-profile sudo because corporate policy disables sudo timestamp caching (`sudo -v` succeeds but an immediate `sudo -n true` fails).
+- `Chezmoi Age Identity` — age private identity in the standard Password field. The work-profile pre-read hook provisions it to `~/.config/sops/age/keys.txt` before chezmoi decrypts encrypted source files.
 
-These values are rendered into generated run scripts. Never print rendered scripts, capture them in logs, or expose them in diffs. Safe lookup test:
+These values are consumed only at runtime by templates or the pre-read hook. Never print rendered secrets, capture them in logs, or expose them in diffs. Safe lookup test:
 
 ```bash
 chezmoi execute-template '{{ if (keeperFindPassword "Homebrew GitHub API Token") }}OK{{ else }}EMPTY{{ end }}'
