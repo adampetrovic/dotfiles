@@ -10,6 +10,8 @@ Chezmoi-managed dotfiles for macOS. Supports **personal** and **work** profiles 
 
 This repo uses **Jujutsu (jj)**, not Git. Use `jj` commands for all VCS operations.
 
+Always commit and push directly to `main` in this repository. Do not create feature branches, topic bookmarks, PR branches, or temporary push bookmarks here unless the user explicitly overrides this instruction.
+
 ## Key Files & Structure
 
 ```
