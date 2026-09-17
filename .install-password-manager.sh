@@ -9,8 +9,8 @@ fi
 
 profile="${1:-}"
 email="${2:-}"
-if [[ "$profile" != "personal" && "$profile" != "work" ]] || [[ -z "$email" ]]; then
-    echo "Usage: $0 personal|work email" >&2
+if [[ "$profile" != "personal" && "$profile" != "work" ]]; then
+    echo "Usage: $0 personal|work [email]" >&2
     exit 1
 fi
 
@@ -101,6 +101,10 @@ if ! accounts="$("$op_bin" account list 2>/dev/null)" || [[ -z "$accounts" ]]; t
         read -r -p "Press Enter to continue..."
     fi
 elif [[ "$accounts" != *my.1password.com* ]]; then
+    if [[ -z "$email" ]]; then
+        echo "An email argument is required to add the 1Password account." >&2
+        exit 1
+    fi
     "$op_bin" account add --address my.1password.com --email "$email"
 fi
 
