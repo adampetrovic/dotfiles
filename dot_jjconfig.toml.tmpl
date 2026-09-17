@@ -9,16 +9,17 @@ backend = "ssh"
 key = "{{ (onepasswordRead "op://Private/SSH Key - Personal/public_key") }}"
 backends.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
 backends.ssh.allowed-signers = "~/.config/git/allowed_ssh_signers"
-
-{{ end }}
+{{ end -}}
 [ui]
 editor = "vim"
 default-command = "log"
 diff-formatter = ["delta", "--dark", "$left", "$right"]
 
+{{- if .work }}
 [fix.tools.detekt]
 command = ["./gradlew", "detekt"]
 patterns = ["glob:'**/*.kt'"]
+{{ end -}}
 
 [git]
 auto-local-bookmark = false

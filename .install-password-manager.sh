@@ -2,180 +2,107 @@
 
 set -euo pipefail
 
-brew_prefix() {
-    if [[ "$(uname -m)" == "arm64" ]]; then
-        printf '/opt/homebrew'
-    else
-        printf '/usr/local'
-    fi
-}
-
-BREW_PREFIX="$(brew_prefix)"
-profile="${1:-${CHEZMOI_PROFILE:-}}"
-
-if [ -z "$profile" ]; then
-    for config_file in \
-        "${CHEZMOI_CONFIG_FILE:-}" \
-        "$HOME/.config/chezmoi/chezmoi.toml" \
-        "$HOME/Library/Application Support/chezmoi/chezmoi.toml"; do
-        [ -n "$config_file" ] || continue
-        [ -r "$config_file" ] || continue
-        profile="$(awk -F= '
-            $1 ~ /^[[:space:]]*profile[[:space:]]*$/ {
-                value=$2
-                sub(/^[[:space:]]*/, "", value)
-                sub(/[[:space:]]*$/, "", value)
-                gsub(/^"|"$/, "", value)
-                print value
-                exit
-            }
-        ' "$config_file")"
-        [ -n "$profile" ] && break
-    done
+if [[ "$(uname -s)" != "Darwin" ]]; then
+    echo "unsupported OS" >&2
+    exit 1
 fi
 
-case "$profile" in
-personal|work)
-    ;;
-*)
-    echo "Unable to determine chezmoi profile; refusing to install a password manager." >&2
-    echo "Set [data].profile in ~/.config/chezmoi/chezmoi.toml or export CHEZMOI_PROFILE=personal|work." >&2
+profile="${1:-}"
+email="${2:-}"
+if [[ "$profile" != "personal" && "$profile" != "work" ]] || [[ -z "$email" ]]; then
+    echo "Usage: $0 personal|work email" >&2
     exit 1
-    ;;
-esac
+fi
+
+if [[ "$(uname -m)" == "arm64" ]]; then
+    brew_prefix="/opt/homebrew"
+else
+    brew_prefix="/usr/local"
+fi
 
 banner_printed=false
 print_banner_once() {
-    if [ "$banner_printed" = false ]; then
+    if [[ "$banner_printed" == false ]]; then
         printf '\n\033[1;35m==> %s\033[0m\n' "Bootstrap prerequisite: Homebrew & password manager ($profile)" >&2
         banner_printed=true
     fi
 }
 
-warn_missing_self_service() {
+warn() {
     print_banner_once
-    {
-        echo "Work profile expects Keeper and Secretive to be installed via work Self Service, not Homebrew."
-        echo "Install these from Self Service if missing:"
-        echo "  - Keeper Password Manager"
-        echo "  - Keeper Commander CLI (provides the 'keeper' command for chezmoi Keeper templates)"
-        echo "  - Secretive (provides the Secure Enclave SSH agent)"
-        echo "After installing Secretive, launch it and create a Secure Enclave SSH key with Command+N."
-    } >&2
+    printf '%s\n' "$@" >&2
 }
 
-ensure_work_age_identity() {
-    local identity_file="$HOME/.config/sops/age/keys.txt"
-    local identity_dir
-    local identity
-    local temp_file
-
-    if grep -Eq '^AGE-SECRET-KEY-1[0-9A-Za-z]+$' "$identity_file" 2>/dev/null; then
-        chmod 600 "$identity_file"
-        return
-    fi
-
-    if ! command -v keeper >/dev/null 2>&1; then
-        echo "Keeper Commander is required to provision the chezmoi age identity." >&2
-        return 1
-    fi
-
-    if ! identity="$(keeper find-password "Chezmoi Age Identity")"; then
-        echo "Unable to retrieve the chezmoi age identity from Keeper." >&2
-        return 1
-    fi
-    if [[ ! "$identity" =~ ^AGE-SECRET-KEY-1[0-9A-Za-z]+$ ]]; then
-        echo "Keeper record 'Chezmoi Age Identity' did not return a valid age identity." >&2
-        return 1
-    fi
-
-    identity_dir="$(dirname "$identity_file")"
-    mkdir -p "$identity_dir"
-    temp_file="$(mktemp "$identity_dir/.keys.txt.XXXXXX")"
-    chmod 600 "$temp_file"
-    printf '%s\n' "$identity" >"$temp_file"
-    mv "$temp_file" "$identity_file"
+app_installed() {
+    [[ -d "/Applications/$1.app" || -d "$HOME/Applications/$1.app" ]]
 }
 
-case "$(uname -s)" in
-Darwin)
-    if ! command -v brew >/dev/null 2>&1 && [[ ! -x "$BREW_PREFIX/bin/brew" ]]; then
+warn_missing_self_service() {
+    warn \
+        "Work profile expects Keeper and Secretive to be installed via work Self Service, not Homebrew." \
+        "Install these from Self Service if missing:" \
+        "  - Keeper Password Manager" \
+        "  - Keeper Commander CLI (provides the 'keeper' command for chezmoi Keeper templates)" \
+        "  - Secretive (provides the Secure Enclave SSH agent)" \
+        "After installing Secretive, launch it and create a Secure Enclave SSH key with Command+N."
+}
+
+if ! command -v brew >/dev/null 2>&1 && [[ ! -x "$brew_prefix/bin/brew" ]]; then
+    print_banner_once
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+eval "$("$brew_prefix/bin/brew" shellenv)"
+
+if [[ "$profile" == "work" ]]; then
+    if ! command -v keeper >/dev/null 2>&1 || \
+        ! app_installed "Keeper Password Manager" || \
+        ! app_installed "Secretive"; then
+        warn_missing_self_service
+    fi
+
+    if command -v keeper >/dev/null 2>&1 && ! keeper whoami </dev/null >/dev/null 2>&1; then
+        warn \
+            "Keeper Commander is installed but not signed in for non-interactive use." \
+            "Run 'keeper login' in an interactive terminal before rendering Keeper-backed templates."
+    fi
+
+    secretive_socket="$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh"
+    if app_installed "Secretive" && [[ ! -S "$secretive_socket" ]]; then
+        warn \
+            "Secretive is installed, but its SSH agent socket is not present." \
+            "Launch Secretive or its SecretAgent login item."
+    fi
+
+    exit 0
+fi
+
+for cask in 1password 1password-cli; do
+    if ! brew list --cask "$cask" >/dev/null 2>&1; then
         print_banner_once
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew install --cask "$cask"
     fi
-    eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+done
 
-    if [ "$profile" = "work" ]; then
-        missing_self_service=false
-
-        if ! command -v keeper >/dev/null 2>&1; then
-            missing_self_service=true
-        elif ! keeper whoami </dev/null >/dev/null 2>&1; then
-            print_banner_once
-            {
-                echo "Keeper Commander is installed but not signed in for non-interactive use."
-                echo "Run 'keeper login' in an interactive terminal before rendering Keeper-backed templates."
-            } >&2
-        fi
-
-        ensure_work_age_identity
-
-        if [ ! -d "/Applications/Keeper Password Manager.app" ] && [ ! -d "$HOME/Applications/Keeper Password Manager.app" ]; then
-            missing_self_service=true
-        fi
-
-        if [ ! -d "/Applications/Secretive.app" ] && [ ! -d "$HOME/Applications/Secretive.app" ]; then
-            missing_self_service=true
-        elif [ ! -S "$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh" ]; then
-            print_banner_once
-            {
-                echo "Secretive is installed, but its SSH agent socket is not present."
-                echo "Launch Secretive or its SecretAgent login item."
-            } >&2
-        fi
-
-        if [ "$missing_self_service" = true ]; then
-            warn_missing_self_service
-        fi
-    else
-        if ! brew list --cask 1password >/dev/null 2>&1; then
-            print_banner_once
-            brew install --cask 1password
-        fi
-        if ! brew list --cask 1password-cli >/dev/null 2>&1; then
-            print_banner_once
-            brew install --cask 1password-cli
-        fi
-
-        OP_BIN="$(command -v op || printf '%s/bin/op' "$BREW_PREFIX")"
-        if [[ ! -x "$OP_BIN" ]]; then
-            echo "1Password CLI is not installed or not executable: $OP_BIN" >&2
-            exit 1
-        fi
-
-        accounts_file="$(mktemp)"
-        trap 'rm -f "$accounts_file"' EXIT
-        if ! "$OP_BIN" account list >"$accounts_file" 2>/dev/null || [[ ! -s "$accounts_file" ]]; then
-            print_banner_once
-            open -a '1Password' >/dev/null 2>&1 || true
-            {
-                echo "Be sure to setup your account(s) and vault(s) in 1Password."
-                echo "Then go to 'Settings > Developer' and enable 'Integrate with 1Password CLI'."
-                echo "Also go to 'Settings > Developer' and enable 'Use the SSH agent'."
-            } >&2
-            if [ -t 0 ]; then
-                read -r -p "Press Enter to continue..."
-            fi
-        elif ! grep -q 'my.1password.com' "$accounts_file"; then
-            "$OP_BIN" account add --address my.1password.com --email "adam@petrovic.com.au"
-        fi
-
-        "$OP_BIN" signin --account my >/dev/null || \
-            echo "1Password sign-in did not complete; unlock 1Password and re-run chezmoi apply if secret reads fail" >&2
-    fi
-    ;;
-*)
-    echo "unsupported OS" >&2
+op_bin="$(command -v op || printf '%s/bin/op' "$brew_prefix")"
+if [[ ! -x "$op_bin" ]]; then
+    echo "1Password CLI is not installed or not executable: $op_bin" >&2
     exit 1
-    ;;
-esac
+fi
+
+accounts=""
+if ! accounts="$("$op_bin" account list 2>/dev/null)" || [[ -z "$accounts" ]]; then
+    print_banner_once
+    open -a '1Password' >/dev/null 2>&1 || true
+    warn \
+        "Be sure to set up your account(s) and vault(s) in 1Password." \
+        "Then go to 'Settings > Developer' and enable 'Integrate with 1Password CLI'." \
+        "Also go to 'Settings > Developer' and enable 'Use the SSH agent'."
+    if [[ -t 0 ]]; then
+        read -r -p "Press Enter to continue..."
+    fi
+elif [[ "$accounts" != *my.1password.com* ]]; then
+    "$op_bin" account add --address my.1password.com --email "$email"
+fi
+
+"$op_bin" signin --account my >/dev/null || \
+    echo "1Password sign-in did not complete; unlock 1Password and re-run chezmoi apply if secret reads fail" >&2

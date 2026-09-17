@@ -1,5 +1,6 @@
 {{/* profile detection */}}
-{{- $profile := promptStringOnce . "profile" "Profile (personal/work)" -}}
+{{- $profiles := list "personal" "work" -}}
+{{- $profile := promptChoiceOnce . "profile" "Select a profile" $profiles -}}
 {{- $email := promptStringOnce . "email" "What is your email address" -}}
 {{- $brewPrefix := "/usr/local" -}}
 {{- if eq .chezmoi.arch "arm64" -}}
@@ -24,4 +25,4 @@ encryption = "age"
 
 [hooks.read-source-state.pre]
     command = ".local/share/chezmoi/.install-password-manager.sh"
-    args = [{{ $profile | quote }}]
+    args = [{{ $profile | quote }}, {{ $email | quote }}]
