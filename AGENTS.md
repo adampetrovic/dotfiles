@@ -98,6 +98,8 @@ Currently encrypted: `dot_pi/agent/encrypted_AGENTS.md.tmpl.age`
 
 ```bash
 chezmoi apply              # Apply all dotfiles to $HOME
+chezmoi apply --dry-run --verbose ~/.jjconfig.toml  # Preview one managed target verbosely
+chezmoi apply --verbose ~/.jjconfig.toml            # Apply one managed target verbosely
 chezmoi diff               # Preview changes before applying
 chezmoi add <file>         # Add a new file to chezmoi
 chezmoi re-add <file>      # Re-add a changed file (non-encrypted only)
@@ -113,6 +115,6 @@ chezmoi managed            # List all managed files
 2. **Profile-aware edits**: When editing `.tmpl` files, preserve Go template syntax and conditionals.
 3. **Run scripts**: Scripts in `.chezmoiscripts/` execute during `chezmoi apply`. `run_onchange_` scripts re-run when their content changes — edit carefully.
 4. **Don't delete files**: A previous incident wiped 203 files from this repo. Always use targeted edits, never bulk operations on the source directory.
-5. **Test before pushing without leaking secrets**: Prefer `jj diff --stat`, `jjc hunks`, shell syntax checks, and profile rendering with mock password-manager commands. Do not run or share unrestricted `chezmoi diff` output because work run scripts contain rendered Keeper secrets. If destination comparison is necessary, exclude scripts and inspect output locally: `chezmoi diff --exclude=scripts`.
+5. **Test before pushing without leaking secrets**: Prefer `jj diff --stat`, `jjc hunks`, shell syntax checks, and profile rendering with mock password-manager commands. For an isolated managed-file change, preview it with `chezmoi apply --dry-run --verbose <target-path>`, then apply only that target with `chezmoi apply --verbose <target-path>`; use the destination path (for example, `~/.jjconfig.toml`), not the chezmoi source name. Do not run or share unrestricted `chezmoi diff` output because work run scripts contain rendered Keeper secrets. If destination comparison is necessary, exclude scripts and inspect output locally: `chezmoi diff --exclude=scripts`.
 6. **Password manager dependency**: The pre-hook (`.install-password-manager.sh`) installs 1Password for personal profiles only. Work Keeper Password Manager, Keeper Commander CLI, and Secretive installation is handled via work Self Service, not Homebrew; the hook only warns if they are missing. Do not add active work-profile `onepasswordRead` or `onepasswordDocument` calls.
 7. **SSH agent split**: Personal profile keeps 1Password SSH agent/signing. Work profile uses Secretive's socket (`~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh`) for SSH auth; do not reintroduce 1Password agent paths into active work templates.
