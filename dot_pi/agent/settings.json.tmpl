@@ -10,14 +10,22 @@
   },
   "packages": [
     "npm:@juicesharp/rpiv-ask-user-question",
-    "npm:@juicesharp/rpiv-todo",
     "npm:@juicesharp/rpiv-btw",
     "npm:@tintinweb/pi-subagents",
     "npm:pi-web-access",
     "npm:pi-lens",
     "npm:@plannotator/pi-extension",
     "npm:@juicesharp/rpiv-args"{{ if .personal }},
-    "npm:@narumitw/pi-usage"{{ end }}
+    "npm:@narumitw/pi-usage"{{ end }},
+    {
+      "source": "npm:mitsupi",
+      "extensions": [
+        "+extensions/todos.ts"
+      ],
+      "skills": [],
+      "prompts": [],
+      "themes": []
+    }
   ],
   "theme": "dark"
 }
