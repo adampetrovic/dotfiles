@@ -319,7 +319,7 @@ The following customisations are active and **must be used in preference to gene
 ### Git Settings
 
 - `[git] auto-local-bookmark = false` — fetching a remote bookmark does **not** create a local bookmark automatically.
-- `[remotes.origin] auto-track-bookmarks = "glob:*"` — newly fetched origin bookmarks are tracked.
+- `[remotes.origin] auto-track-created-bookmarks = "glob:apetrovic/*"` — locally created `apetrovic/*` bookmarks are automatically tracked on origin without importing every collaborator bookmark.
 
 ### Fix Tools
 
@@ -337,6 +337,9 @@ These are available in any `-r` expression:
 |---|---|---|
 | `mine()` | `user("adam@petrovic.com.au")` | Current user's commits |
 | `user(x)` | `author(x)` | Commits by author substring |
+| `log_local_changes()` | `mine() & remote_bookmarks()..` | Authored local changes not contained in remote bookmarks |
+| `log_tracked_bookmarks()` | `tracked_remote_bookmarks() \| (bookmarks() ~ remote_bookmarks())` | Tracked remote and local-only bookmark targets |
+| `log_targets()` | `log_local_changes() \| heads(log_tracked_bookmarks())` | Local-change and tracked-bookmark log endpoints |
 | `stack()` | `ancestors(mutable() & (..@ \| @::), 2)` | Current mutable stack (ancestors depth 2) |
 | `streams()` | `heads(::@ & bookmarks())` | Bookmark heads that are ancestors of `@` |
 | `change()` | `::@ ~ ::trunk()` | All commits on current change path from trunk |
@@ -347,9 +350,9 @@ These are available in any `-r` expression:
 
 ### Custom Log Revset
 
-The default `jj log` shows: `@ | ancestors(trunk()..((visible_heads() & mine()) | heads(bookmarks())), 2) | trunk()`.
+The default `jj log` shows: `trunk() | (trunk()..(@ | log_targets())) | roots(trunk()..(@ | log_targets()))-`.
 
-This means the log displays: the working copy, trunk, and 2 levels of ancestry from the user's visible heads and tracked bookmark heads above trunk.
+This displays the complete off-trunk histories for the working copy and all log targets, each history's actual trunk branch point, and the current trunk head. Local and remote histories both remain visible when a tracked bookmark has diverged.
 
 ### Custom Aliases
 

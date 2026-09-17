@@ -28,8 +28,8 @@ auto-local-bookmark = false
 auto-track-created-bookmarks = "glob:apetrovic/*"
 
 [revsets]
-# show: local changes I've authored, explicitly tracked bookmarks, and trunk
-log = "@ | trunk() | log_targets()"
+# Show complete off-trunk histories, their trunk branch points, and the trunk head.
+log = "trunk() | (trunk()..(@ | log_targets())) | roots(trunk()..(@ | log_targets()))-"
 
 [revset-aliases]
 "mine()" = "user()"
