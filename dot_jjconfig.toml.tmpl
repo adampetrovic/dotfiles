@@ -35,7 +35,8 @@ log = "trunk() | (trunk()..(@ | log_targets())) | roots(trunk()..(@ | log_target
 "mine()" = "user()"
 "user()" = "user(substring:'{{ .email }}')"
 "user(x)" = "author(x)"
-"log_local_changes()" = "mine() & remote_bookmarks().."
+# Tags are immutable history, not unpushed local work.
+"log_local_changes()" = "mine() & mutable() & remote_bookmarks().."
 "log_tracked_bookmarks()" = "tracked_remote_bookmarks() | (bookmarks() ~ remote_bookmarks())"
 "log_targets()" = "log_local_changes() | heads(log_tracked_bookmarks())"
 "immutable_heads()" = "trunk() | tags()"
