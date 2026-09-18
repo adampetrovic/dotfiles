@@ -18,6 +18,9 @@ When asked to work on a project:
 ### Projects
 
 - **dotfiles** — `~/.local/share/chezmoi`: Chezmoi-managed macOS dotfiles for personal/work profiles. Uses Jujutsu. Read repository `AGENTS.md` before editing.
+- **home-ops** — `~/code/home-ops`: Kubernetes/Talos GitOps repository. Uses Jujutsu.
+- **hass-config** — `~/code/hass-config`: Home Assistant YAML packages for the Sydney house.
+- **unifi-config** — `~/code/unifi-config`: UniFi network documentation/configuration.
 {{ if .work -}}
 - **work-scripts** — `~/code/work-scripts`: Private Git repository containing work CLI utilities and private Pi skills delivered through the private `adampetrovic/tap/work-scripts` Homebrew formula.
 {{ end -}}
@@ -25,7 +28,14 @@ When asked to work on a project:
 ## Version Control
 
 - Prefer Jujutsu (`jj`) over raw `git` for all version-control operations whenever a repository has a `.jj/` directory or otherwise supports jj.
+- Make all changes, updates, and review responses in a new `jj` change on top of the previous change instead of mutating an existing changeset.
+- Before pushing to a remote for the first time, it is okay to squash local stacked changes if that produces a cleaner initial history.
+- If the change is already in an active PR, do not mutate existing pushed changesets; preserve review lineage so reviewers are not confused and prior context is not lost.
 - Use raw `git` only when jj cannot perform the required operation, when interacting with GitHub-specific commands via `gh`, or when the user explicitly asks for git.
+
+## Personal Skills and Secrets
+
+- Use the `1password` skill for secrets, credentials, API keys, and login details. Prefer one long-running `op run`; never write resolved secrets to disk. Detailed session handling lives in `~/.pi/agent/skills/1password/references/session-handling.md`.
 {{ if .work }}
 ## Work-only Pi Skills
 
