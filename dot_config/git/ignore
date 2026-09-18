@@ -1,5 +1,9 @@
 **/.claude/settings.local.json
 
+# pi local workspace state
+**/.pi/todos/
+**/plans/
+
 # intellij module files
 *.iml
 .idea
