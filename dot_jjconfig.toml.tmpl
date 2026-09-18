@@ -29,8 +29,9 @@ auto-local-bookmark = false
 auto-track-created-bookmarks = "glob:apetrovic/*"
 
 [revsets]
-# Show complete off-trunk histories, their trunk branch points, and the trunk head.
-log = "trunk() | (trunk()..(@ | log_targets())) | roots(trunk()..(@ | log_targets()))-"
+# Show complete off-trunk histories, their trunk branch points, the trunk head,
+# and tags that are ancestors of local mutable changes.
+log = "trunk() | (trunk()..(@ | log_targets())) | roots(trunk()..(@ | log_targets()))- | (tags() & ::log_local_changes())"
 
 [revset-aliases]
 "mine()" = "user()"
