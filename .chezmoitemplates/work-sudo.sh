@@ -1,4 +1,4 @@
-_CHEZMOI_SUDO_PASSWORD={{ keeperFindPassword "Work Mac Login" | quote }}
+_CHEZMOI_SUDO_PASSWORD={{ keeperFindPassword "Mk_yckn7uZ5hZ-zB3dOpPQ" | quote }}
 
 sudo() {
     printf '%s\n' "$_CHEZMOI_SUDO_PASSWORD" | /usr/bin/sudo -S -p '' "$@"
