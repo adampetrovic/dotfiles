@@ -1,0 +1,43 @@
+# Global AGENTS.md
+
+This file is only for always-on routing, safety rules, and stable personal context. Prefer project `AGENTS.md`, skills, and prompt templates for detailed procedures and reference material.
+
+## Time and Dates
+
+Interpret and report times relative to Sydney, Australia (`Australia/Sydney`). Use `date` when exact current dates/times matter.
+
+## Project Routing
+
+When asked to work on a project:
+
+1. Identify the relevant project below.
+2. `cd` into the project directory.
+3. Read its local `AGENTS.md` when present before editing.
+4. Follow that repository's VCS and validation conventions.
+
+### Projects
+
+- **dotfiles** — `~/.local/share/chezmoi`: Chezmoi-managed macOS dotfiles for personal/work profiles. Uses Jujutsu. Read repository `AGENTS.md` before editing.
+{{ if .work -}}
+- **work-scripts** — `~/code/work-scripts`: Private Git repository containing work CLI utilities and private Pi skills delivered through the private `adampetrovic/tap/work-scripts` Homebrew formula.
+{{ end -}}
+
+## Version Control
+
+- Prefer Jujutsu (`jj`) over raw `git` for all version-control operations whenever a repository has a `.jj/` directory or otherwise supports jj.
+- Use raw `git` only when jj cannot perform the required operation, when interacting with GitHub-specific commands via `gh`, or when the user explicitly asks for git.
+{{ if .work }}
+## Work-only Pi Skills
+
+Private work skills must stay out of this public chezmoi repository. Create or update them in `~/code/work-scripts/pi-skills/<skill-name>/`, commit and push the private repository, then reconcile packaged skills with:
+
+```bash
+chezmoi apply --source-path "$HOME/.local/share/chezmoi/.chezmoiscripts/run_after_11-update-work-scripts.sh.tmpl"
+```
+
+Do not add public per-skill `symlink_*` entries for private skills. The packaged reconciler owns links via `${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/work-pi-skills.manifest` and preserves unrelated/personal skills.
+{{ end -}}
+## Prompt Hygiene
+
+- Keep global context minimal. Place project-specific instructions in project `AGENTS.md`, reusable workflows in prompt templates, and task-specific procedures in skills.
+- When a question spans projects, cross-reference the relevant project directories rather than relying on this global file for detail.

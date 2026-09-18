@@ -31,7 +31,7 @@ For work-profile `chezmoi apply` to be fully Keeper-backed, the remaining work i
    field. Other records still needed include:
    - Work sudo password if non-interactive sudo priming is still desired; otherwise `sudo -v` prompts interactively.
    - Any work WireGuard config if it should be managed by chezmoi.
-   - Atuin sync settings, SOPS age identity, and encrypted Pi agent config if those should exist on work machines.
+   - Atuin sync settings if they should exist on work machines.
 3. Replace active work-profile `onepasswordRead` / `onepasswordDocument` calls
    with Keeper lookups. Useful chezmoi patterns:
 
@@ -56,10 +56,9 @@ For work-profile `chezmoi apply` to be fully Keeper-backed, the remaining work i
    - `dot_jjconfig.toml.tmpl`
    - `private_dot_ssh/private_config.tmpl`
    - `dot_config/mise/config.toml.tmpl`
-   - `dot_config/sops/age/keys.txt.tmpl`
    - any ignored personal-only agent config that should exist on work machines
 
 The package installation scripts read `HOMEBREW_GITHUB_API_TOKEN` directly
 from Keeper at execution time, so the token is not rendered into chezmoi state.
-Keeper Commander must be installed, logged in, and usable non-interactively
-before running a work-profile `chezmoi apply`.
+Keeper Commander must be installed and logged in before the user runs a
+work-profile `chezmoi apply` from an interactive terminal.
