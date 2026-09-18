@@ -10,22 +10,25 @@ Interpret and report times relative to Sydney, Australia (`Australia/Sydney`). U
 
 When asked to work on a project:
 
-1. Look for project repositories under `~/code` (for example, `find ~/code -maxdepth 3 \( -name AGENTS.md -o -name .jj -o -name .git \)` when the location is unclear).
-2. `cd` into the matching project directory.
-3. Read its local `AGENTS.md` when present before editing.
-4. Follow that repository's VCS and validation conventions.
+1. Dotfiles live at `~/.local/share/chezmoi`; other project repositories live under `~/code`.
+2. If the location is unclear, search with `find ~/code -maxdepth 3 \( -name AGENTS.md -o -name .jj -o -name .git \)`.
+3. `cd` into the matching project directory.
+4. Read its local `AGENTS.md` when present before editing.
+5. Follow that repository's VCS and validation conventions.
 
 ## Version Control
 
 - Prefer Jujutsu (`jj`) over raw `git` for all version-control operations whenever a repository has a `.jj/` directory or otherwise supports jj.
-- Make all changes, updates, and review responses in a new `jj` change on top of the previous change instead of mutating an existing changeset.
+- Before editing in a `jj` repository, create a new change with `jj new` when the current `@` is non-empty or represents prior work; do not mutate existing changesets for updates or review responses.
 - Before pushing to a remote for the first time, it is okay to squash local stacked changes if that produces a cleaner initial history.
 - If the change is already in an active PR, do not mutate existing pushed changesets; preserve review lineage so reviewers are not confused and prior context is not lost.
+- Only push to remotes when explicitly directed, so changes can be reviewed before updating remote state.
 - Use raw `git` only when jj cannot perform the required operation, when interacting with GitHub-specific commands via `gh`, or when the user explicitly asks for git.
 
 ## Personal Skills and Secrets
 
 - Use the `1password` skill for secrets, credentials, API keys, and login details. Prefer one long-running `op run`; never write resolved secrets to disk. Detailed session handling lives in `~/.pi/agent/skills/1password/references/session-handling.md`.
+
 {{ if .work }}
 ## Work-only Pi Skills
 
