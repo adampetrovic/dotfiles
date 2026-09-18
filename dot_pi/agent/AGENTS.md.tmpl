@@ -10,20 +10,10 @@ Interpret and report times relative to Sydney, Australia (`Australia/Sydney`). U
 
 When asked to work on a project:
 
-1. Identify the relevant project below.
-2. `cd` into the project directory.
+1. Look for project repositories under `~/code` (for example, `find ~/code -maxdepth 3 \( -name AGENTS.md -o -name .jj -o -name .git \)` when the location is unclear).
+2. `cd` into the matching project directory.
 3. Read its local `AGENTS.md` when present before editing.
 4. Follow that repository's VCS and validation conventions.
-
-### Projects
-
-- **dotfiles** — `~/.local/share/chezmoi`: Chezmoi-managed macOS dotfiles for personal/work profiles. Uses Jujutsu. Read repository `AGENTS.md` before editing.
-- **home-ops** — `~/code/home-ops`: Kubernetes/Talos GitOps repository. Uses Jujutsu.
-- **hass-config** — `~/code/hass-config`: Home Assistant YAML packages for the Sydney house.
-- **unifi-config** — `~/code/unifi-config`: UniFi network documentation/configuration.
-{{ if .work -}}
-- **work-scripts** — `~/code/work-scripts`: Private Git repository containing work CLI utilities and private Pi skills delivered through the private `adampetrovic/tap/work-scripts` Homebrew formula.
-{{ end -}}
 
 ## Version Control
 
