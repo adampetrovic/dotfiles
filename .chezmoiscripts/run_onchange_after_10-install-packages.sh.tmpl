@@ -10,10 +10,10 @@ eval "$("$BREW_PREFIX/bin/brew" shellenv)"
 
 {{ if .personal -}}
 # needed for private homebrew tap
-export HOMEBREW_GITHUB_API_TOKEN="{{ (onepasswordRead "op://Private/Github/personal access token") }}"
+export HOMEBREW_GITHUB_API_TOKEN="{{ (onepasswordRead "op://Private/Github/HOMEBREW_GITHUB_API_TOKEN") }}"
 {{ else if .work -}}
 # needed for private homebrew tap
-export HOMEBREW_GITHUB_API_TOKEN={{ keeperFindPassword "Homebrew GitHub API Token" | quote }}
+export HOMEBREW_GITHUB_API_TOKEN={{ keeperFindPassword "2Esevx_bdHUIvptdaFTFxg" | quote }}
 {{ template "work-sudo.sh" . }}
 {{ end -}}
 [ -n "$HOMEBREW_GITHUB_API_TOKEN" ] || log_warn "HOMEBREW_GITHUB_API_TOKEN is empty — private/custom tap installs may fail"

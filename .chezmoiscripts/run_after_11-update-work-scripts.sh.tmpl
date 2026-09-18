@@ -8,8 +8,9 @@ log_step "Updating work-scripts"
 BREW_PREFIX="{{ if eq .chezmoi.arch "arm64" }}/opt/homebrew{{ else }}/usr/local{{ end }}"
 FORMULA="adampetrovic/tap/work-scripts"
 eval "$("$BREW_PREFIX/bin/brew" shellenv)"
+# Load GitHub credentials from the managed global mise environment.
+eval "$(mise env --shell bash)"
 
-export HOMEBREW_GITHUB_API_TOKEN={{ keeperFindPassword "Homebrew GitHub API Token" | quote }}
 export HOMEBREW_NO_ASK=1
 
 log_info "Updating Homebrew"
@@ -21,7 +22,8 @@ else
     brew install --HEAD "$FORMULA"
 fi
 
-unset HOMEBREW_GITHUB_API_TOKEN
+# Do not expose Homebrew credentials to the skill reconciliation process.
+unset HOMEBREW_GITHUB_API_TOKEN GITHUB_TOKEN
 WORK_SCRIPTS_PREFIX="$(brew --prefix work-scripts)"
 "$WORK_SCRIPTS_PREFIX/bin/sync-pi-skills" "$WORK_SCRIPTS_PREFIX/share/work-scripts/pi-skills"
 log_ok "work-scripts and packaged Pi skills are current"
