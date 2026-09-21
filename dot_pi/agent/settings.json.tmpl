@@ -8,6 +8,31 @@
     "reserveTokens": 32768,
     "keepRecentTokens": 12000
   },
+  "observational-memory": {
+    "chunkTokens": 5000,
+    "chunkOverlapTokens": 0,
+    "poolTargetTokens": 10000,
+    "consolidateAtPoolTokens": 20000,
+    "compactAtContextTokens": 100000,
+    "tailTokens": 20000,
+    "journeyTargetTokens": 1000,
+    "observerConcurrency": 4,
+    "resumeAfterMidRunCompaction": true,
+    "models": {
+        "observer": {
+            "provider": "openai-codex",
+            "id": "gpt-5.3-codex-spark",
+            "thinking": "low"
+        },
+        "consolidator": {
+            "provider": "openai-codex",
+            "id": "gpt-5.5",
+            "thinking": "medium"
+        }
+    },
+    "passive": false,
+    "debugLog": false
+  },
   "packages": [
     "npm:@juicesharp/rpiv-ask-user-question",
     "npm:@juicesharp/rpiv-btw",
