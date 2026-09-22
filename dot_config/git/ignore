@@ -3,6 +3,7 @@
 # pi local workspace state
 **/.pi/todos/
 **/plans/
+.memory
 
 # intellij module files
 *.iml
