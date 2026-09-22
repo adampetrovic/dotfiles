@@ -1,5 +1,5 @@
 {{ if .personal -}}
-sync_address = 'https://atuin.{{ (onepasswordRead "op://k8s/cluster-secrets/SECRET_DOMAIN") -}}'
+sync_address = 'https://atuin.{{ (onepasswordRead "op://Private/chezmoi/SECRET_DOMAIN") -}}'
 {{ else if .work -}}
 # Work profile: Atuin sync is not migrated to Keeper yet, so run local-only history.
 {{ end -}}

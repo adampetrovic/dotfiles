@@ -1,4 +1,4 @@
-{{/* profile detection */}}
+{{- /* profile detection */ -}}
 {{- $profiles := list "personal" "work" -}}
 {{- $profile := promptChoiceOnce . "profile" "Select a profile" $profiles -}}
 {{- $email := promptStringOnce . "email" "What is your email address" -}}
@@ -7,11 +7,15 @@
 {{- $brewPrefix = "/opt/homebrew" -}}
 {{- end -}}
 
+{{- if eq $profile "personal" -}}
 [onepassword]
     command = "{{ $brewPrefix }}/bin/op"
+{{- end }}
 
+{{- if eq $profile "work" -}}
 [keeper]
     args = ["--config", {{ printf "%s/Library/Application Support/.keeper/config.json" .chezmoi.homeDir | quote }}, "--batch-mode"]
+{{- end }}
 
 [update]
     command = "jj"

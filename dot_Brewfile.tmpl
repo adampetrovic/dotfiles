@@ -109,10 +109,10 @@ brew "{{ . }}"
 {{ end }}
 {{ range $name, $args := $brewsWithArgs -}}
 brew "{{ $name }}", args: {{ $args | toJson }}
-{{ end }}
+{{ end -}}
 {{ range ($casks | sortAlpha | uniq) -}}
 cask "{{ . }}"
 {{ end }}
 {{ range $app, $id := $mas -}}
 mas "{{ $app }}", id: {{ $id }}
-{{ end }}
+{{ end -}}
