@@ -15,7 +15,6 @@ export HOMEBREW_NO_ASK=1
 
 log_info "Updating Homebrew"
 brew update
-brew fetch --HEAD --force "$FORMULA"
 if brew list --formula work-scripts >/dev/null 2>&1; then
     brew upgrade --fetch-HEAD "$FORMULA"
 else
