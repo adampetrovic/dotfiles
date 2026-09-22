@@ -1,8 +1,14 @@
 #!/usr/bin/env node
-globalThis.navigator = { platform: 'darwin' };
+Object.defineProperty(globalThis, 'navigator', {
+  value: { platform: 'darwin', userAgent: 'node.js' },
+  configurable: true,
+  writable: true,
+});
 
 const api = require('@actual-app/api');
-const { q, runQuery } = require('@actual-app/api');
+const { q, aqlQuery } = require('@actual-app/api');
+
+let app = null;
 
 // ── Config from environment ──
 const SERVER_URL = process.env.ACTUAL_SERVER_URL;
@@ -27,10 +33,19 @@ function requireEnv() {
 async function connect() {
   requireEnv();
   _suppressLog = true;
-  await api.init({ dataDir: DATA_DIR, serverURL: SERVER_URL, password: PASSWORD });
-  const dlOpts = ENCRYPTION_KEY ? { password: ENCRYPTION_KEY } : undefined;
-  await api.downloadBudget(SYNC_ID, dlOpts);
-  _suppressLog = false;
+  try {
+    app = await api.init({ dataDir: DATA_DIR, serverURL: SERVER_URL, password: PASSWORD });
+    const dlOpts = ENCRYPTION_KEY ? { password: ENCRYPTION_KEY } : undefined;
+    await api.downloadBudget(SYNC_ID, dlOpts);
+  } catch (err) {
+    const msg = String(err && (err.message || err));
+    if (msg.includes('out-of-sync-migrations')) {
+      die('Actual API package is behind the budget database migrations. Update ~/.pi/agent/skills/actual-budget to the current @actual-app/api version, or set ACTUAL_DATA_DIR to a cache created by a matching API version. Original error: ' + msg);
+    }
+    throw err;
+  } finally {
+    _suppressLog = false;
+  }
 }
 
 async function disconnect() {
@@ -42,6 +57,21 @@ async function disconnect() {
 // ── Helpers ──
 function jsonOut(data) { console.log(JSON.stringify(data, null, 2)); }
 function centsToStr(cents) { return (cents / 100).toFixed(2); }
+function dateToRepr(date) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) die(`Invalid date "${date}"; use YYYY-MM-DD`);
+  return Number(date.replace(/-/g, ''));
+}
+function reprToDate(repr) {
+  if (repr == null) return null;
+  const s = String(repr);
+  return `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}`;
+}
+async function resolveSchedule(idOrName) {
+  const schedules = await api.getSchedules();
+  const match = schedules.find(s => s.id === idOrName) || schedules.find(s => (s.name || '').toLowerCase() === idOrName.toLowerCase());
+  if (!match) die(`Schedule "${idOrName}" not found. Available: ${schedules.map(s => s.name || s.id).join(', ')}`);
+  return match;
+}
 
 // ── Commands ──
 const commands = {};
@@ -140,7 +170,9 @@ commands['transactions'] = async (args) => {
   const result = txns.map(t => ({
     id: t.id, date: t.date, amount: centsToStr(t.amount),
     payee: payeeMap[t.payee] || t.payee, category: catMap[t.category] || t.category,
-    notes: t.notes || '', cleared: t.cleared, imported_id: t.imported_id || null,
+    notes: t.notes || '', cleared: t.cleared, reconciled: t.reconciled,
+    schedule: t.schedule || null, imported_id: t.imported_id || null,
+    imported_description: t.imported_description || null,
   }));
   jsonOut(result);
 };
@@ -180,7 +212,7 @@ commands['import-transactions'] = async (args) => {
 commands['update-transaction'] = async (args) => {
   const [id, ...rest] = args;
   const flags = parseFlags(rest);
-  if (!id) die('Usage: update-transaction <id> [--category <name>] [--notes <text>] [--cleared true|false]');
+  if (!id) die('Usage: update-transaction <id> [--category <name>] [--notes <text>] [--cleared true|false] [--payee <name>] [--schedule <id|name|none>]');
 
   const update = {};
   if (flags.category) {
@@ -191,6 +223,15 @@ commands['update-transaction'] = async (args) => {
   }
   if (flags.notes !== undefined) update.notes = flags.notes;
   if (flags.cleared !== undefined) update.cleared = flags.cleared === 'true';
+  if (flags.payee) {
+    const payees = await api.getPayees();
+    const payee = payees.find(p => (p.name || '').toLowerCase() === flags.payee.toLowerCase());
+    if (!payee) die(`Payee "${flags.payee}" not found`);
+    update.payee = payee.id;
+  }
+  if (flags.schedule !== undefined) {
+    update.schedule = flags.schedule.toLowerCase() === 'none' ? null : (await resolveSchedule(flags.schedule)).id;
+  }
 
   await api.updateTransaction(id, update);
   jsonOut({ updated: id, ...update });
@@ -227,6 +268,51 @@ commands['create-rule'] = async (args) => {
   jsonOut({ payee: payeeName, category: catName });
 };
 
+// -- Schedules --
+commands['schedules'] = async () => {
+  const schedules = await api.getSchedules();
+  const accounts = await api.getAccounts();
+  const payees = await api.getPayees();
+  const accountMap = Object.fromEntries(accounts.map(a => [a.id, a.name]));
+  const payeeMap = Object.fromEntries(payees.map(p => [p.id, p.name]));
+  jsonOut(schedules.map(s => ({
+    id: s.id,
+    name: s.name,
+    next_date: s.next_date,
+    amount: centsToStr(s.amount || 0),
+    amountOp: s.amountOp,
+    payee: payeeMap[s.payee] || s.payee,
+    account: accountMap[s.account] || s.account,
+    posts_transaction: s.posts_transaction,
+    date: s.date,
+  })).sort((a, b) => String(a.next_date).localeCompare(String(b.next_date))));
+};
+
+commands['set-schedule-next-date'] = async (args) => {
+  const [idOrName, date] = args;
+  if (!idOrName || !date) die('Usage: set-schedule-next-date <schedule-id-or-name> <YYYY-MM-DD>');
+  if (!app?.db) die('Internal Actual db handle unavailable');
+  const schedule = await resolveSchedule(idOrName);
+  const before = await app.db.first('select * from schedules_next_date where schedule_id = ?', [schedule.id]);
+  if (!before) die(`No schedules_next_date row found for ${schedule.name || schedule.id}`);
+  const nextDate = dateToRepr(date);
+  const now = Date.now();
+  await app.db.update('schedules_next_date', {
+    id: before.id,
+    local_next_date: nextDate,
+    local_next_date_ts: now,
+    base_next_date: nextDate,
+    base_next_date_ts: now,
+  });
+  await api.sync();
+  const after = await app.db.first('select * from schedules_next_date where schedule_id = ?', [schedule.id]);
+  jsonOut({
+    schedule: { id: schedule.id, name: schedule.name },
+    before: { local_next_date: reprToDate(before.local_next_date), base_next_date: reprToDate(before.base_next_date) },
+    after: { local_next_date: reprToDate(after.local_next_date), base_next_date: reprToDate(after.base_next_date) },
+  });
+};
+
 // -- Query (ActualQL) --
 commands['query'] = async (args) => {
   const expr = args.join(' ');
@@ -243,7 +329,7 @@ commands['query'] = async (args) => {
   if (queryDef.limit) qb = qb.limit(queryDef.limit);
   if (queryDef.options) qb = qb.options(queryDef.options);
 
-  const { data } = await runQuery(qb);
+  const { data } = await aqlQuery(qb);
   jsonOut(data);
 };
 
@@ -292,10 +378,12 @@ Commands:
   months                                         List budget months
   transactions --account <name> [--since] [--until]  List transactions
   import-transactions --account <name>           Import JSON array from stdin
-  update-transaction <id> [--category] [--notes] [--cleared]
+  update-transaction <id> [--category] [--notes] [--cleared] [--payee] [--schedule]
   payees                                         List payees
   rules                                          List rules
   create-rule --payee <name> --category <name>   Create categorization rule
+  schedules                                      List schedules
+  set-schedule-next-date <schedule> <YYYY-MM-DD> Fix cached schedule next date
   query <actualql-json>                          Run ActualQL query
 
 Environment variables:

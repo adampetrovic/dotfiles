@@ -4,13 +4,22 @@ Self-hosted Actual Budget instance for the Petrovic family. Migrated from YNAB i
 
 ## Connection
 
-All commands use `op run` to inject credentials:
+All commands use the local mise task: `mise` pins Node and dependencies, loads the local `.mise.toml` environment, and `op run` resolves the `op://Private/Actual/...` secret references.
 
 ```bash
-op run --env-file="$HOME/.pi/agent/skills/actual-budget/.skills-data/.env" -- node ~/.pi/agent/skills/actual-budget/scripts/actual.js <command> [args]
+cd ~/.pi/agent/skills/actual-budget
+mise run actual <command> [args]
 ```
 
-The env file at `~/.pi/agent/skills/actual-budget/.skills-data/.env` contains 1Password secret references (`op://Private/Actual/...`) — not plaintext.
+Current local config:
+
+- `ACTUAL_SERVER_URL`: `op://Private/Actual/website`
+- `ACTUAL_PASSWORD`: `op://Private/Actual/password`
+- `ACTUAL_ENCRYPTION_KEY`: `op://Private/Actual/encryption key`
+- `ACTUAL_SYNC_ID`: `ce59fb57-248e-4fd6-90a8-73ff9b8d40b9` (Petrovic Budget group ID)
+- `ACTUAL_DATA_DIR`: `/tmp/actual-budget-skill-cache`
+
+Do not resolve or print secret values.
 
 ## Budget Structure
 
@@ -32,7 +41,7 @@ The env file at `~/.pi/agent/skills/actual-budget/.skills-data/.env` contains 1P
 
 ## Australian Quirks
 
-- No bank sync — import via CommBank CSV exports.
+- No bank sync — import via CommBank CSV exports or browser extraction workflows.
 - CommBank CSV format: `Date, Amount, Description, Balance`.
 - CommBank OFX exports have broken empty FITIDs.
 - Credit cards use Actual's default overspend behaviour; there is no special credit-card category.

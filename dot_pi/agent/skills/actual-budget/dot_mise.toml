@@ -1,0 +1,22 @@
+[tools]
+node = "22.22.3"
+
+[env]
+ACTUAL_SERVER_URL = "op://Private/Actual/website"
+ACTUAL_PASSWORD = "op://Private/Actual/password"
+ACTUAL_ENCRYPTION_KEY = "op://Private/Actual/encryption key"
+ACTUAL_SYNC_ID = "ce59fb57-248e-4fd6-90a8-73ff9b8d40b9"
+ACTUAL_DATA_DIR = "/tmp/actual-budget-skill-cache"
+
+[tasks.install]
+description = "Install pinned Actual Budget CLI dependencies"
+run = "npm ci"
+sources = ["package.json", "package-lock.json"]
+outputs = ["node_modules/@actual-app/api/package.json"]
+
+[tasks.actual]
+description = "Run the Actual Budget CLI with mise-pinned Node/deps and 1Password env"
+depends = ["install"]
+run = 'op run -- node scripts/actual.js "$@"'
+raw = true
+raw_args = true

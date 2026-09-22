@@ -9,11 +9,14 @@ CLI wrapper around the official `@actual-app/api` for self-hosted [Actual Budget
 
 ## Setup
 
-Install dependencies (once):
+Install pinned runtime/dependencies through mise:
 
 ```bash
-cd ~/.pi/agent/skills/actual-budget && npm install
+cd ~/.pi/agent/skills/actual-budget
+mise run install
 ```
+
+Use `mise run actual ...` for normal commands so the pinned Node version, pinned `@actual-app/api`, and 1Password-backed environment are used consistently.
 
 ## Environment Variables
 
@@ -31,13 +34,14 @@ Read `references/adam-budget-context.md` for Adam's concrete `op run` invocation
 
 ## Running Commands
 
-All commands go through the CLI wrapper. The `op run` prefix injects secrets:
+All commands go through the CLI wrapper. The skill directory has a `.mise.toml` that pins Node, installs the pinned npm dependencies, sets 1Password-backed budget environment variables, and exposes the CLI as a mise task:
 
 ```bash
-op run --env-file=<env-file> -- node ~/.pi/agent/skills/actual-budget/scripts/actual.js <command> [args]
+cd ~/.pi/agent/skills/actual-budget
+mise run actual <command> [args]
 ```
 
-Refer to `references/adam-budget-context.md` for the exact invocation with the user's 1Password references.
+`mise run actual` depends on `mise run install`, which runs `npm ci` only when `package.json` or `package-lock.json` changed. If not using the task, export the same `ACTUAL_*` variables first and wrap the command in `op run`. Refer to `references/adam-budget-context.md` for Adam's exact configuration.
 
 ## Operating Rules
 
@@ -97,6 +101,8 @@ echo '[
 ```bash
 actual update-transaction <txn-id> --category "Eating Out" --notes "Lunch"
 actual update-transaction <txn-id> --cleared true
+actual update-transaction <txn-id> --payee "Sushi Hub" --schedule none
+actual update-transaction <txn-id> --schedule "Council Rates"
 ```
 
 ### Payees
@@ -111,6 +117,15 @@ actual payees                      # List all payees (excludes transfer payees)
 actual rules                       # List all categorization rules
 actual create-rule --payee "Coles" --category "Groceries"
 ```
+
+### Schedules
+
+```bash
+actual schedules
+actual set-schedule-next-date "Council Rates" 2026-11-30
+```
+
+Schedule edits in Actual can leave a stale `schedules_next_date` cache that the UI still displays. After changing schedule cadence/date/amount, verify `actual schedules`; if the UI's next date is stale, use `set-schedule-next-date` with the calculated next occurrence.
 
 ### ActualQL Queries
 
@@ -127,6 +142,27 @@ actual query '{"table":"transactions","filter":{"payee.name":{"$like":"%coles%"}
 **Query shape:** `{ table, filter?, select?, groupBy?, orderBy?, limit?, options? }`
 **Operators:** `$eq`, `$lt`, `$lte`, `$gt`, `$gte`, `$ne`, `$oneof`, `$regex`, `$like`, `$notlike`
 
+## Reconciliation Troubleshooting
+
+When a statement/export total does not match Actual:
+
+1. Compare export rows and Actual rows over the same date range by total first.
+2. If totals match, look for posting-date shifts, tombstoned duplicates, cleared/reconciled state, and transactions just outside the export range.
+3. Use the bank website's running balance when available; it can reveal a missing same-day credit/debit that a downloaded export omitted.
+4. Check card payments, refunds, and transfers separately. A payment can be the right account balance but wrong cleared state.
+5. For scheduled bills, inspect whether the real imported charge and a generated scheduled charge both exist.
+
+## Schedule Repair Workflow
+
+For scheduled bills/rates that posted on a different date or amount:
+
+1. Read the current transactions and schedule first: `actual transactions ...` and `actual schedules`.
+2. Identify the real bank-imported transaction, generated duplicate transaction, category, and schedule name/ID.
+3. After confirmation, update/link the real transaction with `actual update-transaction <id> --schedule "Schedule Name" --notes "..." --cleared true`.
+4. Delete/tombstone duplicates only with a dedicated script/API path and only after confirmation.
+5. Update the schedule cadence/amount using the API when needed.
+6. Verify `actual schedules`. If the UI still shows a stale next date after the rule is correct, repair the cached date with `actual set-schedule-next-date "Schedule Name" <YYYY-MM-DD>`.
+
 ## CommBank CSV Import Workflow
 
 No bank sync is available in Australia. To import transactions:
@@ -141,6 +177,7 @@ CommBank CSV columns and other local quirks are documented in `references/adam-b
 
 ## Tips
 
+- **API version matters**: if commands fail with `out-of-sync-migrations`, update this skill's `@actual-app/api` package to match the server/budget version before retrying.
 - **Transfers** use special payees. List payees to find `transfer_acct` entries.
 - **Split transactions** can be imported with a `subtransactions` array.
 - **Budget carryover**: `set-budget` only sets the amount; carryover toggle must be done in the UI.
