@@ -1,5 +1,16 @@
 {
   "contextInjection": {
     "enabled": false
+  },
+  "lsp": {
+    "disabledServers": ["kotlin"],
+    "servers": {
+      "kotlin-official": {
+        "name": "Official Kotlin LSP",
+        "extensions": [".kt", ".kts"],
+        "command": "kotlin-lsp-wrapper",
+        "args": []
+      }
+    }
   }
 }
