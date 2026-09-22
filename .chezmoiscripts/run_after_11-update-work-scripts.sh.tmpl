@@ -21,9 +21,9 @@ else
     brew install --HEAD "$FORMULA"
 fi
 
-# Do not expose Homebrew credentials to the skill reconciliation process.
+# Do not expose Homebrew credentials to the Pi resource reconciliation process.
 unset HOMEBREW_GITHUB_API_TOKEN GITHUB_TOKEN
 WORK_SCRIPTS_PREFIX="$(brew --prefix work-scripts)"
-"$WORK_SCRIPTS_PREFIX/bin/sync-pi-skills" "$WORK_SCRIPTS_PREFIX/share/work-scripts/pi-skills"
-log_ok "work-scripts and packaged Pi skills are current"
+"$WORK_SCRIPTS_PREFIX/bin/sync-pi-resources" "$WORK_SCRIPTS_PREFIX/share/work-scripts"
+log_ok "work-scripts and packaged Pi skills/extensions are current"
 {{ end -}}
