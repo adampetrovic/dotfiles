@@ -13,6 +13,10 @@
 [keeper]
     args = ["--config", {{ printf "%s/Library/Application Support/.keeper/config.json" .chezmoi.homeDir | quote }}, "--batch-mode"]
 
+[update]
+    command = "jj"
+    args = ["restack"]
+
 [data]
     full_name = "Adam Petrovic"
     profile = {{ $profile | quote }}
