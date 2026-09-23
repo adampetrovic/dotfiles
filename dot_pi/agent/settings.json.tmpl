@@ -1,7 +1,7 @@
 {
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "0.86.1",
   "defaultProvider": "openai-codex",
-  "defaultModel": "{{ if .work }}gpt-5.6-sol{{ else }}gpt-5.5{{ end }}",
+  "defaultModel": "{{ if .work }}gpt-6-sol{{ else }}gpt-5.5{{ end }}",
   "defaultThinkingLevel": "medium",
   "compaction": {
     "enabled": true,
@@ -21,12 +21,12 @@
     "models": {
         "observer": {
             "provider": "openai-codex",
-            "id": "gpt-5.6-luna",
+            "id": "gpt-6-luna",
             "thinking": "low"
         },
         "consolidator": {
             "provider": "openai-codex",
-            "id": "{{ if .work }}gpt-5.6-sol{{ else }}gpt-5.5{{ end }}",
+            "id": "{{ if .work }}gpt-6-sol{{ else }}gpt-5.5{{ end }}",
             "thinking": "medium"
         }
     },
