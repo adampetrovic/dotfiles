@@ -24,6 +24,12 @@ fi
 # Do not expose Homebrew credentials to the Pi resource reconciliation process.
 unset HOMEBREW_GITHUB_API_TOKEN GITHUB_TOKEN
 WORK_SCRIPTS_PREFIX="$(brew --prefix work-scripts)"
-"$WORK_SCRIPTS_PREFIX/bin/sync-pi-resources" "$WORK_SCRIPTS_PREFIX/share/work-scripts"
-log_ok "work-scripts and packaged Pi skills/extensions are current"
+if [ -x "$WORK_SCRIPTS_PREFIX/bin/sync-pi-resources" ]; then
+    "$WORK_SCRIPTS_PREFIX/bin/sync-pi-resources" "$WORK_SCRIPTS_PREFIX/share/work-scripts"
+    log_ok "work-scripts and packaged Pi skills/extensions are current"
+else
+    log_info "Installed work-scripts has no sync-pi-resources; reconciling packaged Pi skills only"
+    "$WORK_SCRIPTS_PREFIX/bin/sync-pi-skills" "$WORK_SCRIPTS_PREFIX/share/work-scripts/pi-skills"
+    log_ok "work-scripts and packaged Pi skills are current (extensions await a newer package)"
+fi
 {{ end -}}
