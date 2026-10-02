@@ -44,4 +44,6 @@ LOGSEQ_API_SERVER_TOKEN = {{ onepasswordRead "op://Private/Logseq/LOGSEQ_API_TOK
 {{ $githubToken := keeperFindPassword "2Esevx_bdHUIvptdaFTFxg" -}}
 GITHUB_TOKEN = {{ $githubToken | quote }}
 HOMEBREW_GITHUB_API_TOKEN = {{ $githubToken | quote }}
+SIGNALFX_API_TOKEN = {{ keeperFindPassword "rk0sqTDRXvoYIxGNU4_m2Q" | quote }}
+SIGNALFX_REALM = 'us1'
 {{ end -}}
