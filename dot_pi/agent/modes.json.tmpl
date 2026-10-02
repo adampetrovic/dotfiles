@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "currentMode": "default",
+  "modes": {
+    "fast": {
+      "provider": "openai-codex",
+      "modelId": "gpt-6-luna",
+      "thinkingLevel": "low"
+    },
+    "default": {
+      "provider": "openai-codex",
+      "modelId": "gpt-6.1-sol",
+      "thinkingLevel": "medium"
+    },
+    "deep": {
+      "provider": "{{ if .work }}anthropic{{ else }}openai-codex{{ end }}",
+      "modelId": "{{ if .work }}claude-opus-5-5{{ else }}gpt-6-astra{{ end }}",
+      "thinkingLevel": "xhigh"
+    }
+  }
+}
