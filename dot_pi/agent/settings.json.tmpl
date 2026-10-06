@@ -9,26 +9,13 @@
     "keepRecentTokens": 12000
   },
   "observational-memory": {
-    "chunkTokens": 5000,
-    "chunkOverlapTokens": 0,
-    "poolTargetTokens": 10000,
-    "consolidateAtPoolTokens": 20000,
-    "compactAtContextTokens": 100000,
-    "tailTokens": 20000,
-    "journeyTargetTokens": 1000,
-    "observerConcurrency": 4,
-    "resumeAfterMidRunCompaction": true,
-    "models": {
-        "observer": {
-            "provider": "openai-codex",
-            "id": "gpt-6-luna",
-            "thinking": "low"
-        },
-        "consolidator": {
-            "provider": "openai-codex",
-            "id": "gpt-6.1-sol",
-            "thinking": "medium"
-        }
+    "observeAfterTokens": 5000,
+    "compactAfterTokensMode": "ratio",
+    "compactAfterTokensRatio": 0.5,
+    "model": {
+      "provider": "openai-codex",
+      "id": "gpt-6-luna",
+      "thinking": "low"
     },
     "passive": false,
     "debugLog": false
@@ -40,7 +27,7 @@
     "npm:pi-web-access",
     "npm:pi-lens",
     "npm:@plannotator/pi-extension",
-    "https://github.com/amosblomqvist/pi-observational-memory"{{ if .personal }},
+    "npm:pi-observational-memory"{{ if .personal }},
     "npm:@narumitw/pi-usage"{{ end }},
     {
       "source": "npm:mitsupi",
