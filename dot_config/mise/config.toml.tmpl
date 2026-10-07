@@ -29,6 +29,33 @@ zoxide = 'latest'
 java = 'corretto-17.0.15.6.1'
 {{ end -}}
 
+{{ if .work -}}
+# Standalone Rovo CLI, not the ACLI Rovo Dev plugin. Keep the full PyInstaller
+# archive together; the launcher selects Rovo mode without running its installer.
+[tools."http:rovo"]
+version = "latest"
+url = 'https://acli.atlassian.com/plugins/rovodev/darwin/arm64/{{ "{{ version }}" }}/rovodev.zip'
+version_list_url = "https://acli.atlassian.com/plugins/rovodev/darwin/arm64/latest-rovocli.json"
+version_json_path = ".version"
+checksum_url = "https://acli.atlassian.com/plugins/rovodev/darwin/arm64/latest-rovocli.json"
+checksum_expr = '"sha256:" + fromJSON(body).checksum'
+bin_path = "bin"
+strip_components = 0
+postinstall = '''
+set -eu
+mkdir -p "$MISE_TOOL_INSTALL_PATH/bin"
+cat > "$MISE_TOOL_INSTALL_PATH/bin/rovo" <<'SH'
+#!/bin/sh
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+export ATLASSIAN_AGENT_TYPE=rovo
+export AUTH_METHOD=oauth
+export TWG_SKILLS_DIR="$root/twg/skills"
+exec "$root/atlassian_cli_rovodev" "$@"
+SH
+chmod +x "$MISE_TOOL_INSTALL_PATH/bin/rovo" "$MISE_TOOL_INSTALL_PATH/atlassian_cli_rovodev"
+'''
+{{ end -}}
+
 [settings]
 idiomatic_version_file_enable_tools = ["java"]
 
