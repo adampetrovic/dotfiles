@@ -1,6 +1,6 @@
 {{ if .personal -}}
 api_key: {{ onepasswordRead "op://k8s/stash/STASH_API_KEY" | quote }}
-base_url: "https://stash-uploader.petrovic.network"
+base_url: "https://stash.petrovic.network"
 stash_url: "https://stash.petrovic.network"
 watch_dir: "{{ .chezmoi.homeDir }}/Desktop/.config"
 watch: true
