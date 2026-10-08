@@ -15,6 +15,7 @@ Resolve relative paths from this skill directory:
 ./scripts/fantastical-mcp-client.mjs list-tool-names
 ./scripts/fantastical-mcp-client.mjs describe-tool <tool-name>
 ./scripts/fantastical-mcp-client.mjs call-tool <tool-name> '<json-arguments>'
+./scripts/fantastical-mcp-client.mjs call-tools '<json-array-of-{name,arguments}>'
 ```
 
 Set `FANTASTICAL_MCP_COMMAND` only if Fantastical is installed somewhere other than `/Applications/Fantastical.app`.
@@ -40,7 +41,19 @@ Before a mutation, state the item, date, time, calendar when known, and action c
 
 ## Tool reference
 
-Schemas can change when Fantastical updates. Run `describe-tool` before an unfamiliar or failed call.
+Check readiness (`doctor`) and relevant schemas (`describe-tool`) once per session, not before every call. Recheck after failures or Fantastical upgrades; inspect any unfamiliar tool before using it.
+
+### Batch independent reads
+
+Use `call-tools` for independent reads with an already known scope. It initializes MCP and discovers tools once, runs at most three calls concurrently, and returns `results` in input order. Each entry contains `name`, `ok`, and the raw `result` (including MCP tool errors), or an `error` for a failed request. Any failed branch gives a nonzero exit status without discarding successful branches.
+
+```bash
+./scripts/fantastical-mcp-client.mjs call-tools '[{"name":"queryCalendars","arguments":{}},{"name":"queryCalendarSets","arguments":{}},{"name":"queryCalendarItems","arguments":{"when":"September 23 2026"}}]'
+```
+
+Only the four read-only tools listed above are allowed. The entire nonempty batch is validated before starting the server; mutations, unknown tools, and `--confirm` are rejected. Batch calls never write calendar data.
+
+Sequence dependent operations: query calendars or items first when their IDs determine later reads, then use those IDs in a subsequent call or batch. Keep all mutations as individual `call-tool` commands with the existing confirmation requirements; never batch ID selection with a dependent mutation.
 
 ### List calendars
 
@@ -105,8 +118,8 @@ Search first to obtain the exact ID, show the matched item to the user, and alwa
 
 ## Troubleshooting
 
-- Run `doctor` to verify the executable, MCP handshake, and discovered tools.
-- Run `list-tool-names` or `describe-tool` after Fantastical upgrades.
+- Run `doctor` once per session to verify the executable, MCP handshake, and discovered tools; repeat after failures or upgrades.
+- Run `list-tool-names` or `describe-tool` once for relevant schemas, and recheck after failures or Fantastical upgrades.
 - If the executable moved, set `FANTASTICAL_MCP_COMMAND` to its absolute path.
 - If a request times out, override `FANTASTICAL_MCP_TIMEOUT` in milliseconds.
 - Fantastical may log that the launching process has no resolvable code signature; this is informational when the MCP handshake and calls still succeed.

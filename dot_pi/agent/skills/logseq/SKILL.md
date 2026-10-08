@@ -9,7 +9,7 @@ Use the official `logseq` CLI against Logseq DB graphs. The CLI talks to Logseq'
 
 ## Start Here
 
-Check the installation and available graphs:
+Check installation once per session, or after a relevant CLI/worker failure or installation change. Discover available graphs only when the target is not specified or already established; do not rerun these checks before every operation:
 
 ```bash
 logseq doctor
@@ -23,7 +23,11 @@ GRAPH="fy27-notes"
 logseq -g "$GRAPH" graph info -o json
 ```
 
+Reuse the selected graph and successful `graph info` result within the task; recheck if the graph changes or access fails. Always pass `-g` explicitly.
+
 Prefer `-o json` for parsing. Run `logseq <command> --help` or `logseq example` before using an unfamiliar mutation.
+
+Once the graph is established, use codemode with `Promise.allSettled()` for independent bounded searches, with at most three concurrent reads. Check command exit codes and retain failures, stable IDs, and concise findings instead of dumping full graph results. Keep duplicate checks → writes → verification sequential; do not parallelize graph mutations.
 
 ## Read and Search
 

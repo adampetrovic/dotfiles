@@ -8,6 +8,7 @@ const DEFAULT_SERVER = '/Applications/Fantastical.app/Contents/Helpers/Fantastic
 const serverCommand = process.env.FANTASTICAL_MCP_COMMAND || DEFAULT_SERVER;
 const timeoutMs = Number(process.env.FANTASTICAL_MCP_TIMEOUT || 30000);
 const clientInfo = { name: 'pi-fantastical-mcp-client', version: '0.1.0' };
+const readOnlyTools = new Set(['queryCalendars', 'queryCalendarSets', 'queryCalendarItems', 'findAvailableTimes']);
 const mutationTools = new Set(['createCalendarItem', 'modifyCalendarItem', 'deleteCalendarItem']);
 
 function usage() {
@@ -18,6 +19,7 @@ function usage() {
   fantastical-mcp-client.mjs list-tool-names
   fantastical-mcp-client.mjs describe-tool <tool-name>
   fantastical-mcp-client.mjs call-tool <tool-name> [json-args] [--confirm]
+  fantastical-mcp-client.mjs call-tools '<json-array-of-{name,arguments}>'
 
 Environment:
   FANTASTICAL_MCP_COMMAND  MCP server executable (default: ${DEFAULT_SERVER})
@@ -32,13 +34,13 @@ const argv = process.argv.slice(2);
 const confirmed = argv.includes('--confirm');
 const positional = argv.filter((arg) => arg !== '--confirm');
 const [command, toolName, jsonArgs = '{}'] = positional;
-const validCommands = new Set(['doctor', 'server-info', 'list-tools', 'list-tool-names', 'describe-tool', 'call-tool']);
+const validCommands = new Set(['doctor', 'server-info', 'list-tools', 'list-tool-names', 'describe-tool', 'call-tool', 'call-tools']);
 
 if (!command || !validCommands.has(command)) usage();
 if ((command === 'describe-tool' || command === 'call-tool') && !toolName) usage();
 if (command !== 'call-tool' && confirmed) usage();
 let maxPositional = 1;
-if (command === 'describe-tool') maxPositional = 2;
+if (command === 'describe-tool' || command === 'call-tools') maxPositional = 2;
 if (command === 'call-tool') maxPositional = 3;
 if (positional.length > maxPositional) usage();
 if (command === 'call-tool' && mutationTools.has(toolName) && !confirmed) {
@@ -55,6 +57,29 @@ if (command === 'call-tool') {
     }
   } catch (error) {
     console.error(`Invalid JSON arguments: ${error.message}`);
+    process.exit(2);
+  }
+}
+
+let batchCalls;
+if (command === 'call-tools') {
+  try {
+    batchCalls = JSON.parse(toolName);
+    if (!Array.isArray(batchCalls) || batchCalls.length === 0) {
+      throw new Error('expected a nonempty JSON array of {name,arguments} calls');
+    }
+    for (const [index, call] of batchCalls.entries()) {
+      if (!call || typeof call !== 'object' || Array.isArray(call)
+          || !readOnlyTools.has(call.name)) {
+        throw new Error(`call ${index}: only known read-only tools are allowed`);
+      }
+      if (!call.arguments || typeof call.arguments !== 'object' || Array.isArray(call.arguments)
+          || Object.keys(call).some((key) => key !== 'name' && key !== 'arguments')) {
+        throw new Error(`call ${index}: expected {name,arguments} with arguments as a JSON object`);
+      }
+    }
+  } catch (error) {
+    console.error(`Invalid batch: ${error.message}`);
     process.exit(2);
   }
 }
@@ -92,6 +117,7 @@ child.stderr.on('data', (chunk) => {
 });
 
 function request(method, params = {}) {
+  if (closed) return Promise.reject(new Error(`Fantastical MCP is closed during ${method}`));
   const id = nextId++;
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -165,6 +191,28 @@ async function listAllTools() {
   return tools;
 }
 
+async function callBatch(tools) {
+  const available = new Set(tools.map((tool) => tool.name));
+  const results = [];
+  let next = 0;
+  async function worker() {
+    while (next < batchCalls.length) {
+      const index = next++;
+      const call = batchCalls[index];
+      try {
+        if (!available.has(call.name)) throw new Error(`Tool not found: ${call.name}`);
+        const result = await request('tools/call', call);
+        results[index] = { name: call.name, ok: !result?.isError, result };
+      } catch (error) {
+        results[index] = { name: call.name, ok: false, error: error.message };
+      }
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(3, batchCalls.length) }, worker));
+  output({ results });
+  if (results.some((result) => !result.ok)) process.exitCode = 1;
+}
+
 async function close() {
   if (closed) return;
   child.stdin.end();
@@ -206,6 +254,8 @@ try {
       const tool = tools.find((candidate) => candidate.name === toolName);
       if (!tool) throw new Error(`Tool not found: ${toolName}`);
       output(tool);
+    } else if (command === 'call-tools') {
+      await callBatch(tools);
     } else if (command === 'call-tool') {
       const tool = tools.find((candidate) => candidate.name === toolName);
       if (!tool) throw new Error(`Tool not found: ${toolName}`);

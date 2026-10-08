@@ -75,15 +75,44 @@ end tell
     return [line for line in out.splitlines() if line.strip()]
 
 
+def get_container_records() -> list[tuple[str, str]]:
+    """Discover both kinds in one call, preserving arbitrary names via JSON."""
+    script = '''
+use framework "Foundation"
+use scripting additions
+set containerRows to {}
+tell application "Things3"
+  repeat with x in areas
+    set end of containerRows to {"area", name of x as text}
+  end repeat
+  repeat with x in projects
+    set end of containerRows to {"project", name of x as text}
+  end repeat
+end tell
+set jsonData to current application's NSJSONSerialization's dataWithJSONObject:containerRows options:0 |error|:(missing value)
+set jsonText to current application's NSString's alloc()'s initWithData:jsonData encoding:(current application's NSUTF8StringEncoding)
+return jsonText as text
+'''
+    response = run_osascript(script)
+    try:
+        records = json.loads(response)
+    except json.JSONDecodeError:
+        raise SystemExit("Invalid Things container discovery response") from None
+    if not isinstance(records, list) or any(
+        not isinstance(record, list) or len(record) != 2
+        or record[0] not in ("area", "project") or not isinstance(record[1], str)
+        for record in records
+    ):
+        raise SystemExit("Invalid Things container discovery response")
+    return [(kind, name) for kind, name in records if name.strip()]
+
+
 def resolve_container(name: str) -> tuple[str, str]:
     """Return (kind, exact name) for an area/project, preferring exact then fuzzy.
 
     kind is AppleScript singular: area or project.
     """
-    candidates: list[tuple[str, str]] = []
-    for kind, plural in [("area", "areas"), ("project", "projects")]:
-        for record_name in get_named_records(plural):
-            candidates.append((kind, record_name))
+    candidates = get_container_records()
     for kind, record_name in candidates:
         if record_name == name:
             return kind, record_name

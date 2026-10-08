@@ -89,16 +89,20 @@ Date guidance:
 
 ## Bulk/project import
 
-For multiple tasks or structured projects, write a temporary Things JSON payload and call:
+For suitable multi-task captures or structured projects, prefer one `import-json` call over a loop of `add-todo` calls. Use this only when the intended target is confirmed exactly and the Things JSON schema/placement fields are known; do not guess fuzzy destinations or translate `--list` directly into JSON. If placement is uncertain, use the existing single-task create → move → verify flow instead.
+
+Write a temporary Things JSON payload and call:
 
 ```bash
 ./scripts/things3-url.py import-json /path/to/payload.json
 ```
 
-The helper wraps the payload in `things:///json?data=...` and opens it. Keep imports reasonably small; split large task sets.
+The helper wraps the payload in `things:///json?data=...` and opens it. It accepts an object or array but does not validate item schemas or verify creation/placement. Preview with `import-json /path/to/payload.json --dry-run`, obtain the same write confirmation as for individual tasks, then import once and verify each task with the existing `locate` command (and `list-area` for area placement). Opening the URL is not proof of success. Keep imports reasonably small; split large task sets. Do not parallelize writes or confirmation, or reorder create → move → verify.
+
+Area/project resolution discovers both kinds in one AppleScript call per resolution; no persistent container cache is used.
 
 ## Reads and full MCP
 
-Pi has no built-in MCP client, so this skill does not expose live Things database reads as Pi tools. For full read/write MCP integration in clients that support MCP, see `references/things-mcp.md`.
+Prefer the helper for this skill's local reads and writes. Pi can use MCP servers through configured MCP support; a Things MCP server is not required for the helper. For optional full read/write MCP integration, see `references/things-mcp.md`.
 
-If the user asks to set up full MCP integration, install/use `hald/things-mcp` with `uvx things-mcp` in the target MCP client. For Pi, continue using the helper script unless a Pi MCP extension is installed.
+Only if the user asks to set up full MCP integration, follow that reference for `hald/things-mcp` in the target client. Do not install or configure MCP tooling just to use this skill.
