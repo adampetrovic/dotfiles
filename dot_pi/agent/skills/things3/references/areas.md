@@ -2,10 +2,10 @@
 
 User-confirmed category meanings. These are guidance, not immutable Things identifiers; fetch live areas/projects before placement.
 
-| Area | Meaning | Example observed project |
+| Area | Meaning | Typical task themes |
 |---|---|---|
-| 🏠 Personal | Everyday personal/home responsibilities | Home Maintenance |
-| 🎁Projects | Personal technical projects | 🦿Home Automation |
-| 💼 Work | Professional responsibilities and work goals | 💸 Cost Estimation |
+| 🏠 Personal | Everyday personal/home responsibilities | Home maintenance |
+| 🎁Projects | Personal technical work | Home automation |
+| 💼 Work | Professional responsibilities and work goals | Work deliverables |
 
-The examples are a discovery snapshot, not a complete or permanent project list. Preserve live names exactly when resolving destinations. The area named Projects is an ongoing category for personal technical work; individual finite goals within it are Things projects. Ask when the boundary between home maintenance and a personal technical project is unclear.
+Preserve live names exactly when resolving destinations. Despite its name, 🎁Projects is an ongoing area for personal technical work. Tasks default directly to areas after Inbox clarification. Home Maintenance and Home Automation are themes, not evergreen Things projects. Reserve Things projects for strictly timebound multi-action outcomes with an agreed timeframe/end point. Use agreed tags for thematic filtering when helpful. Ask when the boundary between home maintenance and personal technical work is unclear.

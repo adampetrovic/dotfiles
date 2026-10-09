@@ -12,7 +12,7 @@ Inspired by [The Fu Master Productivity Checklist](https://productivewithapurpos
 ## Non-negotiable defaults
 
 - **Inbox is a braindump.** Capture thoughts promptly without demanding actionable wording, categorisation, clarification, or deduplication. New tasks go here unless Adam explicitly requests a different destination or list. Preserve supplied context in notes; do not embellish or invent commitments. Briefly confirm capture.
-- **Areas are ongoing responsibilities/focus; projects are finite goals.** Multi-action outcomes can become projects during clarification, not automatically during capture. A project does not need an invented start date or deadline.
+- **Areas are the default home for processed tasks; projects are strictly timebound goals.** Ongoing themes such as home maintenance or home automation belong directly in their areas, not in evergreen project containers. Create a project only for a finite multi-action outcome with an agreed timeframe/end point. Never invent a deadline or scheduled start just to qualify something as a project. Use agreed tags sparingly for thematic grouping instead of evergreen projects; do not automatically create or apply tags.
 - **Today means TODAY.** Keep it limited to what Adam intends to accomplish today. Importance alone is not permission to add something to Today.
 - **Anytime means this week's actionable work, not today.** This week is Monday–Sunday in Australia/Sydney, not a rolling seven days. Once Today is finished, Anytime is the next source of work.
 - **Someday means outside this week's focus.** It is deliberately deferred work, not an idea graveyard; revisit it during weekly reviews. Blocked or speculative future steps may live here or in project notes.
@@ -39,8 +39,8 @@ Read one open Inbox item, including notes. Do not present a batch unless Adam as
 
 Ask only what is missing, in a natural conversation:
 - **What?** What does this mean? What outcome would make it done? Keep, cull, reference-only, or actionable?
-- **How?** What is the next concrete action? Is it one task or a finite multi-step project? What context/checklist would help? Is it blocked?
-- **Where?** Which existing area/project fits? Suggest a destination with a short reason rather than making Adam classify from scratch.
+- **How?** What is the next concrete action? Is it a task or a genuinely timebound multi-step outcome? What context/checklist would help? Is it blocked?
+- **Where?** Which area fits by default? Use an existing project only if the task contributes to its timebound outcome. Suggest a destination with a short reason rather than making Adam classify from scratch.
 - **When?** Today, the remainder of this Monday–Sunday week (Anytime), or outside this week (Someday)? Is there a real deadline? A genuine earliest possible start?
 
 Do not repeatedly ask about facts already supplied. Start with the meaning/outcome if the item is vague; only ask follow-ups needed to resolve the item. Use structured questions when concrete choices are needed, with a custom-answer path available. Keep the interrogation lightweight.
@@ -63,7 +63,7 @@ A broad cleanup request authorises inspection and proposals, not unrestricted mu
 
 **Weekly review:** review area by area, project by project, including Someday. Set the Monday–Sunday focus with Adam. Propose promoting selected Someday work into Anytime and deferring work outside this week's focus. Check active projects for a next action/blocker. Briefly surface accomplishments if requested.
 
-**Cleanup signals:** stale commitments, duplicates, vague wording, speculative or blocked active tasks, overloaded Today/Anytime, arbitrary future starts, and projects without next actions. Existing placement/dates may reflect deliberate decisions: flag inconsistencies, do not assume they are mistakes.
+**Cleanup signals:** stale commitments, duplicates, vague wording, speculative or blocked active tasks, overloaded Today/Anytime, arbitrary future starts, evergreen projects without an agreed timeframe, and projects without next actions. Existing placement/dates may reflect deliberate decisions: flag inconsistencies, do not assume they are mistakes.
 
 Offer a bounded change plan. Get agreement before ambiguous moves, merging, deleting/cancelling/completing tasks, clearing dates, creating projects/areas, or broad restructuring. Preserve useful notes/checklists when merging and confirm what will be retained. Reuse existing tags sparingly; do not adopt a new tagging system without agreement.
 
@@ -71,6 +71,7 @@ Offer a bounded change plan. Get agreement before ambiguous moves, merging, dele
 
 - Explicit instructions authorise the specified change; do not add redundant confirmation to straightforward capture or an already agreed edit.
 - Read affected existing items before editing. Send only intended fields and preserve unrelated notes, dates, tags, and checklist content.
+- When removing an evergreen project, first identify its actual tasks, move them directly into the appropriate area, preserve project-level context and inherited metadata where relevant, and verify preservation before trashing the empty container. Check actual task project IDs: do not trust filters that return unrelated tasks.
 - Inspect live MCP schemas. Distinguish deadline from start/when date. Do not assume an ISO-date field accepts `today`, `anytime`, or `someday`, or that clearing a date necessarily changes list membership correctly. Find the supported operation; if unavailable, stop and explain.
 - Verify destination, list membership, dates, and preserved context after mutations. A successful tool call alone is not proof of correct placement.
 - On partial failure, report actual changes and remaining work; do not claim the whole operation succeeded. Avoid blindly retrying creation or destructive operations.
