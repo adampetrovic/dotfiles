@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "things3": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "things3-mcp@latest"
+      ],
+      "description": "Read and manage local Things 3 tasks, projects, areas and tags"
+    }
+  }
+}
