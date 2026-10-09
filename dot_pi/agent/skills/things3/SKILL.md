@@ -33,6 +33,29 @@ For "add a task", "remind me", or a new thought:
 3. Do not add tags, reminders, start dates, or a project unless requested or agreed during processing.
 4. Verify creation and briefly report where it landed and any dates set.
 
+## Known MCP behaviour and workarounds
+
+Observed with `things3-mcp` 0.2.0; inspect the live tool schema if the server changes. Keep all operations through MCP.
+
+### Create in Inbox, then move to an explicitly requested area
+
+Direct `todos_create` with `areaId` rejected valid IDs for Personal, 🎁Projects, and Work with `invalid_area_reference: Invalid area ID - reference removed`. The task was still created, without its area. This is a creation-validation problem, not evidence that the area does not exist.
+
+For an explicitly requested area:
+1. Resolve the live area ID with `areas_list`.
+2. Call `todos_create` without `areaId` or `projectId`, creating in Inbox. Supply any agreed `checklistItems` at this step.
+3. Capture the returned task ID, then use `bulk_move` with `todoIds` and `areaId`.
+4. Read the task with `todos_get` to verify its `areaId`, notes, and dates. This sequence successfully placed tasks in all three areas. Checklist creation followed by moving to Work also succeeded without reported corrections; checklist contents still require visual confirmation.
+
+Do not move ordinary braindumps out of Inbox without an explicit destination or an agreed clarification decision. If direct creation reports a removed reference, recover by moving the task already created; do not create a duplicate. If the ID is missing or `unknown`, identify the actual new task unambiguously before moving or retrying.
+
+### Checklist creation is supported; checklist readback is not
+
+- `todos_create` accepts native checklist titles in `checklistItems`. Use this when creating an agreed checklist.
+- In this version, `todos_get` hardcodes `checklistItems: []`. That response means **unavailable checklist data**, not proof that a task has no checklist or that creation failed. Do not claim checklist creation failed, retry creation, or delete a task solely because of this empty response.
+- `todos_update` does not expose checklist editing. If Adam requests replacing an existing task to add/fix a checklist, obtain explicit approval for replacement, read and preserve all available metadata, and ask about existing checklist content/completion state that MCP cannot reveal. Create the replacement in Inbox with the agreed checklist, then move it and restore agreed dates/tags/placement through supported MCP operations. Do not delete the original until preservation is verified and Adam visually confirms the native checklist in Things (or explicitly accepts that it cannot be verified).
+- Report area/date verification separately from checklist verification. Ask Adam to inspect the checklist in Things when confirmation is necessary. Do not introduce non-MCP access as a workaround.
+
 ## Inbox clarification: one item at a time
 
 Read one open Inbox item, including notes. Do not present a batch unless Adam asks.
