@@ -1,15 +1,11 @@
 {
   "mcpServers": {
     "things3": {
-      "command": "npx",
+      "command": "uvx",
       "args": [
-        "-y",
-        "things3-mcp@latest"
+        "things-mcp"
       ],
-      "description": "Read and manage local Things 3 tasks, projects, areas and tags"{{ if .personal }},
-      "env": {
-        "THINGS3_AUTH_TOKEN": {{ onepasswordRead "op://Private/Things Cloud/THINGS_URLS_AUTH_TOKEN" | toJson }}
-      }{{ end }}
+      "description": "Read and manage local Things 3 tasks, projects, areas, tags and checklists (hald/things-mcp)"
     }
   }
 }
