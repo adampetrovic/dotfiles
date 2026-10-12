@@ -1,0 +1,15 @@
+{
+  "defaultPlatforms": ["native"],
+  "events": {
+    "agent_end": {
+      "enabled": true,
+      "platforms": ["native"]
+    }
+  },
+  "native": {
+    "enabled": true
+  },
+  "recap": {
+    "enabled": false
+  }
+}
