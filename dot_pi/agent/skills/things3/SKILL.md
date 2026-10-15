@@ -33,6 +33,10 @@ For "add a task", "remind me", or a new thought:
 3. Do not add tags, reminders, start dates, or a project unless requested or agreed during processing.
 4. Verify creation and briefly report where it landed and any dates set.
 
+## Notes formatting
+
+Write task and project notes in Markdown; Things renders it and it is much easier to read. Use `**Label**:` lines for short facts (when, why, prerequisites), bullet lists for steps or expectations, `inline code` for paths, names and short commands, and fenced code blocks for long or multi-line commands. When editing existing notes, keep any Markdown already there.
+
 ## Known MCP behaviour and workarounds
 
 The `things3` MCP server uses `hald/things-mcp` (`uvx things-mcp`). Inspect live tool schemas; tool names and parameters differ from the previous `things3-mcp` server. Do not reuse the old server's area-placement workaround or assume checklist readback is unavailable.
