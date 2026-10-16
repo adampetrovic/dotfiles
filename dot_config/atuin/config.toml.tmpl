@@ -9,3 +9,11 @@ filter_mode = "host"
 
 [keys]
 scroll_exits = false
+
+[daemon]
+enabled = true
+autostart = true
+
+# Capture coding-agent threads; `atuin config enable ai-sessions` is an alias for `atuin threads enable`
+[threads]
+capture = true
