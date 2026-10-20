@@ -28,8 +28,9 @@ setopt APPEND_HISTORY EXTENDED_HISTORY INC_APPEND_HISTORY SHARE_HISTORY
 setopt HIST_EXPIRE_DUPS_FIRST HIST_IGNORE_DUPS HIST_IGNORE_SPACE
 
 # Load Atuin before zsh-autosuggestions, but preserve zsh's native Up/Down bindings.
+# Ctrl-] opens the AI threads picker (replaces zsh's char search on that key).
 if command -v atuin >/dev/null 2>&1; then
-    eval "$(atuin init zsh --disable-up-arrow)"
+    eval "$(atuin init zsh --disable-up-arrow --bind-ai-resume)"
 fi
 
 # Load theme first
