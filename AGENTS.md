@@ -102,3 +102,16 @@ chezmoi managed            # List all managed files
 4. **Test before pushing without leaking secrets**: Prefer `jj diff --stat`, `jjc hunks`, shell syntax checks, and profile rendering with mock password-manager commands. For an isolated managed-file change, preview it with `chezmoi apply --dry-run --verbose <target-path>`, then apply only that target with `chezmoi apply --verbose <target-path>`; use the destination path (for example, `~/.jjconfig.toml`), not the chezmoi source name. Do not run or share unrestricted `chezmoi diff` output because work run scripts contain rendered Keeper secrets. If destination comparison is necessary, exclude scripts and inspect output locally: `chezmoi diff --exclude=scripts`.
 5. **Password manager dependency**: The pre-hook (`.install-password-manager.sh`) installs 1Password for personal profiles only. Work Keeper Password Manager, Keeper Commander CLI, and Secretive installation is handled via work Self Service, not Homebrew; the hook only warns if they are missing. Do not add active work-profile `onepasswordRead` or `onepasswordDocument` calls.
 6. **SSH agent split**: Personal profile keeps 1Password SSH agent/signing. Work profile uses Secretive's socket (`~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh`) for SSH auth; do not reintroduce 1Password agent paths into active work templates.
+
+## Review Checklist
+
+Used by the generic `Review` subagent (and humans) when reviewing changes here, in addition to the rules above:
+
+- Go template syntax stays valid and both profiles render: `.profile` / `.work` / `.personal` branches are balanced and each branch is correct. Check with `chezmoi execute-template --override-data '{"profile":"work","work":true,"personal":false}' < file.tmpl`, rendering only a slice when the template reads secrets.
+- Work profile must not call `onepasswordRead` / `onepasswordDocument`, reference 1Password SSH agent paths, or reintroduce 1Password for work. Work uses Keeper (secrets) and Secretive (SSH). Personal keeps its 1Password behaviour unchanged.
+- No secrets, tokens or rendered Keeper output committed or echoed. Never run unrestricted `chezmoi diff` or `chezmoi apply --verbose` as a reviewer; rendered non-script templates (e.g. mise config) also contain secrets.
+- Private work skills are never copied into this public repo or added as per-skill `symlink_*` entries.
+- `run_onchange_` scripts: edits re-trigger them on every machine, so flag unintended re-runs; scripts must be idempotent and pass a shell syntax check.
+- Source naming/attributes (`dot_`, `private_`, `executable_`, `symlink_`, `.tmpl`) and modes are correct (SSH: 0600 file / 0700 dir); `.chezmoiignore.tmpl` and `.chezmoiexternal.toml` stay consistent with added/removed files.
+- No bulk or recursive operations on the source directory, and no unexpected deletions (a past incident wiped 203 files).
+- Commit/push directly to `main`; no feature branches or bookmarks.

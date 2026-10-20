@@ -28,9 +28,8 @@ zoxide = 'latest'
 "cargo:https://tangled.sh/akashina.tngl.sh/jjc" = { version = "rev:bb71fdcd704e8bf4ddfac9ac0e3a036cab441b2c" }
 {{ if .work -}}
 java = 'corretto-17.0.15.6.1'
-{{ end -}}
+databricks-cli = 'latest'
 
-{{ if .work -}}
 # Standalone Rovo CLI, not the ACLI Rovo Dev plugin. Keep the full PyInstaller
 # archive together; the launcher selects Rovo mode without running its installer.
 [tools."http:rovo"]
