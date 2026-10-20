@@ -146,9 +146,21 @@ zi ice wait="1" lucid if'[[ -f $(brew --prefix)/share/work-scripts/aliases.zsh ]
     atload'source $(brew --prefix)/share/work-scripts/aliases.zsh'
 zi light zdharma-continuum/null
 
-# Lazily initialise the Atlas kubeconfig on first Kubernetes or Atlas command use.
-# The timeout bounds failures when offline or disconnected from the VPN.
+_atlas_kube_init() {
+  local pool cache=${XDG_CACHE_HOME:-$HOME/.cache}/atlaskube/tdp-os-bb00.kubeconfig
+  pool=$(gtimeout --kill-after=1s 5s atlas kitt context:create --pid=$$ 2>/dev/null) && [[ -n $pool ]] || return
+  export KUBECONFIG=$pool
+  if [[ ! -f $cache || -n $(find $cache -mmin +30 2>/dev/null) ]]; then
+    mkdir -p ${cache:h} && local tmp=$cache.$$
+    if KUBECONFIG=$tmp gtimeout --kill-after=1s 30s atlas atlaskube context -s tdp-os-stg-gcentral-01 -r us-central1 -e stg -c bb00 >/dev/null 2>&1; then
+      chmod 600 $tmp && mv $tmp $cache
+    else
+      rm -f $tmp
+    fi
+  fi
+  [[ -f $cache ]] && export KUBECONFIG=$cache:$pool
+}
 zi ice has"atlas" trigger-load'!kubectl;!helm;!k9s;!atlas' \
-    atload'local kubeconfig; kubeconfig=$(gtimeout --kill-after=1s 5s atlas kitt context:create --pid=$$ 2>/dev/null) && [[ -n $kubeconfig ]] && export KUBECONFIG=$kubeconfig'
+    atload'_atlas_kube_init'
 zi light zdharma-continuum/null
 {{ end -}}
