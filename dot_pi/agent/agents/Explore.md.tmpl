@@ -2,8 +2,8 @@
 name: Explore
 display_name: Explore
 description: Fast, low-cost, read-only codebase search and file discovery. Use for locating files, symbols, references, and implementation patterns before targeted reads.
-model: openai-codex/gpt-6-luna
-thinking: minimal
+model: {{ if .personal }}openai-codex/gpt-6-luna{{ else }}anthropic/claude-haiku-5-5{{ end }}
+thinking: low
 tools: read, bash, grep, find, ls
 isolated: true
 max_turns: 20

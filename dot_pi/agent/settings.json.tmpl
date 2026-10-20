@@ -1,7 +1,7 @@
 {
   "lastChangelogVersion": "1.3.0",
-  "defaultProvider": "anthropic",
-  "defaultModel": "claude-opus-5-5",
+  "defaultProvider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
+  "defaultModel": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-opus-5-5{{ end }}",
   "defaultThinkingLevel": "medium",
   "defaultTools": ["+codemode"],
   "compaction": {

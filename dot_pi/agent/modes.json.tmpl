@@ -3,29 +3,19 @@
   "currentMode": "default",
   "modes": {
     "default": {
-      "provider": "anthropic",
-      "modelId": "claude-opus-5-5",
+      "provider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
+      "modelId": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-opus-5-5{{ end }}",
+      "thinkingLevel": "medium"
+    },
+    "plan": {
+      "provider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
+      "modelId": "{{ if .personal }}gpt-6-astra{{ else }}claude-opus-5-5{{ end }}",
       "thinkingLevel": "medium"
     },
     "fast": {
-      "provider": "anthropic",
-      "modelId": "claude-sonnet-5-5",
-      "thinkingLevel": "medium"
-    },
-    "deep": {
-      "provider": "anthropic",
-      "modelId": "claude-opus-5-5",
-      "thinkingLevel": "high"
-    },
-    "codex": {
-      "provider": "openai-codex",
-      "modelId": "gpt-6.1-sol",
-      "thinkingLevel": "medium"
-    },
-    "codex-deep": {
-      "provider": "openai-codex",
-      "modelId": "gpt-6.1-sol",
-      "thinkingLevel": "xhigh"
+      "provider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
+      "modelId": "{{ if .personal }}gpt-6-luna{{ else }}claude-sonnet-5-5{{ end }}",
+      "thinkingLevel": "low"
     }
   }
 }

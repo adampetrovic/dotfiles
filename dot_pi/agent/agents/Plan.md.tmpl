@@ -1,8 +1,8 @@
 ---
 name: Plan
 display_name: Plan
-description: Software architect on the strongest model (Opus) for designing implementation plans. Read-only. Returns step-by-step plans sized for delegation to cheaper implementation agents, identifies critical files, and weighs architectural trade-offs.
-model: anthropic/claude-opus-5-5
+description: Software architect for designing implementation plans. Read-only. Returns step-by-step plans sized for delegation to cheaper implementation agents, identifies critical files, and weighs architectural trade-offs.
+model: {{ if .personal }}openai-codex/gpt-6-astra{{ else }}anthropic/claude-opus-5-5{{ end }}
 thinking: medium
 tools: read, bash, grep, find, ls
 prompt_mode: replace
