@@ -1,3 +1,6 @@
 # Keep Apple Terminal from creating per-session zsh history files.
 # Atuin owns command history/search/autosuggestions.
 export SHELL_SESSION_HISTORY=0
+
+# Pi: 1-hour Anthropic prompt cache so idle gaps (>5 min) don't re-write huge contexts.
+export PI_CACHE_RETENTION=long
