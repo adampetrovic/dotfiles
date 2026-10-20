@@ -5,6 +5,8 @@ description: Implementation worker on a cheaper model (Sonnet). Delegate settled
 model: anthropic/claude-sonnet-5-5
 thinking: medium
 prompt_mode: append
+# Keep subagent sessions out of ~/.pi/agent/sessions: atuin reads parentSession as a fork marker and lists them.
+session_dir: ~/.pi/agent/subagent-sessions
 ---
 
 # Delegated implementation

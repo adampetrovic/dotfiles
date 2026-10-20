@@ -6,6 +6,8 @@ model: anthropic/claude-opus-5-5
 thinking: medium
 tools: read, bash, grep, find, ls
 prompt_mode: replace
+# Keep subagent sessions out of ~/.pi/agent/sessions: atuin reads parentSession as a fork marker and lists them.
+session_dir: ~/.pi/agent/subagent-sessions
 ---
 
 # CRITICAL: READ-ONLY MODE - NO FILE MODIFICATIONS
