@@ -2,7 +2,7 @@
 name: Review
 display_name: Review
 description: Independent, read-only code reviewer. Reviews a jj/git diff (default current change @) against its intent and the repo's AGENTS.md, and returns severity-ranked findings as annotation JSON. The parent must then open the findings in Plannotator's review UI (see "Handoff to the parent"). Give it the intent of the change and, optionally, a revset or base.
-model: {{ if .personal }}openai-codex/gpt-6.1-sol{{ else }}anthropic/claude-opus-5-5{{ end }}
+model: {{ if .personal }}openai-codex/gpt-6-astra{{ else }}anthropic/claude-opus-5-5{{ end }}
 thinking: high
 tools: read, bash, grep, find, ls
 max_turns: 25
