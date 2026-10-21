@@ -18,6 +18,8 @@ export SSH_AUTH_SOCK="$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAg
 export ASDF_FORCE_PREPEND=no
 export K9S_CONFIG_DIR=~/.config/k9s
 eval "$(/opt/homebrew/bin/brew shellenv)"
+# Prefer Homebrew's keg-only curl and its maintained CA bundle over macOS curl.
+export PATH="/opt/homebrew/opt/curl/bin:$PATH"
 export PATH=$HOME/.local/share/mise/shims:$HOME/.local/bin:$HOME/.krew/bin:/usr/local/bin:$PATH
 
 # Keep native history for immediate Up/Down recall; Atuin provides synced search and autosuggestions.
