@@ -39,6 +39,12 @@ chezmoi apply --source-path "$HOME/.local/share/chezmoi/.chezmoiscripts/run_afte
 ```
 
 Do not add public per-skill `symlink_*` entries for private skills. The packaged reconciler owns links via `${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/work-pi-skills.manifest` and preserves unrelated/personal skills.
+
+## Work Commit Messages
+
+- Format: `<ticket>: <single line description>`, e.g. `BLOB-1234: Add retry to chunk upload`.
+- One line only: no body, no bullet lists, no semicolons or other multi-clause chaining. Keep the description short and imperative.
+- Take the ticket key from the branch name, bookmark, or user; ask if unknown.
 {{ end -}}
 ## Prompt Hygiene
 
