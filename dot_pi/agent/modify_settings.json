@@ -1,9 +1,19 @@
+{{/* chezmoi:modify-template */}}
+{{- /* Keep only Pi's local changelog state; all preferences remain managed here. */ -}}
+{{- $current := dict -}}
+{{- if .chezmoi.stdin -}}
+{{- $current = mustFromJson .chezmoi.stdin -}}
+{{- end -}}
 {
-  "lastChangelogVersion": "1.4.0",
+{{- if hasKey $current "lastChangelogVersion" }}
+  "lastChangelogVersion": {{ index $current "lastChangelogVersion" | toJson }},
+{{- end }}
   "defaultProvider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
   "defaultModel": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-sonnet-5-5{{ end }}",
   "defaultThinkingLevel": "medium",
-  "defaultTools": ["+codemode"],
+  "defaultTools": [
+      "+codemode"
+  ],
   "compaction": {
     "enabled": true,
     "reserveTokens": 32768,
@@ -21,7 +31,6 @@
     "passive": false,
     "debugLog": false
   },
-  "extensions": ["-extensions/notify.ts"],
   "packages": [
     "npm:@juicesharp/rpiv-ask-user-question",
     "npm:@juicesharp/rpiv-btw",
