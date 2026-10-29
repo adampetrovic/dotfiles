@@ -288,11 +288,12 @@ This displays the complete off-trunk histories for the working copy and all log 
 | `jj tug` | `jj bookmark move --from 'heads(::@- & bookmarks())' --to @-` | Move the bookmark in `@-`'s ancestry forward to `@-`. Use after squashing/amending to keep the bookmark pointing at the right commit. |
 | `jj forget <bookmark>` | `jj bookmark forget` | Forget a bookmark (removes locally without propagating deletion to remote). |
 | `jj a` | `jj abandon` | Short alias for abandon. |
-| `jj yoink` | Finds the single bookmark in `trunk()..@` and moves it to `@`. | Move the only bookmark between trunk and working copy to the current change. Errors if 0 or >1 bookmarks found. |
 | `jj track <name>` | sync + `jj bookmark track <name>@origin` + `jj new -r <name>` | Fetch, track a remote bookmark, and start working on top of it. |
 | `jj remote-diff` | sync + `jj diff --from <bookmark>@origin --to @` | Show what local changes would be pushed compared to the remote bookmark. |
 | `jj reset-to-remote` | Rebases children onto remote, abandons `@`, resets bookmark to remote. | **Destructive.** Discard all local changes and reset to the remote bookmark state. Prompts for confirmation. |
 | `jj split-changes` | Splits unpushed local changes off the current bookmark into a new changeset. | Separates local-only changes from what's already on the remote. |
+
+Use the builtin `jj bookmark advance` to move the closest ancestral bookmarks to `@` (including trunk if no closer bookmark exists). It moves all candidates when several qualify; use `jj bookmark advance <name>` to select one, or `--to <rev>` for another destination.
 
 ### Typical Feature Workflow (Using Custom Aliases)
 
@@ -314,8 +315,8 @@ jj git push -b my-feature
 jj tug
 jj git push -b my-feature
 
-# Or if the bookmark is behind, yoink it to current change
-jj yoink
+# Or advance the closest bookmarks to the current change
+jj bookmark advance
 jj git push -b my-feature
 
 # Rebase onto latest trunk

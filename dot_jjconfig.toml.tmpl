@@ -104,42 +104,6 @@ tug = ["bookmark", "move", "--from", "heads(::@- & bookmarks())", "--to", "@-"]
 forget = ['bookmark', 'forget']
 a = ['abandon']
 
-# Move the closest local bookmark ancestor to the current changeset
-# (including the trunk bookmark when no closer bookmark exists)
-yoink = [
-  "util",
-  "exec",
-  "--",
-  "bash",
-  "-c",
-  '''
-  #!/usr/bin/env bash
-  set -eu -o pipefail
-  
-  # Find the closest local bookmark ancestor(s), including trunk
-  bookmarks=$(jj log --no-graph -r "heads(::@ & bookmarks())" -T 'local_bookmarks.map(|b| b.name()).join("\n")' | grep -v '^$' || true)
-  
-  # Count the candidate bookmarks
-  bookmark_count=$(printf '%s\n' "$bookmarks" | grep -c . || true)
-  
-  if [[ "$bookmark_count" -eq 0 ]]; then
-    echo "Error: No bookmark found in the ancestry of @"
-    exit 1
-  elif [[ "$bookmark_count" -gt 1 ]]; then
-    echo "Error: Multiple equally close bookmarks found in the ancestry of @:"
-    echo "$bookmarks"
-    echo "Please specify which bookmark to move manually"
-    exit 1
-  fi
-  
-  # We have exactly one closest bookmark; move it to @
-  bookmark_name=$(printf '%s\n' "$bookmarks" | head -1)
-  echo "Moving bookmark '$bookmark_name' to current changeset"
-  jj bookmark set "$bookmark_name" -r @
-  ''',
-  ""
-]
-
 # track a remote branch by fetching first
 track = [
   "util",
