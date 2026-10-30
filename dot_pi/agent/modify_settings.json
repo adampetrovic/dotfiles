@@ -37,6 +37,7 @@
     "npm:@tintinweb/pi-subagents",
     "npm:pi-web-access",
     "npm:pi-lens",
+    "npm:@osolmaz/pi-workflows",
     "npm:@plannotator/pi-extension",
     "npm:pi-observational-memory"{{ if .personal }},
     "npm:@narumitw/pi-usage"{{ end }},
