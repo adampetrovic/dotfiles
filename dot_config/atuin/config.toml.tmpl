@@ -1,7 +1,5 @@
 {{ if .personal -}}
 sync_address = 'https://atuin.{{ (onepasswordRead "op://Private/chezmoi/SECRET_DOMAIN") -}}'
-{{ else if .work -}}
-# Work profile: Atuin sync is not migrated to Keeper yet, so run local-only history.
 {{ end -}}
 enter_accept = false
 search_mode = "fuzzy"
@@ -14,6 +12,5 @@ scroll_exits = false
 enabled = true
 autostart = true
 
-# Capture coding-agent threads; `atuin config enable ai-sessions` is an alias for `atuin threads enable`
 [threads]
 capture = true
