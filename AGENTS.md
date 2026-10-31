@@ -31,7 +31,6 @@ dot_zshrc.tmpl              # Zsh config (zinit, spaceship prompt)
 dot_zsh/aliases.zsh.tmpl    # Shell aliases
 dot_jjconfig.toml.tmpl      # Jujutsu VCS config
 dot_wezterm.lua.tmpl        # WezTerm terminal config
-dot_aerospace.toml.tmpl     # AeroSpace window manager
 dot_config/git/config.tmpl  # Git config
 dot_config/mise/config.toml.tmpl  # mise (language version manager)
 private_dot_ssh/private_config.tmpl # SSH config (0600 file / 0700 dir; personal 1Password agent, work Secretive agent)
