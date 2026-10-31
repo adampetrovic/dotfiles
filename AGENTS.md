@@ -24,7 +24,7 @@ Always commit and push directly to `main` in this repository. Do not create feat
   run_after_11-*            # Always update private work-scripts HEAD and reconcile packaged Pi skills
   run_onchange_after_30-*   # Kubernetes setup
   run_onchange_after_90-*   # macOS defaults, vim, mise, wireguard (personal only)
-  run_onchange_after_91-*   # macOS apps, dock, energy, finder, input, screen
+  run_onchange_after_91-*   # macOS apps, dock, energy (personal only), finder, input, screen
 
 dot_Brewfile.tmpl           # Homebrew packages (templated per profile)
 dot_zshrc.tmpl              # Zsh config (zinit, spaceship prompt)

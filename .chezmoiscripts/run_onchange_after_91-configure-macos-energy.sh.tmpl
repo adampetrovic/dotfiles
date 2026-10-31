@@ -1,3 +1,4 @@
+{{- if .personal -}}
 #!/bin/bash
 
 set -eufo pipefail
@@ -28,3 +29,4 @@ sudo touch /private/var/vm/sleepimage
 sudo chflags uchg /private/var/vm/sleepimage
 
 log_ok "Done configuring macOS energy settings."
+{{ end -}}
