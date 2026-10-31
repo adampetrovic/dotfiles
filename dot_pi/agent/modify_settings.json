@@ -40,16 +40,7 @@
     "npm:@osolmaz/pi-workflows",
     "npm:@plannotator/pi-extension",
     "npm:pi-observational-memory"{{ if .personal }},
-    "npm:@narumitw/pi-usage"{{ end }},
-    {
-      "source": "npm:mitsupi",
-      "extensions": [
-        "extensions/todos.ts"
-      ],
-      "skills": [],
-      "prompts": [],
-      "themes": []
-    }
+    "npm:@narumitw/pi-usage"{{ end }}
   ],
   "theme": "dark",
   "warnings": {
