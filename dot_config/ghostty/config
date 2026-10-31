@@ -18,3 +18,45 @@ cursor-style-blink = false
 
 # macOS
 macos-option-as-alt = true
+
+# Splits
+# Built-in defaults still apply: cmd+d / cmd+shift+d split right / down,
+# cmd+opt+arrows move focus, cmd+ctrl+arrows resize, cmd+shift+enter zoom,
+# cmd+ctrl+equal equalize, cmd+w close.
+unfocused-split-opacity = 0.85
+split-preserve-zoom = navigation
+
+# Vim-style focus without entering pane mode
+keybind = cmd+opt+h=goto_split:left
+keybind = cmd+opt+j=goto_split:down
+keybind = cmd+opt+k=goto_split:up
+keybind = cmd+opt+l=goto_split:right
+
+# Pane mode (tmux-style): cmd+s, then a key. Escape or enter to leave.
+# Navigation and resizing stay in pane mode so they can be repeated;
+# split, zoom and close return to normal typing straight away.
+keybind = cmd+s=activate_key_table:pane
+keybind = pane/escape=deactivate_key_table
+keybind = pane/enter=deactivate_key_table
+keybind = pane/catch_all=ignore
+
+keybind = pane/h=goto_split:left
+keybind = pane/j=goto_split:down
+keybind = pane/k=goto_split:up
+keybind = pane/l=goto_split:right
+keybind = pane/tab=goto_split:next
+
+keybind = pane/shift+h=resize_split:left,20
+keybind = pane/shift+j=resize_split:down,20
+keybind = pane/shift+k=resize_split:up,20
+keybind = pane/shift+l=resize_split:right,20
+keybind = pane/e=equalize_splits
+
+keybind = pane/v=new_split:right
+keybind = chain=deactivate_key_table
+keybind = pane/s=new_split:down
+keybind = chain=deactivate_key_table
+keybind = pane/z=toggle_split_zoom
+keybind = chain=deactivate_key_table
+keybind = pane/x=close_surface
+keybind = chain=deactivate_key_table
