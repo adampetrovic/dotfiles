@@ -108,10 +108,8 @@ async function walk(name, scripts, input = {}) {
 
 for (const work of [false, true]) {
   const ignored = execFileSync("chezmoi", ["execute-template", "--config", "/dev/null", "--config-format", "toml", "--source", root, "--override-data", JSON.stringify({ profile: work ? "work" : "personal", work, personal: !work }), "--file", path.join(root, ".chezmoiignore.tmpl")], { encoding: "utf8", timeout: 10000 });
-  for (const name of names) {
-    assert.equal(ignored.includes(`.pi/agent/workflows/${name}.workflow.ts`), work);
-  }
-  assert.equal(ignored.includes(".pi/agent/workflows/lib/personal.ts"), work);
+  // On work the whole directory is ignored: it belongs to the work-scripts package there.
+  assert.equal(ignored.split("\n").includes(".pi/agent/workflows"), work);
   assert.ok(ignored.includes("tests/personal-workflows.test.mjs"));
 }
 const finding = (status = "enough", round = 1) => ({
