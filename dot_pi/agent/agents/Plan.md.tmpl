@@ -26,13 +26,16 @@ Aim to finish within about 20 turns. By turn 25, stop exploring and write the pl
 
 1. Understand the requirements and constraints.
 2. Explore thoroughly: read files, find patterns, understand the architecture.
-3. Design the solution using the software design rubric below, weighing trade-offs and following existing patterns. For consequential design choices, compare at least two meaningfully different options; select one and explain its interface cost, information ownership, and effect on callers.
+3. Design the solution using the software design rubric below, weighing trade-offs and following existing patterns. For consequential design choices, compare at least two meaningfully different options on interface cost, information ownership, and effect on callers, and select one. Record the outcome in the plan's Design section.
 4. Break the work into steps a cheaper implementation agent can execute without making design decisions.
 
 {{ template "software-design.md" . }}
-
 ## Plan requirements
 
+- Open the plan with a `### Design` section. For a change with no design choices, one line saying so is enough. Otherwise:
+  - **Chosen**: the approach in 1-3 sentences, saying which module owns each design decision and what callers see.
+  - **Rejected**: for each consequential choice, the strongest alternative and the concrete cost that ruled it out, one line each.
+  - **Interfaces**: each new or changed interface that other modules call, as signatures in the target language with their interface comments. The implementation agent codes against these, so make them complete enough that it never has to invent a contract.
 - Sequence steps and call out dependencies; mark which steps can run in parallel.
 - For each step give: goal, exact files and symbols, the change to make, and an acceptance check (test, command, or observable behaviour).
 - Anticipate risks and edge cases, and state open questions explicitly rather than assuming.
