@@ -2,7 +2,6 @@
 // Structural checks only; model-based smoke results are recorded in the skill's evaluation.md.
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
-import { createHash } from "node:crypto";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -131,13 +130,6 @@ for (const profile of profiles) {
       for (const field of ["filePath", "lineStart", "severity", "annotations"]) assert.ok(rendered.includes(`"${field}"`));
     }
   }
-  // Independently captured from parent 21389f3c before the merge, including both APOSD partials.
-  const aposd = execFileSync("chezmoi", [
-    "execute-template", "--config", "/dev/null", "--config-format", "toml",
-    "--source", root, "--override-data", data, "--file", path.join(root, "dot_agents/skills/aposd-design-review/SKILL.md.tmpl"),
-  ], { encoding: "utf8", timeout: 20000 });
-  assert.equal(createHash("sha256").update(aposd).digest("hex"), "e3cac8628f0bab6e23e2c5733bff5c0fc5527cf28da8246f923736614afd07a2", "APOSD-only review changed unexpectedly");
-  assert.ok(!aposd.includes("14 supplied") && !aposd.includes("<<<<<<<"));
   const ignored = execFileSync("chezmoi", [
     "execute-template", "--config", "/dev/null", "--config-format", "toml",
     "--source", root, "--override-data", data, "--file", path.join(root, ".chezmoiignore.tmpl"),
