@@ -2,6 +2,9 @@
   "contextInjection": {
     "enabled": false
   },
+  "ui": {
+    "compactWidget": true
+  },
   "lsp": {
     "disabledServers": ["kotlin"],
     "servers": {
