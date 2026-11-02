@@ -29,7 +29,10 @@ export default defineWorkflow({
       prompt: (c) => prompt(c, `Read-only planning. No code edits or mutating commands before operator approval.
 ${practical}
 If input.plan exists it is inline plan text or a path: inspect the path when it identifies a file, and read it.
-Draft/adapt the practical plan for this task. Address any approval revision feedback and preserve previous findings.
+Launch the read-only Plan subagent to draft/adapt the practical plan for this task. Its brief must be self-contained: the task,
+context, input.plan, the previous plan, approval revision feedback and previous findings, with the plan requirements above.
+Submit its plan verbatim as plan, Design section included, with evidence from its findings. If the Plan subagent cannot
+run or fails, return blocked with a concrete question.
 Do not request approval yourself; the protected operator gate follows. If a real user decision is unresolved,
 return blocked with a concrete question and any usable partial plan.`),
       expectedOutput: planShape, validate: validatePlan,
@@ -70,7 +73,12 @@ return blocked with a concrete question and any usable partial plan.`),
       timeoutMs,
       prompt: (c) => prompt(c, `Implement ONLY the latest operator-approved plan. On later rounds fix review findings within that approved scope.
 If a scope/plan change needs a user decision, return blocked with a concrete question; do not silently replan.
-Preserve unrelated changes and follow local jj conventions before editing. Inspect current changes before repeating work.
+Preserve unrelated changes and set up the jj change yourself, per local conventions, before any edits. Inspect current
+changes before repeating work.
+Delegate all edits, including review fixes, to Implement subagents, one at a time, one brief per step or group of related
+steps. Each brief needs the goal, exact files, the plan's Design interfaces, constraints and acceptance checks, and must say
+to edit in the current jj change without creating a new one. Do not edit files yourself; if an Implement subagent cannot
+run or fails, return blocked with a concrete question.
 Run project-native checks and record actual commands, outcomes and evidence. Never count skipped, failed or unavailable
 checks as passing; document reasons. Keep previous feedback and check failures visible. Return blocked for uncertainty
 requiring the user; otherwise ready for an independent review, even if checks still have fixable failures.`),
