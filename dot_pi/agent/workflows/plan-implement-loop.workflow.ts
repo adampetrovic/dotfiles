@@ -75,13 +75,16 @@ return blocked with a concrete question and any usable partial plan.`),
 If a scope/plan change needs a user decision, return blocked with a concrete question; do not silently replan.
 Preserve unrelated changes and set up the jj change yourself, per local conventions, before any edits. Inspect current
 changes before repeating work.
-Delegate all edits, including review fixes, to Implement subagents, one at a time, one brief per step or group of related
-steps. Each brief needs the goal, exact files, the plan's Design interfaces, constraints and acceptance checks, and must say
-to edit in the current jj change without creating a new one. Do not edit files yourself; if an Implement subagent cannot
-run or fails, return blocked with a concrete question.
-Run project-native checks and record actual commands, outcomes and evidence. Never count skipped, failed or unavailable
-checks as passing; document reasons. Keep previous feedback and check failures visible. Return blocked for uncertainty
-requiring the user; otherwise ready for an independent review, even if checks still have fixable failures.`),
+Delegate all edits, including review fixes, to Implement subagents, one brief per step or group of related steps. Each brief
+needs the goal, exact files, the plan's Design interfaces, constraints and acceptance checks, and must say to edit in the
+current jj change without creating a new one. Run briefs in parallel only for steps the plan marks parallel that touch
+different files, and tell those subagents to run only checks scoped to their own files, never repo-wide tests or formatters.
+Keep dependent or file-sharing steps in order. Do not edit files yourself; if an Implement subagent cannot run or fails,
+return blocked with a concrete question.
+After the subagents finish, run project-native checks and record actual commands, outcomes and evidence. Never count
+skipped, failed or unavailable checks as passing; document reasons. Keep previous feedback and check failures visible.
+Return blocked for uncertainty requiring the user; otherwise ready for an independent review, even if checks still have
+fixable failures.`),
       expectedOutput: workShape, validate: validateWork,
     }),
     review: agent({
