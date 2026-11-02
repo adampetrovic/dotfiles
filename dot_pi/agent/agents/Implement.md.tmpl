@@ -4,6 +4,7 @@ display_name: Implement
 description: Implementation worker for settled, well-specified tasks. Delegate settled, well-specified work here — multi-file edits, refactors, tests, migrations, and multi-step research. Give it a self-contained brief with the goal, exact files, the plan's interface sketch if any, constraints, and acceptance checks; keep design decisions in the parent.
 model: {{ if .personal }}openai-codex/gpt-6.1-sol{{ else }}anthropic/claude-sonnet-5-5{{ end }}
 thinking: medium
+max_turns: 50
 prompt_mode: append
 allowed_subagents: Explore
 # Keep subagent sessions out of ~/.pi/agent/sessions: atuin reads parentSession as a fork marker and lists them.
