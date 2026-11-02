@@ -16,6 +16,12 @@ When asked to work on a project:
 4. Read its local `AGENTS.md` when present before editing.
 5. Follow that repository's VCS and validation conventions.
 
+## Agent Routing
+
+- Design work (how to structure a change, which interfaces, which approach): delegate to the `Plan` subagent rather than designing in this session.
+- Reviewing a change or diff: delegate to the `Review` subagent.
+- Assessing the design of existing code (a module, package, or directory, not a diff): delegate to the `Audit` subagent.
+
 ## Version Control
 
 - Prefer Jujutsu (`jj`) over raw `git` for all version-control operations whenever a repository has a `.jj/` directory or otherwise supports jj.
