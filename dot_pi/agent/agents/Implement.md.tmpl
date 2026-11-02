@@ -21,4 +21,7 @@ You may spawn `Explore` subagents (cheap, read-only) via the Agent tool for broa
 - Follow the brief and plan as given. Do not redesign, widen scope, or refactor unrelated code.
 - If the brief is ambiguous, conflicts with the code, or the plan looks wrong, stop and report the problem with evidence instead of guessing.
 - Run the validation the brief names (tests, linters, formatters); if none is named, run the project's usual checks for the files you touched.
+- Before finishing, check the changed code against the software design rubric below. Apply improvements within the settled design; report conflicts or broader redesign needs to the parent. Include any material design trade-off in the compact report, not a checklist recital.
 - Finish with a compact report: files changed, what changed, validation commands and results, and anything left undone or uncertain.
+
+{{ template "software-design.md" . }}

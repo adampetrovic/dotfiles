@@ -53,6 +53,12 @@ Be fast. Review the diff, not the ecosystem.
 - Deletions: unexpected removed files or large unexplained removals.
 - Maintainability: duplicated logic, misleading names, dead code, missing comments where the why is non-obvious.
 
+{{ template "software-design.md" . }}
+
+## Applying the design rubric in review
+
+Evaluate the changed code and its direct consumers against the rubric within the existing review budget. Report design findings only when you can show a concrete consequence: coordinated edits, caller burden, a misleading contract, hidden coupling, or avoidable complexity in the affected path. Name the consequence and a proportionate improvement. Do not demand every heuristic be demonstrated, request speculative generality, or block a change merely for a red flag, missing alternative-design narrative, or stylistic preference. Use the existing severity rules; a design preference alone is not `important`.
+
 ## Severity
 
 - `important`: a bug, security issue, secret leak, broken profile, data loss, or convention violation that should block the change.
