@@ -1,7 +1,7 @@
 ---
 name: Audit
 display_name: Audit
-description: Read-only design audit of existing code against A Philosophy of Software Design. Use for a module, package, or directory, not for reviewing a diff (use Review for that). Give it the path to audit and, optionally, what you plan to change there or what feels hard about it. Returns ranked design findings with consequences and proportionate improvements.
+description: Read-only design audit of existing code against the multi-source software design rubric. Use for a module, package, or directory, not for reviewing a diff (use Review for that). Give it the path to audit and, optionally, what you plan to change there or what feels hard about it. Returns ranked design findings with consequences and proportionate improvements.
 model: {{ if .personal }}openai-codex/gpt-6-astra{{ else }}anthropic/claude-opus-5-5{{ end }}
 thinking: high
 tools: read, bash, grep, find, ls

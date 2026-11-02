@@ -1,0 +1,161 @@
+{
+  "archiveSha256": "59b2b6673c98d309efeb9a7d80eec7ca55ac2cf2a02ca6f19bf49d61a4a660a1",
+  "coverage": "All 86 extracted-text chunks processed by complete-file reading workers; original image-only content was not independently inspected.",
+  "method": "EPUB package spine order; HTML text and image alt text, with chapter headings retained. Text counts include front/back matter, indexes and advertisements where supplied. Chapter anchors in topic references identify arguments; hashes identify exact input files.",
+  "books": [
+    {
+      "id": "01",
+      "file": "Programming Pearls - Jon Bentley (2016).epub",
+      "title": "Programming Pearls",
+      "edition": "Supplied EPUB; filename year 2016 is not an edition claim",
+      "sha256": "3416cbcfebaa246de0caf0ad32db7212359e4be8c46ff619bbea6db5e85792a8",
+      "words": 86613,
+      "spineItems": 194,
+      "chunks": 5,
+      "processedChunks": 5
+    },
+    {
+      "id": "02",
+      "file": "Release It!, 2nd Edition (2018).epub",
+      "title": "Release It!: Design and Deploy Production-Ready Software",
+      "edition": "Second edition",
+      "sha256": "a598fd41fe8fbb6c6f88f7004a373ed623ba18954478a7caaffbc3d2add58e4f",
+      "words": 124722,
+      "spineItems": 151,
+      "chunks": 7,
+      "processedChunks": 7
+    },
+    {
+      "id": "03",
+      "file": "The Pragmatic Programmer (2020).epub",
+      "title": "The Pragmatic Programmer: Your Journey to Mastery",
+      "edition": "Twentieth anniversary, second edition",
+      "sha256": "28a22947db45150e74edd87b6e1e9017b778997548481c09b4669a970d230fa2",
+      "words": 101565,
+      "spineItems": 84,
+      "chunks": 5,
+      "processedChunks": 5
+    },
+    {
+      "id": "04",
+      "file": "Refactoring (2018).epub",
+      "title": "Refactoring: Improving the Design of Existing Code",
+      "edition": "Second edition",
+      "sha256": "13c5b1a28c6b15ab0ea3908114cbf6f9ba19ab4d8c7341c078596bbc2d3aa543",
+      "words": 116031,
+      "spineItems": 36,
+      "chunks": 7,
+      "processedChunks": 7
+    },
+    {
+      "id": "05",
+      "file": "Good Code, Bad Code (2021).epub",
+      "title": "Good Code, Bad Code",
+      "edition": "Supplied 2021-labelled EPUB",
+      "sha256": "d1064ea40f8b5a2f2f688f8b397ad7a096735354b588909ecf11c61cbd7b2009",
+      "words": 124399,
+      "spineItems": 25,
+      "chunks": 8,
+      "processedChunks": 8
+    },
+    {
+      "id": "06",
+      "file": "Working Effectively with Legacy Code (2004).epub",
+      "title": "Working Effectively with Legacy Code",
+      "edition": "Supplied 2004-labelled EPUB",
+      "sha256": "4570d1ea03dbe262684324851a3d8bc6632363418f72c721290dab30efcf0101",
+      "words": 118739,
+      "spineItems": 40,
+      "chunks": 7,
+      "processedChunks": 7
+    },
+    {
+      "id": "07",
+      "file": "Fundamentals of Software Architecture (2025).epub",
+      "title": "Fundamentals of Software Architecture",
+      "edition": "Second edition, 2025",
+      "sha256": "109617c87b6ea16232c2fefc6e49deeb31949d73a274491b1b560a618c909d7a",
+      "words": 141394,
+      "spineItems": 39,
+      "chunks": 8,
+      "processedChunks": 8
+    },
+    {
+      "id": "08",
+      "file": "Software Architecture (2021).epub",
+      "title": "Software Architecture: The Hard Parts",
+      "edition": "First edition",
+      "sha256": "0849893d87e7095afd32dfc53e464d94a11effe3c7f922ad2959595c85588dbf",
+      "words": 118309,
+      "spineItems": 28,
+      "chunks": 7,
+      "processedChunks": 7
+    },
+    {
+      "id": "09",
+      "file": "Balancing Coupling in Software Design (2024).epub",
+      "title": "Balancing Coupling in Software Design",
+      "edition": "Supplied 2024-labelled EPUB; copyright frontmatter 2025",
+      "sha256": "6b9aea98cb585d2f984a11674160669d4e5207b2fd606691df8e4b4318ca07b7",
+      "words": 78222,
+      "spineItems": 47,
+      "chunks": 4,
+      "processedChunks": 4
+    },
+    {
+      "id": "10",
+      "file": "Learning Domain-Driven Design (2021).epub",
+      "title": "Learning Domain-Driven Design",
+      "edition": "Supplied 2021-labelled EPUB",
+      "sha256": "e23ee6bc6b7dc52dd525f8e1f7f3322e795dea5584c9fc491f3739ea2a6db6a1",
+      "words": 84634,
+      "spineItems": 34,
+      "chunks": 5,
+      "processedChunks": 5
+    },
+    {
+      "id": "11",
+      "file": "Grokking Simplicity (2021).epub",
+      "title": "Grokking Simplicity",
+      "edition": "Supplied 2021-labelled EPUB",
+      "sha256": "bc639dd83a23f25772bc0e549cfaa06ba3e29149bebd0c28b211a38fb76449ef",
+      "words": 126900,
+      "spineItems": 27,
+      "chunks": 7,
+      "processedChunks": 7
+    },
+    {
+      "id": "12",
+      "file": "Secure by Design (2019).epub",
+      "title": "Secure by Design",
+      "edition": "Supplied 2019-labelled EPUB",
+      "sha256": "9e19fda83b354294905891e73da9e536b03fef90c6b5ae94d4f5689d0f235c5f",
+      "words": 149106,
+      "spineItems": 31,
+      "chunks": 8,
+      "processedChunks": 8
+    },
+    {
+      "id": "13",
+      "file": "Unit Testing Principles, Practices, and Patterns (2020).epub",
+      "title": "Unit Testing: Principles, Practices, and Patterns",
+      "edition": "MEAP Version 3, not assumed to be the final edition",
+      "sha256": "a5200b8cce43ab9b2b5a329e9f5319ee053ae9274ec1c134f12dda2bd33be080",
+      "words": 83132,
+      "spineItems": 20,
+      "chunks": 5,
+      "processedChunks": 5
+    },
+    {
+      "id": "14",
+      "file": "A Philosophy of Software Design (2018).epub",
+      "title": "A Philosophy of Software Design",
+      "edition": "First edition, 2018",
+      "sha256": "c8c081f1356cdd8ede4251a1529bdbdd704aa26420eeb48bb9993e5986929dec",
+      "words": 58763,
+      "spineItems": 30,
+      "chunks": 3,
+      "processedChunks": 3
+    }
+  ]
+}

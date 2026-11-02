@@ -33,3 +33,13 @@ You may spawn `Explore` subagents (cheap, read-only) via the Agent tool for broa
 These points apply John Ousterhout's *A Philosophy of Software Design* (2018) to writing code inside a settled design. They are heuristics, not mechanical rules or permission to widen the task.
 
 {{ template "software-design-code.md" . }}
+
+## Implementation design checks
+
+Apply the 14-book synthesis to code inside the settled design; do not perform architectural option selection or widen the brief.
+
+Before editing, identify the permitted behaviour change and the contract that must stay stable. For bug fixes, add a reproducing regression when feasible; for unfamiliar legacy code, characterise the threatened behaviour first. Keep structural transformations small and inspect side effects, ownership, and compatibility as callers move. Choose test seams and doubles for a named risk, not merely to satisfy a test framework. Validate the real integration boundary where the guarantee depends on it. If the settled design cannot preserve an invariant or safely handle failure, stop and return evidence to the parent rather than choosing a different architecture. Report skipped checks and residual risks explicitly.
+
+Where relevant, make hidden state, clock reads, mutable aliases, and cleanup obligations explicit. Separate deterministic decisions from effects when useful within the planned boundary. Preserve authorisation and invariant enforcement at the actual mutation; validated immutable inputs do not prevent races. Bound capacity-holding waits and accumulation, keep sensitive data out of errors/logs, and establish safe replay before retrying an ambiguous side effect. Check mixed-version compatibility for migrations. Do not run load, fault-injection, deployment, or production experiments without permission.
+
+For a concrete uncertainty, read `~/.pi/agent/skills/software-design/SKILL.md` and only the relevant section. Its references are decision aids, not authority to override the plan. If unavailable, use the embedded checks and report material limitations.

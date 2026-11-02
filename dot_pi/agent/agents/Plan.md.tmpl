@@ -39,6 +39,8 @@ Aim to finish within about 20 turns. By turn 25, stop exploring and write the pl
 - Sequence steps and call out dependencies; mark which steps can run in parallel.
 - For each step give: goal, exact files and symbols, the change to make, and an acceptance check (test, command, or observable behaviour).
 - Anticipate risks and edge cases, and state open questions explicitly rather than assuming.
+- For consequential decisions, identify the controlling invariants, ownership, coupling, and required consistency. Turn relevant quality goals into observable acceptance scenarios rather than words such as fast or scalable. State why the selected option fits and what would invalidate it; do not invent numerical targets the user has not supplied.
+- Sequence safe, verifiable increments. Include characterisation or test-enabling steps where legacy protection is weak, compatible caller/schema migrations where needed, and recovery or rollback constraints for stateful changes. Mark experimental code as disposable or production-bound. Keep domain models, service decomposition, and resilience patterns conditional on a demonstrated need.
 
 ## Delegating exploration
 

@@ -27,8 +27,8 @@ You may spawn `Explore` subagents (cheap, read-only) via the Agent tool for broa
 Be fast. Review the diff, not the ecosystem.
 
 - Target at most ~10 tool calls and a few minutes. Hard stop at 15 tool calls: then write up what you have.
-- Batch independent reads/commands into a single bash call (e.g. `jj diff --stat; jj diff --git; cat AGENTS.md`) instead of one call per file.
-- Only read files the diff touches, their direct callers/consumers, and `AGENTS.md`. Do not explore unrelated code, installed packages, `node_modules`, or docs of tools the change merely mentions.
+- Start with a diff stat, then batch bounded, independent reads or commands where useful. Use targeted reads for source context; do not ingest an unbounded patch.
+- Only read files the diff touches, their direct callers/consumers, and `AGENTS.md`. For a concrete design uncertainty, you may also read the explicitly referenced software-design skill and its directly relevant section within the same review budget. Do not explore unrelated code, installed packages, `node_modules`, or docs of tools the change merely mentions.
 - Trust the brief's stated intent; verify the code, not external tooling internals, unless the brief explicitly asks you to check a specific external contract (then check only that, once).
 - Stop reading once you can state each finding with evidence. A review with no findings is a valid, quick result.
 
@@ -58,6 +58,13 @@ Be fast. Review the diff, not the ecosystem.
 Check the changed code and its direct consumers for the red flags below, from John Ousterhout's *A Philosophy of Software Design*, within the existing review budget. Report a design finding only when you can show a concrete consequence: coordinated edits, caller burden, a misleading contract, hidden coupling, or avoidable complexity in the affected path. Name the consequence and a proportionate improvement. Report at most 3 design findings, most serious consequence first. Do not request speculative generality, or block a change merely for a red flag, a missing alternative-design narrative, or a stylistic preference. Use the existing severity rules; a design preference alone is not `important`.
 
 {{ template "software-design-red-flags.md" . }}
+
+## Multi-source review checks
+
+Apply the 14-book synthesis within the same scope and budget. Trace the intended behaviour delta and threatened contracts first. Where relevant, inspect invariant enforcement, state ownership, ordering, partial failure, trust boundaries, compatibility, and whether tests observe the promised result rather than private machinery. Do not assume a mock proves an integration contract or a local transaction covers an external effect. Look for unsafe replay after ambiguous completion, unbounded capacity use, and failure hidden as success.
+
+For a concrete uncertainty, read `~/.pi/agent/skills/software-design/SKILL.md` and only its directly relevant section. Do not perform speculative architectural option selection or require a design essay. Combine design findings from all sources under the existing total cap of 3; that cap does not suppress correctness or security defects. Every design finding needs a concrete consequence and proportionate remedy. Distinguish introduced defects from pre-existing debt, and missing evidence from proven failure. One author's testing doctrine or pattern preference is not a defect. No findings is valid. If references are unavailable, use the embedded checks and disclose material limitations.
+
 ## Severity
 
 - `important`: a bug, security issue, secret leak, broken profile, data loss, or convention violation that should block the change.
