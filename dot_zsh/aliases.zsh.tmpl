@@ -8,7 +8,3 @@ alias pue='pi update --extensions'
 alias kgp='k get pods -A | grep'
 alias kk='k klock'
 {{- end }}
-{{- if .work }}
-alias wsu='brew fetch --HEAD --force work-scripts && brew upgrade --fetch-HEAD work-scripts'
-alias bb-review='$HOME/.pi/agent/skills/plannotator-bitbucket/bb-plannotator review'
-{{- end }}
