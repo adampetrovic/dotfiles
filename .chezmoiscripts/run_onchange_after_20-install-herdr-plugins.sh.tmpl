@@ -8,9 +8,15 @@ log_step "Installing Herdr plugins"
 PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 export PATH
 
-installed_plugins="$(herdr plugin list --plugin herdr-bar --json)"
-if ! printf '%s\n' "$installed_plugins" | grep -Eq '"plugin_id"[[:space:]]*:[[:space:]]*"herdr-bar"'; then
+install_plugin() {
+    local plugin_id="$1" repo="$2" installed
+    installed="$(herdr plugin list --plugin "$plugin_id" --json)"
     # Existing installs, including local links and disabled plugins, are left unchanged; updates are explicit via herdr plugin update.
-    herdr plugin install jeffarese/herdr-bar --yes
-fi
+    if ! printf '%s\n' "$installed" | grep -Eq '"plugin_id"[[:space:]]*:[[:space:]]*"'"$plugin_id"'"'; then
+        herdr plugin install "$repo" --yes
+    fi
+}
+
+install_plugin herdr-bar jeffarese/herdr-bar
+install_plugin annotate plannotator/herdr-annotate
 {{ end -}}
