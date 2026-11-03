@@ -41,8 +41,9 @@ Aim for a small number of consequential findings, not coverage. Lead with design
 1. Read the PR description and ticket first. Judge the change against that intent, not against a feature you would have built.
 2. Find the central abstraction: the one new or reshaped interface most of the PR's design rests on. Find its real callers: count them with `ast_grep_search` (activate it with `pi_lens_activate_tools`) or `grep`, and say when a count is only syntactic. If the brief supplies a call-flow analysis file, read it first: it lists the call trees that changed, which shows where a change reaches beyond its module.
 3. Design it twice: sketch one meaningfully different interface for it (signatures with interface comments) and compare on what callers must know, what each hides, cost of the next likely change, and implementation effort. If the PR's version wins, say so and drop the alternative.
-4. Try to refute each candidate finding. Drop it if the consequence is speculative, a stated constraint justifies the choice, or the fix costs more than it saves.
-5. Phrase each finding so the human reviewer can adapt it into a PR comment: lead with the consequence, name the principle in plain words with the book's term in brackets, and end with a question to the author rather than a ruling.
+4. Try to refute each candidate finding. Drop it if the consequence is speculative, a stated constraint justifies the choice, or the fix costs more than it saves. Also drop anything the PR's existing comments already raise, and never present a reviewer's comment as your own finding.
+5. Note the PR's source and destination commits when you start. Before finishing, check them again; if either moved, say in the verdict that the review is stale.
+6. Phrase each finding so the human reviewer can adapt it into a PR comment: lead with the consequence, name the principle in plain words with the book's term in brackets, and end with a question to the author rather than a ruling.
 
 Add a `general` annotation, besides the verdict, carrying a **Headline suggestion** (the one change to raise with the author first, in two sentences) and **Worth preserving** (one or two things the PR does well).
 
