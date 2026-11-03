@@ -1,0 +1,14 @@
+onboarding = false
+
+[keys]
+focus_pane_up = ""
+
+[[keys.command]]
+key = "prefix+k"
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "command bar"
+
+[theme]
+name = "gruvbox"
+auto_switch = false

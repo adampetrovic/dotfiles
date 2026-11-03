@@ -1,0 +1,16 @@
+{{ if (eq .chezmoi.os "darwin" "linux") -}}
+#!/usr/bin/env bash
+
+set -Eeuo pipefail
+{{ template "log.sh" . }}
+log_step "Installing Herdr plugins"
+
+PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PATH
+
+installed_plugins="$(herdr plugin list --plugin herdr-bar --json)"
+if ! printf '%s\n' "$installed_plugins" | grep -Eq '"plugin_id"[[:space:]]*:[[:space:]]*"herdr-bar"'; then
+    # Existing installs, including local links and disabled plugins, are left unchanged; updates are explicit via herdr plugin update.
+    herdr plugin install jeffarese/herdr-bar --yes
+fi
+{{ end -}}
