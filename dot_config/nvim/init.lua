@@ -1,5 +1,6 @@
 -- Basic Neovim config. Add plugins/panels incrementally.
 vim.g.mapleader = ","
+vim.g.markdown_recommended_style = 0 -- keep our own indent settings for markdown
 
 local o = vim.opt
 o.number = true
@@ -96,15 +97,29 @@ vim.api.nvim_create_autocmd("FileType", {
   callback = function()
     local map = function(mode, lhs, rhs) vim.keymap.set(mode, lhs, rhs, { buffer = true }) end
     vim.opt_local.conceallevel = 2
+    vim.opt_local.autoindent = false -- the <CR> mapping below copies the bullet indent itself
+    -- Logseq indents nested blocks with tabs; spaces show up an extra level deep there
+    if vim.fn.expand("%:p"):find(vim.fn.expand("~/code/logseq"), 1, true) == 1 then
+      vim.opt_local.expandtab = false
+      vim.opt_local.tabstop = 2
+      vim.opt_local.shiftwidth = 2
+    end
     vim.opt_local.foldmethod = "indent"
     vim.opt_local.foldlevel = 99
     vim.keymap.set("i", "<CR>", function()
       local line = vim.api.nvim_get_current_line()
       local indent = line:match("^(%s*)%- ")
-      if not indent then return "<CR>" end
-      if line:match("^%s*%- $") then return "<C-u>" end
-      return "<CR>" .. indent .. "- "
-    end, { buffer = true, expr = true })
+      local keys
+      if not indent then
+        keys = "<CR>"
+      elseif line:match("^%s*%- $") then
+        keys = "<C-u>"
+      else
+        keys = "<CR>" .. indent .. "- "
+      end
+      -- noremap + insert-at-front so literal tabs aren't re-mapped to <Tab>
+      vim.api.nvim_feedkeys(vim.keycode(keys), "ni", false)
+    end, { buffer = true })
     map("i", "<Tab>", "<C-t>")
     map("i", "<S-Tab>", "<C-d>")
     map("n", "<Tab>", ">>")
