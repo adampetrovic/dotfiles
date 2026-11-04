@@ -5,6 +5,7 @@ rectangle
 
 README.md
 AGENTS.md
+tests/personal-workflows.test.mjs
 tests/software-design.test.mjs
 
 {{ if .work -}}
@@ -19,4 +20,7 @@ tests/software-design.test.mjs
 .pi/agent/skills/ios-app
 .pi/agent/skills/surf
 .pi/agent/skills/telegram
+# Personal lightweight workflows are personal-only. On work, ~/.pi/agent/workflows belongs to the
+# private work-scripts package (see AGENTS.md), so chezmoi must not manage the directory or its permissions.
+.pi/agent/workflows
 {{ end -}}

@@ -62,6 +62,9 @@ Private skills must never be copied into this public repository or represented b
 2. The private formula packages all skill directories under `$(brew --prefix work-scripts)/share/work-scripts/pi-skills` and installs `bin/sync-pi-skills`.
 3. `.chezmoiscripts/run_after_11-update-work-scripts.sh.tmpl` fetches/upgrades HEAD and invokes the packaged reconciler.
 4. The reconciler links packaged skills into `~/.pi/agent/skills`, tracks owned links in `${XDG_STATE_HOME:-$HOME/.local/state}/chezmoi/work-pi-skills.manifest`, prunes only unchanged owned links, and preserves unrelated/personal skills.
+5. Packaged pi-workflows (`share/work-scripts/pi-workflows`: `*.workflow.ts` plus `lib/`) are copied, not linked, into `~/.pi/agent/workflows`, because pi-workflows ignores symlinked workflow files. Copies are hash-tracked in `work-pi-workflows.manifest` in the same state directory; a copy edited in place is kept and no longer updated. The workflow engine itself is the public `npm:@osolmaz/pi-workflows` package in `dot_pi/agent/modify_settings.json`, and its `piw` viewer is pinned to the same version in `dot_config/mise/config.toml.tmpl`.
+
+The lightweight personal workflows (`explore-loop`, `delivery-plan`, `plan-implement-loop` and `lib/personal.ts`, under `dot_pi/agent/workflows/`) are personal-profile only. `.chezmoiignore.tmpl` ignores the whole `.pi/agent/workflows` directory on work, because on work that directory belongs to the private work-scripts package and holds pi-workflows runtime state. Do not add shared workflow files there without checking both profiles. `tests/personal-workflows.test.mjs` checks the personal set and is never deployed.
 
 Run only the work-skills update with:
 

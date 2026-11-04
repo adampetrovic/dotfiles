@@ -25,6 +25,8 @@ ripgrep = 'latest'
 yq = 'latest'
 zoxide = 'latest'
 "cargo:https://tangled.sh/akashina.tngl.sh/jjc" = { version = "rev:bb71fdcd704e8bf4ddfac9ac0e3a036cab441b2c" }
+# piw: terminal viewer for pi-workflows. Must equal the npm @osolmaz/pi-workflows version in pi settings (0.17.7); bump both together.
+"cargo:pi-workflows" = "0.17.7"
 {{ if .work -}}
 java = 'corretto-17.0.15.6.1'
 databricks-cli = 'latest'
