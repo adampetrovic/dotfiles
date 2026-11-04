@@ -1,0 +1,30 @@
+{{/* chezmoi:modify-template */}}
+{{- /* Preferences are managed here; Plannotator's runtime state (inbox prompts, notification origin) is kept from the current file. */ -}}
+{{- $current := dict -}}
+{{- if .chezmoi.stdin -}}
+{{- $current = mustFromJson .chezmoi.stdin -}}
+{{- end -}}
+{{- $state := dict -}}
+{{- range $k := list "inboxSound" "inboxAgentNotes" "inboxNotifications" -}}
+{{- if hasKey $current $k }}{{ $_ := set $state $k (index $current $k) }}{{ end -}}
+{{- end -}}
+{{- $config := dict
+  "reviewAnalysis" (dict "semanticDiff" true "callFlow" true)
+  "diffOptions" (dict "fontFamily" "JetBrains Mono" "diffStyle" "split" "defaultDiffType" "merge-base")
+  "displayName" .full_name
+  "agentTool" true
+  "theme" (dict "mode" "light" "light" "plannotator" "dark" "plannotator")
+  "conventionalComments" true
+  "conventionalLabels" (list
+    (dict "label" "suggestion" "display" "suggestion" "blocking" true)
+    (dict "label" "nitpick" "display" "nit" "blocking" true)
+    (dict "label" "question" "display" "question" "blocking" true)
+    (dict "label" "issue" "display" "issue" "blocking" true)
+    (dict "label" "praise" "display" "praise" "blocking" false)
+    (dict "label" "thought" "display" "thought" "blocking" false)
+    (dict "label" "note" "display" "note" "blocking" false)
+    (dict "label" "todo" "display" "todo" "blocking" true))
+  "inboxTool" (dict "pi" false "claude-code" false)
+-}}
+{{- range $k, $v := $state }}{{ $_ := set $config $k $v }}{{ end -}}
+{{ toPrettyJson $config }}
