@@ -55,27 +55,3 @@ command = "zsh -c 'cd ~/code/logseq && f=journals/$(date +%Y_%m_%d).md && touch 
 width = "80%"
 height = "70%"
 description = "logseq journal"
-
-[[keys.command]]
-key = "prefix+a"
-type = "plugin_action"
-command = "annotate.capture"
-description = "annotate text"
-
-[[keys.command]]
-key = "prefix+d"
-type = "plugin_action"
-command = "annotate.open"
-description = "review documents in this folder"
-
-[[keys.command]]
-key = "prefix+shift+o"
-type = "plugin_action"
-command = "annotate.last"
-description = "review the agent's last reply"
-
-[[keys.command]]
-key = "prefix+ctrl+s"
-type = "plugin_action"
-command = "annotate.send-archive"
-description = "send annotations to the agent and archive them"
