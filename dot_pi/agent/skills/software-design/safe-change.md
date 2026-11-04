@@ -28,11 +28,34 @@ Refactoring directions are reversible choices. Extraction and inlining, hiding d
 
 Assess regression protection, resistance to harmless refactoring, feedback speed, and maintenance cost. Coverage highlights omissions but does not establish meaningful assertions. Test behaviours and invariants, boundaries, failures, and important integration assumptions. Avoid tests whose only value is proving that a private helper or incidental call sequence exists. [13, chs. 1, 4; 04, ch. 4.]
 
-Define a unit by the purpose and dependencies of the test, not automatically by one class. Several deterministic collaborators may form one behaviour-sized unit. Isolation can improve setup and localisation but can also freeze internal collaborations. Avoid universal historical speed thresholds; report actual cost and interference risks. [13, ch. 2; 06, ch. 2 and glossary.]
+Define a unit by the purpose and dependencies of the test, not automatically by one class. Several deterministic collaborators may form one behaviour-sized unit. Isolation can improve setup and localisation but can also freeze internal collaborations. Do not quote a universal speed threshold; report the actual runtime and what the test shares with others (database, clock, files, ports) that could make it interfere. [13, ch. 2; 06, ch. 2 and glossary.]
 
 Distinguish data supplied by stubs from outgoing effects checked by interaction assertions. Mocking internal reads often asserts intermediate implementation rather than useful behaviour. Assertions about external notifications or other supported outgoing contracts can be valuable. State why each double exists, what it proves, and which assumptions about the real dependency remain unverified. [13, chs. 5, 9; 06, ch. 3 “Sensing and Separation.”]
 
 Use integration evidence for persistence and other application-controlled infrastructure where its actual behaviour matters. A mock cannot establish database constraints, queries, or transaction semantics. If the environment is unavailable, report the gap and use whatever narrower checks remain useful rather than claiming integration success. [13, chs. 8, 10.]
+
+## Decide how many tests a change needs
+
+Count follows distinct behaviour, not lines or methods. A test earns its place when it adds regression protection that no existing test gives, at a maintenance cost the protection justifies. Each additional test that exercises an already-covered path adds cost and no protection. [13, chs. 1, 4.]
+
+- Give one test to each distinct outcome or branch, including failure, retry and boundary outcomes. Two inputs that take the same path are one case.
+- Extend the existing test of the changed unit before creating a new class. Create a new class for a new production unit.
+- Use a parameterised test only when the rows reach different paths or produce different outcomes. Rows that all hit one validation path are one row.
+- Skip getters, pass-through calls, constants, data-class equality and framework behaviour.
+- Before deleting a test as redundant, check that it does not cover a boundary or error branch that the others reach only by accident.
+
+Under-testing has the same signs in reverse: an untested boundary (limit, tolerance, empty and full), an untested failure of a dependency, or a flag with one branch covered. State the unprotected path when one remains.
+
+## Keep tests deterministic and honest about their data
+
+Practical additions, not drawn from a supplied book.
+
+- Inject clocks, identifiers and randomness. Do not sleep or depend on test order, and make asynchronous waits explicit. Mark a known-flaky test visibly and track it; do not disable it silently.
+- Check that a new test can fail. Revert the fix or break the behaviour and see the test fail, or confirm that it would. A test that passed before the change protects nothing about it.
+- Label fixtures built from an assumed contract. When the real format or protocol is unseen, record what was assumed and what has not been verified, and replace the fixture with a captured real sample as soon as one exists. Passing tests built on an assumed format show only that the code matches the assumption.
+- When a schema, wire format or flag changes behaviour for data that already exists, test reading old data with new code and, where rollout allows it, the reverse. Cover both branches of a flag and its default.
+- A fake or in-memory stand-in is trustworthy only if the same contract test also runs against the real dependency. Prefer strict doubles, which fail on unexpected calls, so drift shows up as a failure.
+- Name tests for the behaviour. Names and comments should not mention the ticket or "new" or "fixed" behaviour; when behaviour changes, edit the old expectation instead of adding a contradicting test.
 
 ## Separate decisions from effects when useful
 

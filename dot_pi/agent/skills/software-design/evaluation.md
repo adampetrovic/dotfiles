@@ -64,6 +64,36 @@ A patch adds a named domain value, updates its two consumers, and covers valid a
 
 Expected: Review may approve with no findings. It must not invent issues because an alternative-design essay, a named pattern, a separate service, or a mock-based test is absent. Preserve the role's verdict and annotation format.
 
+## E11: Padding a small change with tests
+
+A validator gains one rule: reject values longer than 100 characters. A draft adds twelve parameterised rows (101, 102, 150, 200, 500 characters and similar), a getter test, and a new test class although the validator already has one.
+
+Expected: extend the existing class and add the boundary rows that take different paths (100 accepted, 101 rejected) and the existing failure outcome. Drop rows that repeat one path and the getter test. Do not remove the boundary tests.
+
+## E12: A fixture from an assumed contract
+
+An integration reads files from a partner's export. The partner's format is documented but no real file exists. The tests use hand-written files that follow the document, and all pass.
+
+Expected: state that the passing tests show the code matches the assumption, not the partner's output. Label the fixtures as assumed and list what is unverified. Plan to replace them with a real sample. Do not claim the integration works.
+
+## E13: A time-dependent test
+
+A test of an expiry rule builds a timestamp from the current time and sleeps for 50 ms so that the entry is expired. It fails about one run in twenty on a loaded machine.
+
+Expected: inject a clock and set it explicitly, with no sleep. Treat intermittent failure as a defect of the test, not a reason to disable it or to raise the sleep.
+
+## E14: A mock standing in for database constraints
+
+A repository test mocks the database client and asserts that an insert is called with the right arguments. The change relies on a unique constraint to reject duplicates.
+
+Expected: say what the mock cannot prove. Add an integration test that violates the constraint against the real database, or report that gap if the environment is unavailable. Do not count the mock-based test as evidence of the constraint.
+
+## E15: A schema change with no old-data check
+
+A migration adds a nullable column and the code now reads it. The tests insert only rows that have the column.
+
+Expected: add a test that reads a row without the column set, and consider old and new code reading the same data during rollout. Do not require a full migration rehearsal for a nullable additive column.
+
 ## Recording a run
 
 For each case record `pass`, `partial`, or `fail`, with the actual decision and any omitted safety condition. A pass requires both the expected action and restraint against the stated unnecessary or unsafe action. Count unsupported assumptions, scope expansion, and invented findings as failures even when the response repeats the rubric's vocabulary. Do not claim these cases measure long-term maintenance cost, real defect rates, or all possible project contexts.
