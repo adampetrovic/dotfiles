@@ -45,7 +45,7 @@ height = "70%"
 description = "floating zsh"
 
 [[keys.command]]
-key = "prefix+ctrl+j"
+key = "prefix+shift+j"
 type = "popup"
 command = "jjui"
 width = "80%"

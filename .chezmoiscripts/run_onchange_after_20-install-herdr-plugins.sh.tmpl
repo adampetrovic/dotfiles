@@ -8,14 +8,17 @@ log_step "Installing Herdr plugins"
 PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
 export PATH
 
-install_plugin() {
-    local plugin_id="$1" repo="$2" installed
-    installed="$(herdr plugin list --plugin "$plugin_id" --json)"
-    # Existing installs, including local links and disabled plugins, are left unchanged; updates are explicit via herdr plugin update.
-    if ! printf '%s\n' "$installed" | grep -Eq '"plugin_id"[[:space:]]*:[[:space:]]*"'"$plugin_id"'"'; then
+# Herdr plugins to install (GitHub owner/repo), one per line.
+plugins=(
+    jeffarese/herdr-bar
+)
+
+# Anything already installed (including local links and disabled plugins) is
+# left alone; update explicitly with `herdr plugin update`.
+installed="$(herdr plugin list --json)"
+for repo in "${plugins[@]}"; do
+    if ! grep -q "\"repo\":\"${repo#*/}\"" <<<"$installed" || ! grep -q "\"owner\":\"${repo%/*}\"" <<<"$installed"; then
         herdr plugin install "$repo" --yes
     fi
-}
-
-install_plugin herdr-bar jeffarese/herdr-bar
+done
 {{ end -}}
