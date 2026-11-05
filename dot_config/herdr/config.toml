@@ -11,6 +11,10 @@ tab_bar_right = [
   { type = "datetime", format = "%H:%M" },
 ]
 
+[ui.toast]
+delivery = "system"
+delay_seconds = 0
+
 [theme]
 name = "gruvbox"
 auto_switch = false
