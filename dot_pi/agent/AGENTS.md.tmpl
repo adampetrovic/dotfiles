@@ -22,6 +22,14 @@ When asked to work on a project:
 - Reviewing a change or diff: delegate to the `Review` subagent.
 - Assessing the design of existing code (a module, package, or directory, not a diff): delegate to the `Audit` subagent.
 
+## Editing Files
+
+- Modify files with the `edit` tool, batching disjoint changes to one file in a single call. Use `write` only for new files or full rewrites.
+- Never edit files through `python`/`sed`/`perl` heredocs or scripts. They bypass pi-lens diagnostics and the read guard, and cost far more context than an `edit` call.
+- For a large block, `read` the range first, then `edit` with the full old text. If `edit` fails on uniqueness, widen `oldText` with a nearby unique line; do not fall back to a script.
+- Use `ast_grep_replace` (activate via `pi_lens_activate_tools`) for structural changes across many files; `sed -i` is acceptable only for a simple mechanical rename.
+- Use `codemode` to batch independent reads/searches and filter output, not to edit files.
+
 ## Version Control
 
 - Prefer Jujutsu (`jj`) over raw `git` for all version-control operations whenever a repository has a `.jj/` directory or otherwise supports jj.
