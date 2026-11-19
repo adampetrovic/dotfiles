@@ -24,11 +24,18 @@ When asked to work on a project:
 
 ## Editing Files
 
-- Modify files with the `edit` tool, batching disjoint changes to one file in a single call. Use `write` only for new files or full rewrites.
-- Never edit files through `python`/`sed`/`perl` heredocs or scripts. They bypass pi-lens diagnostics and the read guard, and cost far more context than an `edit` call.
-- For a large block, `read` the range first, then `edit` with the full old text. If `edit` fails on uniqueness, widen `oldText` with a nearby unique line; do not fall back to a script.
-- Use `ast_grep_replace` (activate via `pi_lens_activate_tools`) for structural changes across many files; `sed -i` is acceptable only for a simple mechanical rename.
-- Use `codemode` to batch independent reads/searches and filter output, not to edit files.
+- Modify existing files with the `edit` tool: one call per file, with every disjoint change as a separate `edits[]` entry. Create files with `write`; use it on an existing file only for a full rewrite.
+- Never modify files through `python`/`sed`/`perl`/`awk` scripts, heredoc find-and-replace, `s.index(...)` slicing, or `cat > file <<EOF` over an existing file. They bypass pi-lens diagnostics and the read guard, skip the exact-match check, and cost far more context than an `edit` call.
+- Before editing, `read` (or `read_symbol`/`read_enclosing`) the region with the pi tools, not `cat`/`sed -n` via bash. The read guard rejects an `edit` on a file that was only read through bash.
+- For a large block, `read` the range, then `edit` with the full old text. If `edit` fails on uniqueness, widen `oldText` with a nearby unique line; never fall back to a script.
+- Use `ast_grep_replace` (activate via `pi_lens_activate_tools`) for structural changes across many files. `sed -i` is acceptable only for a single mechanical rename.
+
+## Codemode
+
+- Default to `codemode` whenever two or more tool calls are needed and the later ones don't depend on a model decision: batch independent reads, searches and status checks in one script with `Promise.allSettled`, and chain dependent steps inside the script.
+- Filter in the script (`grep`, slice, summarise, count) and return only what is needed, so large output never enters the context. Prefer it over several sequential `bash`/`read` turns.
+- Inside codemode, use `tools.edit`/`tools.write` for file changes (batch edits across files in one script). Do not shell out to scripts to patch files.
+- Use a single direct tool call when only one call is needed.
 
 ## Version Control
 
