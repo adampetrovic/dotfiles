@@ -9,7 +9,7 @@
   "lastChangelogVersion": {{ index $current "lastChangelogVersion" | toJson }},
 {{- end }}
   "defaultProvider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
-  "defaultModel": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-sonnet-5-5{{ end }}",
+  "defaultModel": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-opus-5-5{{ end }}",
   "defaultThinkingLevel": "medium",
   "defaultTools": [
       "+codemode"

@@ -4,12 +4,12 @@
   "modes": {
     "default": {
       "provider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
-      "modelId": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-sonnet-5-5{{ end }}",
+      "modelId": "{{ if .personal }}gpt-6.1-sol{{ else }}claude-opus-5-5{{ end }}",
       "thinkingLevel": "medium"
     },
     "plan": {
       "provider": "{{ if .personal }}openai-codex{{ else }}anthropic{{ end }}",
-      "modelId": "{{ if .personal }}gpt-6-astra{{ else }}claude-opus-5-5{{ end }}",
+      "modelId": "{{ if .personal }}gpt-6-astra{{ else }}claude-fable-5-2{{ end }}",
       "thinkingLevel": "medium"
     },
     "fast": {
